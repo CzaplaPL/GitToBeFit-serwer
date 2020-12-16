@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/GitToBeFit-serwer.iml" filepath="$PROJECT_DIR$/.idea/GitToBeFit-serwer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/PROJEKT.iml" filepath="$PROJECT_DIR$/PROJEKT.iml" />
     </modules>
   </component>
 </project>

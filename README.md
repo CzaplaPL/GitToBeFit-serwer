@@ -1,1 +1,0 @@
-# GitToBeFit-serwer
