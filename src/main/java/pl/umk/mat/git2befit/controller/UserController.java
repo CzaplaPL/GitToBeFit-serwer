@@ -1,7 +1,6 @@
 package pl.umk.mat.git2befit.controller;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
@@ -32,6 +31,17 @@ public class UserController {
         return userRepository.findById(id);
     }
 
+
+    @GetMapping("/{email}")
+    public User getUserByEmail(@PathVariable String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * @param id variable sent in path of request
+     * @param user object sent from the application in JSON file as the body of request
+     * author KacperCzajkowski
+     */
     @PutMapping("/{id}")
     public void update(@PathVariable long id,
                         @RequestBody User user){
