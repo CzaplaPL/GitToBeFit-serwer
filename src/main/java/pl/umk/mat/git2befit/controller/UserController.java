@@ -25,9 +25,34 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userRepository.save(user);
     }
+
     @GetMapping("/{id}")
     public Optional<User> getUser(@PathVariable long id){
         return userRepository.findById(id);
     }
 
+
+    @GetMapping("/{email}")
+    public User getUserByEmail(@PathVariable String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    /**
+     * @param id variable sent in path of request
+     * @param user object sent from the application in JSON file as the body of request
+     * author KacperCzajkowski
+     */
+    @PutMapping("/{id}")
+    public void update(@PathVariable long id,
+                        @RequestBody User user){
+        Optional<User> userFromTheDB = userRepository.findById(id);
+        if (userFromTheDB.isEmpty()) {
+            //TODO Tu do rzucenia wyjątek ale nie wiem jaki (Kacper)
+        } else {
+            User tempUser = userFromTheDB.get();
+            tempUser.setEmail(user.getEmail());
+            tempUser.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(tempUser);
+        }
+    }
 }
