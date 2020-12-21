@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
+import java.util.Optional;
+
 import static java.util.Collections.emptyList;
 
 @Service
@@ -22,10 +24,11 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        pl.umk.mat.git2befit.model.User user = userRepository.findByEmail(email);
-        if (user == null) {
+        Optional<pl.umk.mat.git2befit.model.User> foundUser = userRepository.findByEmail(email);
+        if (foundUser.isEmpty()) {
             throw new UsernameNotFoundException(email);
         }
+        pl.umk.mat.git2befit.model.User user = foundUser.get();
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), emptyList());
 
 

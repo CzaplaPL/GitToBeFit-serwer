@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.model;
 
+import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
