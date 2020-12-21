@@ -1,10 +1,13 @@
 package pl.umk.mat.git2befit.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
+import java.net.URI;
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -15,44 +18,49 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
 
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository,
+                          PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @PostMapping("/signup")
-    public void signUp(@RequestBody User user){
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
+    public ResponseEntity<?> signUp(@RequestBody User user) {
+        try {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            User tmp = userRepository.save(user);
+            return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
     @GetMapping("/{id}")
-    public Optional<User> getUser(@PathVariable long id){
-        return userRepository.findById(id);
-    }
-
-
-    @GetMapping("/{email}")
-    public User getUserByEmail(@PathVariable String email) {
-        return userRepository.findByEmail(email);
+    public ResponseEntity<User> getUser(@PathVariable long id) {
+        Optional<User> foundUser = userRepository.findById(id);
+        return foundUser.isPresent() ?
+                ResponseEntity.ok(foundUser.get()) :
+                ResponseEntity.notFound().build();
     }
 
     /**
-     * @param id variable sent in path of request
+     * @param id   variable sent in path of request
      * @param user object sent from the application in JSON file as the body of request
-     * author KacperCzajkowski
+     *             author KacperCzajkowski
      */
     @PutMapping("/{id}")
-    public void update(@PathVariable long id,
-                        @RequestBody User user){
+    public ResponseEntity<?> update(@PathVariable long id,
+                                    @RequestBody User user) {
         Optional<User> userFromTheDB = userRepository.findById(id);
         if (userFromTheDB.isEmpty()) {
-            //TODO Tu do rzucenia wyjątek ale nie wiem jaki (Kacper)
+            return ResponseEntity.notFound()
+                    .build();
         } else {
             User tempUser = userFromTheDB.get();
             tempUser.setEmail(user.getEmail());
             tempUser.setPassword(passwordEncoder.encode(user.getPassword()));
             userRepository.save(tempUser);
+            return ResponseEntity.ok().build();
         }
     }
 }
