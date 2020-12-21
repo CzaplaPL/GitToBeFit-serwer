@@ -1,17 +1,20 @@
 package pl.umk.mat.git2befit.controller;
 
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
+import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
+import pl.umk.mat.git2befit.googleLoginAPI.GoogleLogin;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
 import java.net.URI;
-import java.security.Principal;
 import java.util.Optional;
+
+import static pl.umk.mat.git2befit.security.SecurityConstraints.HEADER_STRING;
+import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
 
 @RestController
 @RequestMapping("/user")
@@ -19,12 +22,22 @@ public class UserController {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private GoogleLogin googleLogin;
 
-
-    public UserController(UserRepository userRepository,
-                          PasswordEncoder passwordEncoder) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, GoogleLogin googleLogin) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.googleLogin = googleLogin;
+    }
+
+    @GetMapping("/login/google/{idToken}")
+    public ResponseEntity<?> loginWithGoogle(@PathVariable String idToken){
+        Optional<String> tokenJWT = googleLogin.LoginUserWithGoogleToken(idToken);
+        if(tokenJWT.isPresent()){
+            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT.get()).build();
+        }else
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+
     }
 
     @PostMapping("/signup")
@@ -62,10 +75,10 @@ public class UserController {
             User tempUser = userFromTheDB.get();
             tempUser.setEmail(user.getEmail());
             tempUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            try{
+            try {
                 userRepository.save(tempUser);
-            }catch (DataIntegrityViolationException e){
-                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            } catch (DataIntegrityViolationException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
 
             return ResponseEntity.status(HttpStatus.OK).build();
