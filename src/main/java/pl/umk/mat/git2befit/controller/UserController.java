@@ -1,5 +1,8 @@
 package pl.umk.mat.git2befit.controller;
 
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
@@ -46,7 +49,7 @@ public class UserController {
     /**
      * @param id   variable sent in path of request
      * @param user object sent from the application in JSON file as the body of request
-     *             author KacperCzajkowski
+     * @author KacperCzajkowski
      */
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable long id,
@@ -59,8 +62,13 @@ public class UserController {
             User tempUser = userFromTheDB.get();
             tempUser.setEmail(user.getEmail());
             tempUser.setPassword(passwordEncoder.encode(user.getPassword()));
-            userRepository.save(tempUser);
-            return ResponseEntity.ok().build();
+            try{
+                userRepository.save(tempUser);
+            }catch (DataIntegrityViolationException e){
+                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+
+            return ResponseEntity.status(HttpStatus.OK).build();
         }
     }
 }
