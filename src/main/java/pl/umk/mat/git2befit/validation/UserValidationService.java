@@ -24,6 +24,7 @@ public class UserValidationService {
     private boolean validatePassword(String password) {
         return password.matches(this.passwordRegex);
     }
+
     public boolean validateUser(User user) {
         return  validateUserId(user.getId()) &&
                 validateEmail(user.getEmail()) &&

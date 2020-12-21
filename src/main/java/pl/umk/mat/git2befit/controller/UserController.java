@@ -7,6 +7,7 @@ import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
 import java.net.URI;
+import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -25,23 +26,21 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody User user) {
-        Optional<User> foundUser = userRepository.findByEmail(user.getEmail());
-        if (foundUser.isEmpty()) {
+        try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User tmp = userRepository.save(user);
             return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().build();
         }
-        return ResponseEntity.badRequest().build();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable long id) {
         Optional<User> foundUser = userRepository.findById(id);
-        if (foundUser.isPresent()) {
-            return ResponseEntity.ok(foundUser.get());
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return foundUser.isPresent() ?
+                ResponseEntity.ok(foundUser.get()) :
+                ResponseEntity.notFound().build();
     }
 
     /**
