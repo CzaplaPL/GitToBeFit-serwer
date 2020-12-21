@@ -5,16 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
 import pl.umk.mat.git2befit.googleLoginAPI.GoogleLogin;
+import pl.umk.mat.git2befit.model.GoogleUser;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
 import java.net.URI;
 import java.util.Optional;
-
-import static pl.umk.mat.git2befit.security.SecurityConstraints.HEADER_STRING;
-import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
 
 @RestController
 @RequestMapping("/user")
@@ -30,14 +27,9 @@ public class UserController {
         this.googleLogin = googleLogin;
     }
 
-    @GetMapping("/login/google/{idToken}")
-    public ResponseEntity<?> loginWithGoogle(@PathVariable String idToken){
-        Optional<String> tokenJWT = googleLogin.LoginUserWithGoogleToken(idToken);
-        if(tokenJWT.isPresent()){
-            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT.get()).build();
-        }else
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-
+    @PostMapping("/login/google")
+    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleUser googleUser){
+        return googleLogin.LoginUserWithGoogleToken(googleUser.getIdToken());
     }
 
     @PostMapping("/signup")

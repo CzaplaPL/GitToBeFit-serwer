@@ -10,6 +10,8 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -21,8 +23,8 @@ import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Optional;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.EXPIRATION_TIME;
-import static pl.umk.mat.git2befit.security.SecurityConstraints.SECRET;
+import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
+import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
 
 @Service
 public class GoogleLogin {
@@ -36,13 +38,14 @@ public class GoogleLogin {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public Optional<String> LoginUserWithGoogleToken(String idTokenString){
+    public ResponseEntity<?> LoginUserWithGoogleToken(String idTokenString){
         Optional<Payload> payload = verifyToken(idTokenString);
         if (payload.isPresent()){
             createUserIfNotExists(payload.get());
-            return Optional.of(generateJWT(payload.get()));
+            String tokenJWT = generateJWT(payload.get());
+            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
         }else {
-            return Optional.empty();
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
 
