@@ -7,6 +7,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Date;
 import java.util.Optional;
+import java.util.Random;
 
 import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
 import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
@@ -59,7 +61,7 @@ public class GoogleLogin {
     private void createUserIfNotExists(Payload payload) {
         Optional<User> user = userRepository.findByEmail(payload.getEmail());
         if(user.isEmpty()){
-            String encodedPassword = encodePassword((String) payload.get("sub"));
+            String encodedPassword = encodePassword(new RandomString(10).nextString());
             userRepository.save(new User(payload.getEmail(), encodedPassword));
         }
     }
