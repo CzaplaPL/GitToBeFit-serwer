@@ -1,10 +1,11 @@
-package pl.umk.mat.git2befit;
+package pl.umk.mat.git2befit.messaging.email;
 
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 
+//TODO komentarz
 public class EmailMessage {
     private Email email;
 
@@ -61,6 +62,5 @@ public class EmailMessage {
         } else {
             throw new IllegalStateException("Not initalized email can't be sent");
         }
-
     }
 }
