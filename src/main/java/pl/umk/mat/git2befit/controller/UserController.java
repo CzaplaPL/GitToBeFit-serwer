@@ -7,7 +7,6 @@ import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
 import java.net.URI;
-import java.security.Principal;
 import java.util.Optional;
 
 @RestController
@@ -63,4 +62,6 @@ public class UserController {
             return ResponseEntity.ok().build();
         }
     }
+
+
 }
