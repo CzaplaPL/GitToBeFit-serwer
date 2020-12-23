@@ -5,12 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.LoginAPI.FacebookLogin;
-import pl.umk.mat.git2befit.LoginAPI.GoogleLogin;
+import pl.umk.mat.git2befit.service.LoginAPI.FacebookLogin;
+import pl.umk.mat.git2befit.service.LoginAPI.GoogleLogin;
 import pl.umk.mat.git2befit.model.FacebookAuthModel;
 import pl.umk.mat.git2befit.model.GoogleAuthModel;
-import pl.umk.mat.git2befit.model.User;
+import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.PasswordUpdateForm;
 import pl.umk.mat.git2befit.repository.UserRepository;
+import pl.umk.mat.git2befit.service.UserService;
 
 import java.net.URI;
 import java.util.Optional;
@@ -23,12 +25,15 @@ public class UserController {
     private PasswordEncoder passwordEncoder;
     private GoogleLogin googleLogin;
     private FacebookLogin facebookLogin;
+    private UserService userService;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, GoogleLogin googleLogin, FacebookLogin facebookLogin) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, GoogleLogin googleLogin,
+                          FacebookLogin facebookLogin, UserService userService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.googleLogin = googleLogin;
         this.facebookLogin = facebookLogin;
+        this.userService = userService;
     }
 
     @PostMapping("/login/facebook")
@@ -58,6 +63,11 @@ public class UserController {
         return foundUser.isPresent() ?
                 ResponseEntity.ok(foundUser.get()) :
                 ResponseEntity.notFound().build();
+    }
+
+    @PutMapping("/{id}/passwordUpdate")
+    public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody PasswordUpdateForm form){
+        return userService.updatePassword(id, form);
     }
 
     /**

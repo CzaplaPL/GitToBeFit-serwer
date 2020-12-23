@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.LoginAPI;
+package pl.umk.mat.git2befit.service.LoginAPI;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.User;
+import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 

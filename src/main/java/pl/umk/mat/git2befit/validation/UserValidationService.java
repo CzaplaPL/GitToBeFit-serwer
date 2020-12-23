@@ -1,9 +1,7 @@
 package pl.umk.mat.git2befit.validation;
 
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.User;
+import pl.umk.mat.git2befit.model.Entity.User;
 
 @Service
 public class UserValidationService {
