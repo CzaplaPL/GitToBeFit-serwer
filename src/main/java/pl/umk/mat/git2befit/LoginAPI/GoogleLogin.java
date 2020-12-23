@@ -1,7 +1,5 @@
-package pl.umk.mat.git2befit.googleLoginAPI;
+package pl.umk.mat.git2befit.LoginAPI;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -9,21 +7,15 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
+import pl.umk.mat.git2befit.security.JWTGenerator;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.Date;
 import java.util.Optional;
-import java.util.Random;
 
 import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
 import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
@@ -44,18 +36,11 @@ public class GoogleLogin {
         Optional<Payload> payload = verifyToken(idTokenString);
         if (payload.isPresent()){
             createUserIfNotExists(payload.get());
-            String tokenJWT = generateJWT(payload.get());
+            String tokenJWT = JWTGenerator.generate(payload.get().getEmail());
             return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
         }else {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-    }
-
-    private String generateJWT(Payload payload) {
-        return  JWT.create()
-                .withSubject((payload.getEmail()))
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(Algorithm.HMAC256(SECRET.getBytes()));
     }
 
     private void createUserIfNotExists(Payload payload) {
@@ -67,6 +52,7 @@ public class GoogleLogin {
     }
 
     private String encodePassword(String password) {
+
         return passwordEncoder.encode(password);
     }
 

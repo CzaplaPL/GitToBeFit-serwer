@@ -1,12 +1,8 @@
 package pl.umk.mat.git2befit.model;
 
 
-public class GoogleUser {
+public class GoogleAuthModel {
     private String idToken;
-
-    public GoogleUser(String idToken) {
-        this.idToken = idToken;
-    }
 
     public String getIdToken() {
         return idToken;

@@ -5,8 +5,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.googleLoginAPI.GoogleLogin;
-import pl.umk.mat.git2befit.model.GoogleUser;
+import pl.umk.mat.git2befit.LoginAPI.FacebookLogin;
+import pl.umk.mat.git2befit.LoginAPI.GoogleLogin;
+import pl.umk.mat.git2befit.model.FacebookAuthModel;
+import pl.umk.mat.git2befit.model.GoogleAuthModel;
 import pl.umk.mat.git2befit.model.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 
@@ -20,16 +22,23 @@ public class UserController {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private GoogleLogin googleLogin;
+    private FacebookLogin facebookLogin;
 
-    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, GoogleLogin googleLogin) {
+    public UserController(UserRepository userRepository, PasswordEncoder passwordEncoder, GoogleLogin googleLogin, FacebookLogin facebookLogin) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.googleLogin = googleLogin;
+        this.facebookLogin = facebookLogin;
+    }
+
+    @PostMapping("/login/facebook")
+    public ResponseEntity<?> loginWithFacebook(@RequestBody FacebookAuthModel fbModel){
+        return facebookLogin.loginWithFacebookToken(fbModel.getToken());
     }
 
     @PostMapping("/login/google")
-    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleUser googleUser){
-        return googleLogin.LoginUserWithGoogleToken(googleUser.getIdToken());
+    public ResponseEntity<?> loginWithGoogle(@RequestBody GoogleAuthModel googleAuthModel){
+        return googleLogin.LoginUserWithGoogleToken(googleAuthModel.getIdToken());
     }
 
     @PostMapping("/signup")

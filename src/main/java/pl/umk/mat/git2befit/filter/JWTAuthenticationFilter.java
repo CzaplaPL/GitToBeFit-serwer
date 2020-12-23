@@ -9,6 +9,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import pl.umk.mat.git2befit.model.User;
+import pl.umk.mat.git2befit.security.JWTGenerator;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -45,10 +46,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
-        String token = JWT.create()
-                .withSubject(((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername())
-                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .sign(Algorithm.HMAC256(SECRET.getBytes()));
+        String token = JWTGenerator.generate((((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername()));
         response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
     }
 }
