@@ -5,10 +5,19 @@ import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 
-//TODO komentarz
+/**
+ * The {@code EmailMessage} class allow sending emails.
+ *
+ * @implNote To create {@code EmailMessage} object you have to use Builder class.
+ * @author Kacper
+ */
 public class EmailMessage {
     private Email email;
 
+    /**
+     * Builder class allows to create new EmailMessage object.
+     * You have to execute all subject, message and address methods.
+     */
     public static final class Builder {
         private String subject;
         private String message;
@@ -44,11 +53,11 @@ public class EmailMessage {
             tmp.setMsg(this.message);
             tmp.addTo(this.address);
 
-            tmp.setHostName(this.HOST_NAME);
-            tmp.setSmtpPort(this.SMTP_PORT);
-            tmp.setAuthenticator(this.AUTHENTICATOR);
+            tmp.setHostName(HOST_NAME);
+            tmp.setSmtpPort(SMTP_PORT);
+            tmp.setAuthenticator(AUTHENTICATOR);
             tmp.setSSLOnConnect(true);
-            tmp.setFrom(this.SERVER_EMAIL);
+            tmp.setFrom(SERVER_EMAIL);
 
             EmailMessage msg = new EmailMessage();
             msg.email = tmp;
@@ -56,6 +65,10 @@ public class EmailMessage {
         }
     }
 
+    /**
+     * Send initialized email.
+     * @throws EmailException If message could not be sent, {@code EmailException} will be thrown.
+     */
     public void sendEmail() throws EmailException {
         if (email != null) {
             email.send();

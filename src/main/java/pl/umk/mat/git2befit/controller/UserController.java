@@ -20,8 +20,8 @@ import java.util.Optional;
 @RequestMapping("/user")
 public class UserController {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
 
     public UserController(UserRepository userRepository,
@@ -44,17 +44,17 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<User> getUser(@PathVariable long id) {
         Optional<User> foundUser = userRepository.findById(id);
-        return foundUser.isPresent() ?
-                ResponseEntity.ok(foundUser.get()) :
-                ResponseEntity.notFound().build();
+        return foundUser.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     @GetMapping("/search/{email}")
     public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
-        return foundUser.isPresent() ?
-                ResponseEntity.ok(foundUser.get()) :
-                ResponseEntity.notFound().build();
+        return foundUser.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 
     @PutMapping("/{id}")
