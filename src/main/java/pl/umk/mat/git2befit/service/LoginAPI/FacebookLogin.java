@@ -13,6 +13,7 @@ import pl.umk.mat.git2befit.model.FacebookUser;
 import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
+import pl.umk.mat.git2befit.security.PasswordGenerator;
 
 import java.util.Optional;
 
@@ -59,7 +60,7 @@ public class FacebookLogin {
 
     private void createUserIfNotExists(FacebookUser facebookUser, Optional<User> userOptional) {
         if (userOptional.isEmpty()){
-            userRepository.save(new User(facebookUser.getEmail(), encodePassword(new RandomString(10).nextString())));
+            userRepository.save(new User(facebookUser.getEmail(), encodePassword(PasswordGenerator.generateRandomPassword())));
         }
     }
 

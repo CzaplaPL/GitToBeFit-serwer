@@ -9,11 +9,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
 import pl.umk.mat.git2befit.messaging.email.EmailMessage;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
 import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.model.PasswordUpdateForm;
 import pl.umk.mat.git2befit.repository.UserRepository;
+import pl.umk.mat.git2befit.security.PasswordGenerator;
+import pl.umk.mat.git2befit.validation.UserValidationService;
 
 import java.net.URI;
 import java.util.Optional;
@@ -22,14 +25,16 @@ import java.util.Optional;
 public class UserService {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private UserValidationService userValidationService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserValidationService userValidationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.userValidationService = userValidationService;
     }
 
-    public ResponseEntity updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
+    public ResponseEntity<?> updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
         Optional<User> savedUserOptional = userRepository.findById(id);
         if (savedUserOptional.isEmpty())
             return ResponseEntity.notFound().build();
@@ -37,6 +42,11 @@ public class UserService {
         boolean isEquals = compareEmailAndPassword(savedUserOptional.get(), passwordUpdateForm);
 
         if (isEquals) {
+            try {
+                userValidationService.validatePassword(passwordUpdateForm.getNewPassword());
+            } catch (WeakPasswordException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
+            }
             User user = savedUserOptional.get();
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
 
@@ -62,10 +72,16 @@ public class UserService {
 
     public ResponseEntity<?> registerUserFromApp(User user) {
         try {
+            userValidationService.validateUser(user);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User tmp = userRepository.save(user);
             return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
-        } catch (Exception e) {
+        } catch (EmailException | WeakPasswordException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
+        } catch (DataIntegrityViolationException e){
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicate entry").build();
+        }catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
     }
@@ -90,16 +106,13 @@ public class UserService {
         if (dbUser.isEmpty()) {
             response = ResponseEntity.notFound().build();
         } else {
-            String newPassword = RandomString.make(10);
+            String newPassword = PasswordGenerator.generateRandomPassword().substring(0,14);
             String message = MessageGenerator.getPasswordChangingMessage(newPassword);
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
             try {
                 userRepository.save(user);
-            } catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
-            }
-            try {
+
                 EmailMessage emailMessage = new EmailMessage.Builder()
                         .address(email)
                         .subject("Przypomnienie hasła")
@@ -107,6 +120,8 @@ public class UserService {
                         .build();
                 emailMessage.sendEmail();
                 response = ResponseEntity.ok().build();
+            }catch (DataIntegrityViolationException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
             } catch (EmailException e) {
                 response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
             }

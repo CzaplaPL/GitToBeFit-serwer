@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
+import pl.umk.mat.git2befit.security.PasswordGenerator;
 
 import java.util.Optional;
 
@@ -46,7 +47,7 @@ public class GoogleLogin {
     private void createUserIfNotExists(Payload payload) {
         Optional<User> user = userRepository.findByEmail(payload.getEmail());
         if(user.isEmpty()){
-            String encodedPassword = encodePassword(new RandomString(10).nextString());
+            String encodedPassword = encodePassword(PasswordGenerator.generateRandomPassword());
             userRepository.save(new User(payload.getEmail(), encodedPassword));
         }
     }
@@ -59,7 +60,7 @@ public class GoogleLogin {
     private Optional<Payload> verifyToken(String idTokenString){
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).build();
 
-        GoogleIdToken idToken = null;
+        GoogleIdToken idToken;
         try {
             idToken = verifier.verify(idTokenString);
             return Optional.ofNullable(idToken.getPayload());
