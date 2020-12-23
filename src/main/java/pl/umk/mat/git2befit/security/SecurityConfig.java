@@ -15,7 +15,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
 import pl.umk.mat.git2befit.filter.JWTAuthorizationFilter;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.SIGN_UP_URL;
+import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
@@ -31,7 +31,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+                .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))

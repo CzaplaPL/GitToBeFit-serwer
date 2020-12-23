@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.model;
+package pl.umk.mat.git2befit.model.Entity;
 
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 
