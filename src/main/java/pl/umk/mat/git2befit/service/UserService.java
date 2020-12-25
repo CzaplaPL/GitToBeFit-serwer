@@ -86,9 +86,8 @@ public class UserService {
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
         Optional<User> dbUser = userRepository.findByEmail(email);
-        ResponseEntity<?> response;
         if (dbUser.isEmpty()) {
-            response = ResponseEntity.notFound().build();
+            return ResponseEntity.notFound().build();
         } else {
             String newPassword = RandomString.make(10);
             String message = MessageGenerator.getPasswordChangingMessage(newPassword);
@@ -106,12 +105,11 @@ public class UserService {
                         .message(message)
                         .build();
                 emailMessage.sendEmail();
-                response = ResponseEntity.ok().build();
+                return ResponseEntity.ok().build();
             } catch (EmailException e) {
-                response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+                return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
             }
         }
-        return response;
     }
 
     public ResponseEntity<?> deleteUser(long id) {
