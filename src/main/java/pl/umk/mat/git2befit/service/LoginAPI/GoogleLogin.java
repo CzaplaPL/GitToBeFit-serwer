@@ -40,7 +40,7 @@ public class GoogleLogin {
             String tokenJWT = JWTGenerator.generate(payload.get().getEmail());
             return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
         }else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            return ResponseEntity.badRequest().build();
         }
     }
 

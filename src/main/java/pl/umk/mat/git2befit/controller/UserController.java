@@ -51,13 +51,13 @@ public class UserController {
         return userService.getUserByEmail(email);
     }
 
-    @PutMapping("/{id}/passwordUpdate")
+    @PutMapping("/{id}/password-update")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody PasswordUpdateForm form) {
         return userService.updatePassword(id, form);
     }
 
-    @PostMapping("/remind-password")
-    public ResponseEntity<?> remindPassword(@PathParam("email") String email) {
+    @PostMapping("/remind-password/{email}")
+    public ResponseEntity<?> remindPassword(@PathVariable String email) {
         return userService.sendNewGeneratedPasswordByEmail(email);
     }
 
