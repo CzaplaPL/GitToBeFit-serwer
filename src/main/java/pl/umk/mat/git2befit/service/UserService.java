@@ -119,7 +119,7 @@ public class UserService {
                         .build();
                 emailMessage.sendEmail();
 
-                response = ResponseEntity.ok().build();
+                return ResponseEntity.ok().build();
             }catch (DataIntegrityViolationException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).build();
             } catch (EmailException e) {
