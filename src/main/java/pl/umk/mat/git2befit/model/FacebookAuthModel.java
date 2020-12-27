@@ -1,13 +1,13 @@
 package pl.umk.mat.git2befit.model;
 
 public class FacebookAuthModel {
-    private String token;
+    private String idToken;
 
-    public String getToken() {
-        return token;
+    public String getIdToken() {
+        return idToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setIdToken(String idToken) {
+        this.idToken = idToken;
     }
 }

@@ -10,8 +10,6 @@ import pl.umk.mat.git2befit.service.LoginAPI.FacebookLogin;
 import pl.umk.mat.git2befit.service.LoginAPI.GoogleLogin;
 import pl.umk.mat.git2befit.service.UserService;
 
-import javax.websocket.server.PathParam;
-
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -28,7 +26,7 @@ public class UserController {
 
     @PostMapping("/login/facebook")
     public ResponseEntity<?> loginWithFacebook(@RequestBody FacebookAuthModel fbModel) {
-        return facebookLogin.loginWithFacebookToken(fbModel.getToken());
+        return facebookLogin.loginWithFacebookToken(fbModel.getIdToken());
     }
 
     @PostMapping("/login/google")
@@ -47,8 +45,8 @@ public class UserController {
     }
 
     @GetMapping("/search/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+    public ResponseEntity<Long> getUserByEmail(@PathVariable String email) {
+        return userService.getUserIDByEmail(email);
     }
 
     @PutMapping("/{id}/password-update")

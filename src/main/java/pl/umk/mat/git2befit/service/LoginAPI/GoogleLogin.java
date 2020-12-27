@@ -16,6 +16,7 @@ import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 import pl.umk.mat.git2befit.security.PasswordGenerator;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
@@ -58,7 +59,9 @@ public class GoogleLogin {
     }
 
     private Optional<Payload> verifyToken(String idTokenString){
-        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory()).build();
+        GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
+                .setAudience(Collections.singleton(GOOGLE_CLIENT_ID))
+                .build();
 
         GoogleIdToken idToken;
         try {

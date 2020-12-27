@@ -93,11 +93,10 @@ public class UserService {
                         .build());
     }
 
-    public ResponseEntity<User> getUserByEmail(String email) {
+    public ResponseEntity<Long> getUserIDByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
-        return foundUser.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound()
-                        .build());
+        return foundUser.<ResponseEntity<Long>>map(user -> ResponseEntity.ok()
+                .header("idUser", user.getId().toString()).build()).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {

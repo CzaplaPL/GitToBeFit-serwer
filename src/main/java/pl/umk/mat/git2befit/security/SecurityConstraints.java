@@ -9,5 +9,6 @@ public class SecurityConstraints {
     public static final String FACEBOOK_AUTH_URL = "https://graph.facebook.com/me?fields=email&access_token=%s";
     public static final String FACEBOOK_LOGIN = "/user/login/facebook";
     public static final String GOOGLE_LOGIN = "/user/login/google";
+    public static final String GOOGLE_CLIENT_ID = "167652090961-5dkah0ddinbeh8clnq81ieg3h2onkvjp.apps.googleusercontent.com";
 
 }
