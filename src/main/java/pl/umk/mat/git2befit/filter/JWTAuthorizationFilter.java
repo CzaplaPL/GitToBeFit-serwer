@@ -2,6 +2,7 @@ package pl.umk.mat.git2befit.filter;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -31,13 +32,18 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             return;
         }
 
-        UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
+        try {
+            UsernamePasswordAuthenticationToken authentication = getAuthentication(request);
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        chain.doFilter(request, response);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            chain.doFilter(request, response);
+        }catch (TokenExpiredException e){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        }
+
     }
 
-    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
+    private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws TokenExpiredException {
         String token = request.getHeader(HEADER_STRING);
         if (token != null) {
             String client = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
