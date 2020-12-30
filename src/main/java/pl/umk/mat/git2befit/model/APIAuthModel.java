@@ -1,7 +1,6 @@
 package pl.umk.mat.git2befit.model;
 
-
-public class GoogleAuthModel {
+public class APIAuthModel {
     private String idToken;
 
     public String getIdToken() {
