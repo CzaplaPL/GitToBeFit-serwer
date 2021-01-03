@@ -30,8 +30,8 @@ import static pl.umk.mat.git2befit.security.SecurityConstraints.SECRET;
 
 @Service
 public class UserService {
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -39,7 +39,7 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
+    public ResponseEntity<?> updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
         Optional<User> savedUserOptional = userRepository.findById(id);
         if (savedUserOptional.isEmpty())
             return ResponseEntity.notFound().build();
@@ -86,15 +86,13 @@ public class UserService {
     public ResponseEntity<User> getUserById(long id) {
         Optional<User> foundUser = userRepository.findById(id);
         return foundUser.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound()
-                        .build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<User> getUserByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
         return foundUser.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound()
-                        .build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
@@ -142,17 +140,20 @@ public class UserService {
         ResponseEntity<?> response;
         if (dbUser.isPresent()) {
             User user = dbUser.get();
-            user.setEmail(form.getEmail());
-            user.setEnable(false);
-            try {
-                userRepository.save(user);
-                //TODO poprawić treść maila do weryfikacji
-                String token = JWTGenerator.generateVerificationToken(user.getId());
-                sendEmailWithVerificationToken(form.getEmail(), token);
-                response = ResponseEntity.ok().build();
-            } catch (EmailException e) {
-                response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
-            } catch (DataIntegrityViolationException e) {
+            if (isPasswordEquals(user.getPassword(), form.getPassword())) {
+                user.setEmail(form.getEmail());
+                user.setEnable(false);
+                try {
+                    userRepository.save(user);
+                    String token = JWTGenerator.generateVerificationToken(user.getId());
+                    sendEmailWithVerificationToken(form.getEmail(), token);
+                    response = ResponseEntity.ok().build();
+                } catch (EmailException e) {
+                    response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+                } catch (DataIntegrityViolationException e) {
+                    response = ResponseEntity.status(HttpStatus.CONFLICT).build();
+                }
+            } else {
                 response = ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
         } else {
@@ -174,11 +175,11 @@ public class UserService {
     public ResponseEntity<?> activateUser(String token) {
         ResponseEntity<?> response = null;
         try {
-            String index = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
+            String id = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
                     .build()
                     .verify(token)
                     .getSubject();
-            Optional<User> userOptional = userRepository.findById(Long.valueOf(index));
+            Optional<User> userOptional = userRepository.findById(Long.valueOf(id));
             if (userOptional.isPresent()) {
                 User user = userOptional.get();
                 if (!user.isEnable()) {
