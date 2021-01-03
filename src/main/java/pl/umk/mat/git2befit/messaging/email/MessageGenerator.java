@@ -13,4 +13,13 @@ public class MessageGenerator {
                      "\nPamiętaj, żeby jak najszybciej je zmienić.\n\n" +
                      "Pozdrawiamy,\nGitToBeFit";
     }
+
+    public static String getVerificationMessage(String token) {
+        return "Witaj użytkowniku,\n" +
+                "\nOto twój link do aktywacji konta na naszej platformie:\n" +
+                "https://77.55.236.227:8443/user/activation/" +
+                token +
+                "\n\nW celu aktywacji konta wystarczy kliknąć w powyższy link.\n\n" +
+                "Pozdrawiamy,\nGitToBeFit";
+    }
 }
