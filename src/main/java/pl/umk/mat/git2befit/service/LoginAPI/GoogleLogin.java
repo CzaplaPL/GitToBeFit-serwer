@@ -34,13 +34,12 @@ public class GoogleLogin {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public ResponseEntity<?> LoginUserWithGoogleToken(String idTokenString){
+    public ResponseEntity<?> loginUserWithGoogleToken(String idTokenString){
         Optional<Payload> payload = verifyToken(idTokenString);
         if (payload.isPresent()){
             Optional<User> user = createUserIfNotExists(payload.get());
             String tokenJWT = JWTGenerator.generate(payload.get().getEmail());
-            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT)
-                    .header("idUser", user.get().getId().toString()).build();
+            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
         }else {
             return ResponseEntity.badRequest().build();
         }
@@ -56,7 +55,6 @@ public class GoogleLogin {
     }
 
     private String encodePassword(String password) {
-
         return passwordEncoder.encode(password);
     }
 
