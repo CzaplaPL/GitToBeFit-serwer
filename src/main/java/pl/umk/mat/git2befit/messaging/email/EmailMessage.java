@@ -58,6 +58,7 @@ public class EmailMessage {
             tmp.setAuthenticator(AUTHENTICATOR);
             tmp.setSSLOnConnect(true);
             tmp.setFrom(SERVER_EMAIL);
+            
 
             EmailMessage msg = new EmailMessage();
             msg.email = tmp;

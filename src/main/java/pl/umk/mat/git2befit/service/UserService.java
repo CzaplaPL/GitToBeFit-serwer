@@ -1,40 +1,45 @@
 package pl.umk.mat.git2befit.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.TokenExpiredException;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.mail.EmailException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
 import pl.umk.mat.git2befit.messaging.email.EmailMessage;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
 import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.model.PasswordUpdateForm;
 import pl.umk.mat.git2befit.repository.UserRepository;
-import pl.umk.mat.git2befit.security.PasswordGenerator;
-import pl.umk.mat.git2befit.validation.UserValidationService;
+import pl.umk.mat.git2befit.security.JWTGenerator;
 
+import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+
+import static pl.umk.mat.git2befit.security.SecurityConstraints.SECRET;
 
 @Service
 public class UserService {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
-    private UserValidationService userValidationService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, UserValidationService userValidationService) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
-        this.userValidationService = userValidationService;
     }
 
-    public ResponseEntity<?> updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
+    public ResponseEntity updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
         Optional<User> savedUserOptional = userRepository.findById(id);
         if (savedUserOptional.isEmpty())
             return ResponseEntity.notFound().build();
@@ -42,11 +47,6 @@ public class UserService {
         boolean isEquals = compareEmailAndPassword(savedUserOptional.get(), passwordUpdateForm);
 
         if (isEquals) {
-            try {
-                userValidationService.validatePassword(passwordUpdateForm.getNewPassword());
-            } catch (WeakPasswordException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
-            }
             User user = savedUserOptional.get();
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
 
@@ -72,15 +72,12 @@ public class UserService {
 
     public ResponseEntity<?> registerUserFromApp(User user) {
         try {
-            userValidationService.validateUser(user);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             User tmp = userRepository.save(user);
+            String token = JWTGenerator.generateVerificationToken(tmp.getId());
+            sendEmailWithVerificationToken(tmp.getEmail(), token);
             return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
-        } catch (EmailException | WeakPasswordException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
-        } catch (DataIntegrityViolationException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicate entry").build();
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().build();
         }
@@ -93,18 +90,20 @@ public class UserService {
                         .build());
     }
 
-    public ResponseEntity<Long> getUserIDByEmail(String email) {
+    public ResponseEntity<User> getUserByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
-        return foundUser.<ResponseEntity<Long>>map(user -> ResponseEntity.ok()
-                .header("idUser", user.getId().toString()).build()).orElseGet(() -> ResponseEntity.notFound().build());
+        return foundUser.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound()
+                        .build());
     }
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
         Optional<User> dbUser = userRepository.findByEmail(email);
+        ResponseEntity<?> response;
         if (dbUser.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            response = ResponseEntity.notFound().build();
         } else {
-            String newPassword = PasswordGenerator.generateRandomPassword().substring(0,14);
+            String newPassword = RandomString.make(10);
             String message = MessageGenerator.getPasswordChangingMessage(newPassword);
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -117,14 +116,14 @@ public class UserService {
                         .message(message)
                         .build();
                 emailMessage.sendEmail();
-
-                return ResponseEntity.ok().build();
-            }catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+                response = ResponseEntity.ok().build();
             } catch (EmailException e) {
-                return ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+                response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+            } catch (DataIntegrityViolationException e) {
+                response = ResponseEntity.status(HttpStatus.CONFLICT).build();
             }
         }
+        return response;
     }
 
     public ResponseEntity<?> deleteUser(long id) {
@@ -136,5 +135,71 @@ public class UserService {
             responseEntity = ResponseEntity.notFound().build();
         }
         return responseEntity;
+    }
+
+    public ResponseEntity<?> updateEmail(long id, User form) {
+        Optional<User> dbUser = userRepository.findById(id);
+        ResponseEntity<?> response;
+        if (dbUser.isPresent()) {
+            User user = dbUser.get();
+            user.setEmail(form.getEmail());
+            user.setEnable(false);
+            try {
+                userRepository.save(user);
+                //TODO poprawić treść maila do weryfikacji
+                String token = JWTGenerator.generateVerificationToken(user.getId());
+                sendEmailWithVerificationToken(form.getEmail(), token);
+                response = ResponseEntity.ok().build();
+            } catch (EmailException e) {
+                response = ResponseEntity.status(HttpStatus.FAILED_DEPENDENCY).build();
+            } catch (DataIntegrityViolationException e) {
+                response = ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+        } else {
+            response = ResponseEntity.notFound().build();
+        }
+        return response;
+    }
+
+    private void sendEmailWithVerificationToken(String email, String token) throws EmailException {
+        EmailMessage msg = new EmailMessage.Builder()
+                .address(email)
+                .subject("Weryfikacja konta")
+                .message(MessageGenerator.getVerificationMessage(token))
+                .build();
+        msg.sendEmail();
+    }
+
+    //TODO dodanie wersji jezykowych i wyciagania z requestheadera jaki jezyk ma byc
+    public ResponseEntity<?> activateUser(String token) {
+        ResponseEntity<?> response = null;
+        try {
+            String index = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
+                    .build()
+                    .verify(token)
+                    .getSubject();
+            Optional<User> userOptional = userRepository.findById(Long.valueOf(index));
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                if (!user.isEnable()) {
+                    user.setEnable(true);
+                    userRepository.save(user);
+                    String msg = Files.readString(Path.of("src/main/resources/verification.messages/success.txt"));
+                    response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
+                }
+            } else {
+                String msg = Files.readString(Path.of("src/main/resources/verification.messages/user-not-found.txt"));
+                response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
+            }
+        } catch (TokenExpiredException e) {
+            String msg = null;
+            try {
+                msg = Files.readString(Path.of("src/main/resources/verification.messages/token-expired.txt"));
+            } catch (IOException ioException) {}
+            response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
+        } catch (IOException e) {
+            response = ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+        return response;
     }
 }

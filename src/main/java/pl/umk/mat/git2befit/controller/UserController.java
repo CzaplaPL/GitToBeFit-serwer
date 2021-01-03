@@ -2,8 +2,8 @@ package pl.umk.mat.git2befit.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.model.APIAuthModel;
+import pl.umk.mat.git2befit.model.Entity.User;
 import pl.umk.mat.git2befit.model.PasswordUpdateForm;
 import pl.umk.mat.git2befit.service.LoginAPI.FacebookLogin;
 import pl.umk.mat.git2befit.service.LoginAPI.GoogleLogin;
@@ -44,17 +44,28 @@ public class UserController {
     }
 
     @GetMapping("/search/{email}")
-    public ResponseEntity<Long> getUserByEmail(@PathVariable String email) {
-        return userService.getUserIDByEmail(email);
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
+        return userService.getUserByEmail(email);
     }
 
-    @PutMapping("/{id}/password-update")
+    @PutMapping("/{id}/passwordUpdate")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody PasswordUpdateForm form) {
         return userService.updatePassword(id, form);
     }
 
-    @PostMapping("/remind-password/{email}")
-    public ResponseEntity<?> remindPassword(@PathVariable String email) {
+    @PutMapping("/{id}/email-update")
+    public ResponseEntity<?> changeEmail(@PathVariable long id, @RequestBody User form) {
+        return userService.updateEmail(id, form);
+
+    }
+
+    @GetMapping("/activation/{token}")
+    public ResponseEntity<?> activateUser(@PathVariable String token) {
+        return userService.activateUser(token);
+    }
+
+    @PostMapping("/remind-password")
+    public ResponseEntity<?> remindPassword(@RequestParam String email) {
         return userService.sendNewGeneratedPasswordByEmail(email);
     }
 

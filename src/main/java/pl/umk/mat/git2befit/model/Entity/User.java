@@ -1,7 +1,5 @@
 package pl.umk.mat.git2befit.model.Entity;
 
-import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -17,8 +15,12 @@ public class User implements Serializable {
     private String email;
     @Column(nullable = false)
     private String password;
+    @Column
+    private boolean enable;
 
-    public User(){}
+    public User(){
+        this.enable = false;
+    }
 
     public User(String nick, String password) {
         this.email = nick;
@@ -47,6 +49,14 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 
     @Override
