@@ -56,13 +56,13 @@ public class UserController {
     @PutMapping("/{id}/email-update")
     public ResponseEntity<?> changeEmail(@PathVariable long id, @RequestBody User form) {
         return userService.updateEmail(id, form);
-
     }
 
     @GetMapping("/activation/{token}")
     public ResponseEntity<?> activateUser(@PathVariable String token) {
         return userService.activateUser(token);
     }
+
 
     @PostMapping("/remind-password")
     public ResponseEntity<?> remindPassword(@RequestParam String email) {
