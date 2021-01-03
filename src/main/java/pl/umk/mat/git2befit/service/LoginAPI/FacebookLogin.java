@@ -35,6 +35,8 @@ public class FacebookLogin {
     public ResponseEntity<?> loginWithFacebookToken(String facebookToken) {
         FacebookUser facebookUser = validateFacebookToken(facebookToken);
 
+        System.out.println(facebookUser.getEmail());
+
         if(facebookUser.getEmail().isEmpty())
             return ResponseEntity.badRequest().build();
 
@@ -44,18 +46,21 @@ public class FacebookLogin {
 
         String token = JWTGenerator.generate(facebookUser.getEmail());
 
-        return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + token).build();
+        return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + token).header("idUser", userOptional.get().getId().toString()).build();
 
     }
 
     private FacebookUser validateFacebookToken(String facebookToken) {
         String url = String.format(FACEBOOK_AUTH_URL, facebookToken);
 
-        return webClient.get().uri(url).retrieve()
+        FacebookUser fb =  webClient.get().uri(url).retrieve()
                 .onStatus(HttpStatus::isError, clientResponse -> {
                     throw new ResponseStatusException(clientResponse.statusCode(), "facebook login error");
                 }).bodyToMono(FacebookUser.class)
                 .block();
+        System.out.println(fb.getEmail());
+
+        return fb;
     }
 
     private void createUserIfNotExists(FacebookUser facebookUser, Optional<User> userOptional) {
