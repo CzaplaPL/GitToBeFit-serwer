@@ -37,20 +37,22 @@ public class GoogleLogin {
     public ResponseEntity<?> LoginUserWithGoogleToken(String idTokenString){
         Optional<Payload> payload = verifyToken(idTokenString);
         if (payload.isPresent()){
-            createUserIfNotExists(payload.get());
+            Optional<User> user = createUserIfNotExists(payload.get());
             String tokenJWT = JWTGenerator.generate(payload.get().getEmail());
-            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
+            return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT)
+                    .header("idUser", user.get().getId().toString()).build();
         }else {
             return ResponseEntity.badRequest().build();
         }
     }
 
-    private void createUserIfNotExists(Payload payload) {
+    private Optional<User> createUserIfNotExists(Payload payload) {
         Optional<User> user = userRepository.findByEmail(payload.getEmail());
         if(user.isEmpty()){
             String encodedPassword = encodePassword(PasswordGenerator.generateRandomPassword());
             userRepository.save(new User(payload.getEmail(), encodedPassword));
         }
+        return userRepository.findByEmail(payload.getEmail());
     }
 
     private String encodePassword(String password) {
