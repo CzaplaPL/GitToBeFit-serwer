@@ -15,7 +15,7 @@ public class User implements Serializable {
     private String email;
     @Column(nullable = false)
     private String password;
-    @Column
+    @Column(nullable = false)
     private boolean enable;
 
     public User(){
@@ -23,6 +23,7 @@ public class User implements Serializable {
     }
 
     public User(String nick, String password) {
+        super();
         this.email = nick;
         this.password = password;
     }
