@@ -34,6 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().requiresSecure())
                 .cors().and().csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN).permitAll()
+                .antMatchers(HttpMethod.GET, EMAIL_VERIFICATION).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
