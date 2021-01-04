@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping("/login/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody APIAuthModel googleAuthModel) {
-        return googleLogin.LoginUserWithGoogleToken(googleAuthModel.getIdToken());
+        return googleLogin.loginUserWithGoogleToken(googleAuthModel.getIdToken());
     }
 
     @PostMapping("/signup")

@@ -53,7 +53,7 @@ public class UserService {
             userRepository.save(user);
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad password").build();
         }
     }
 
