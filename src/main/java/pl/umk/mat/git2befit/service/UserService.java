@@ -73,6 +73,7 @@ public class UserService {
     public ResponseEntity<?> registerUserFromApp(User user) {
         try {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setEnable(false);
             User tmp = userRepository.save(user);
             String token = JWTGenerator.generateVerificationToken(tmp.getId());
             sendEmailWithVerificationToken(tmp.getEmail(), token);
