@@ -12,5 +12,7 @@ public class SecurityConstraints {
     public static final String GOOGLE_LOGIN = "/user/login/google";
     public static final String GOOGLE_CLIENT_ID = "57028483820-2fdhd5l8e0vc3knl5o3urda3n2di4gu9.apps.googleusercontent.com";
     public static final String EMAIL_VERIFICATION = "/user/activation/{token}";
+    public static final String PASSWORD_REMIND = "/user/remind-password";
+
 
 }
