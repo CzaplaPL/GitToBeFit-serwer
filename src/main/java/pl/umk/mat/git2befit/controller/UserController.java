@@ -44,8 +44,8 @@ public class UserController {
     }
 
     @GetMapping("/search/{email}")
-    public ResponseEntity<User> getUserByEmail(@PathVariable String email) {
-        return userService.getUserByEmail(email);
+    public ResponseEntity<?> getUserIdByEmail(@PathVariable String email) {
+        return userService.getUserIdByEmail(email);
     }
 
     @PutMapping("/{id}/passwordUpdate")
