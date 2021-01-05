@@ -90,10 +90,11 @@ public class UserService {
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    public ResponseEntity<User> getUserByEmail(String email) {
+    public ResponseEntity<?> getUserIdByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
-        return foundUser.map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return foundUser.isPresent() ?
+                ResponseEntity.ok().header("idUser", String.valueOf(foundUser.get().getId())).build() :
+                ResponseEntity.notFound().build();
     }
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
