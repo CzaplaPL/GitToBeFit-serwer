@@ -48,7 +48,7 @@ public class UserController {
         return userService.getUserIdByEmail(email);
     }
 
-    @PutMapping("/{id}/passwordUpdate")
+    @PutMapping("/{id}/password-update")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody PasswordUpdateForm form) {
         return userService.updatePassword(id, form);
     }

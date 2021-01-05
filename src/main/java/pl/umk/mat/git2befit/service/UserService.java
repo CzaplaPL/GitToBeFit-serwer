@@ -45,7 +45,6 @@ public class UserService {
             return ResponseEntity.notFound().build();
 
         boolean isEquals = compareEmailAndPassword(savedUserOptional.get(), passwordUpdateForm);
-
         if (isEquals) {
             User user = savedUserOptional.get();
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
