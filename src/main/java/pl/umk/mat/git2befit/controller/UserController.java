@@ -30,7 +30,7 @@ public class UserController {
 
     @PostMapping("/login/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody APIAuthModel googleAuthModel) {
-        return googleLogin.LoginUserWithGoogleToken(googleAuthModel.getIdToken());
+        return googleLogin.loginUserWithGoogleToken(googleAuthModel.getIdToken());
     }
 
     @PostMapping("/signup")
@@ -48,7 +48,7 @@ public class UserController {
         return userService.getUserIdByEmail(email);
     }
 
-    @PutMapping("/{id}/passwordUpdate")
+    @PutMapping("/{id}/password-update")
     public ResponseEntity<?> changePassword(@PathVariable long id, @RequestBody PasswordUpdateForm form) {
         return userService.updatePassword(id, form);
     }

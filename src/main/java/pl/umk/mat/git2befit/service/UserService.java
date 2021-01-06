@@ -45,7 +45,6 @@ public class UserService {
             return ResponseEntity.notFound().build();
 
         boolean isEquals = compareEmailAndPassword(savedUserOptional.get(), passwordUpdateForm);
-
         if (isEquals) {
             User user = savedUserOptional.get();
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
@@ -53,7 +52,7 @@ public class UserService {
             userRepository.save(user);
             return ResponseEntity.ok().build();
         } else {
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad password").build();
         }
     }
 
@@ -77,6 +76,7 @@ public class UserService {
             User tmp = userRepository.save(user);
             String token = JWTGenerator.generateVerificationToken(tmp.getId());
             sendEmailWithVerificationToken(tmp.getEmail(), token);
+
             return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
         } catch (Exception e) {
             e.printStackTrace();
