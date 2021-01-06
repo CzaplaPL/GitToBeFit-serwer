@@ -191,6 +191,7 @@ public class UserService {
                     System.out.println(msg);
                     response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
                 }
+                //TODO dodac obsluge, gdy user jest juz aktywowany ale klika dalej w link
             } else {
                 String msg = Files.readString(Path.of("src/main/resources/verification.messages/user-not-found.txt"));
                 response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
