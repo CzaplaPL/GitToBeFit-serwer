@@ -76,6 +76,7 @@ public class UserService {
             User tmp = userRepository.save(user);
             String token = JWTGenerator.generateVerificationToken(tmp.getId());
             sendEmailWithVerificationToken(tmp.getEmail(), token);
+
             return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
         } catch (Exception e) {
             e.printStackTrace();

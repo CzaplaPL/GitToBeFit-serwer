@@ -47,7 +47,7 @@ public class GoogleLogin {
 
     private Optional<User> createUserIfNotExists(Payload payload) {
         Optional<User> user = userRepository.findByEmail(payload.getEmail());
-        if(user.isEmpty()){
+        if(user.isEmpty()) {
             String encodedPassword = encodePassword(PasswordGenerator.generateRandomPassword());
             userRepository.save(new User(payload.getEmail(), encodedPassword));
         }
