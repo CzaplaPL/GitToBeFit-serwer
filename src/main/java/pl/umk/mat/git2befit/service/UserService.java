@@ -188,6 +188,7 @@ public class UserService {
                     user.setEnable(true);
                     userRepository.save(user);
                     String msg = Files.readString(Path.of("src/main/resources/verification.messages/success.txt"));
+                    System.out.println(msg);
                     response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
                 }
             } else {

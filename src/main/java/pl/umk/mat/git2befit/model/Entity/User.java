@@ -29,6 +29,12 @@ public class User implements Serializable {
         this.password = password;
     }
 
+    public User(String email, String password, boolean enable) {
+        this.email = email;
+        this.password = password;
+        this.enable = enable;
+    }
+
     public Long getId() {
         return id;
     }

@@ -62,7 +62,7 @@ public class FacebookLogin {
 
     private void createUserIfNotExists(FacebookUser facebookUser, Optional<User> userOptional) {
         if (userOptional.isEmpty()){
-            userRepository.save(new User(facebookUser.getEmail(), encodePassword(PasswordGenerator.generateRandomPassword())));
+            userRepository.save(new User(facebookUser.getEmail(), encodePassword(PasswordGenerator.generateRandomPassword()), true));
         }
     }
 
