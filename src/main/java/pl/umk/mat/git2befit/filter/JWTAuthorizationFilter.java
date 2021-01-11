@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 

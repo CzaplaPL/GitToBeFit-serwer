@@ -5,7 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 
 import java.util.Date;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 public class JWTGenerator {
     public static String generate(String email){

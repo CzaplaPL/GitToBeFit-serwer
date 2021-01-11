@@ -3,6 +3,7 @@ package pl.umk.mat.git2befit.model.Entity;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.List;
 
 
 @Entity

@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.model;
+package pl.umk.mat.git2befit.model.account.management;
 
 public class FacebookUser {
     private String email;

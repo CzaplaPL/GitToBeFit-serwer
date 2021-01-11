@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.HEADER_STRING;
-import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.HEADER_STRING;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.TOKEN_PREFIX;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 

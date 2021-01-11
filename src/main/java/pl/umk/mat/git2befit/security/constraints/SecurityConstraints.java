@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.security;
+package pl.umk.mat.git2befit.security.constraints;
 
 public class SecurityConstraints {
     public static final String SECRET = "SecretKeyToGenJWTs";

@@ -1,25 +1,26 @@
-package pl.umk.mat.git2befit.model.Entity;
+package pl.umk.mat.git2befit.model.Entity.workout.equipment;
+
+import pl.umk.mat.git2befit.model.Entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
+@Table(name = "equipment")
 public class Equipment implements Serializable {
     private static final long serialVersionUID = 3L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    //TODO ogarniecie klucza obcego do klasy user
-//  @JoinColumn(name = "user_id")
-    private long userID;
-    //TODO zrobic klucz obcy do equipmenttype
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(referencedColumnName = "id")
+    private User user;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(referencedColumnName = "id")
     private EquipmentType type;
     @Column(nullable = false, unique = true)
     private String name;
-    @Column(nullable = false)
-    private String description;
     @Column
     private String url;
 
@@ -33,12 +34,12 @@ public class Equipment implements Serializable {
         this.id = id;
     }
 
-    public long getUserID() {
-        return userID;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserID(long userID) {
-        this.userID = userID;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public EquipmentType getType() {
@@ -57,19 +58,22 @@ public class Equipment implements Serializable {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getUrl() {
         return url;
     }
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    @Override
+    public String toString() {
+        return "Equipment{" +
+                "id=" + id +
+                ", user=" + user +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", url='" + url + '\'' +
+                '}';
     }
 }

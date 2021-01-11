@@ -5,9 +5,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
-import net.bytebuddy.utility.RandomString;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,8 +17,8 @@ import pl.umk.mat.git2befit.security.PasswordGenerator;
 import java.util.Collections;
 import java.util.Optional;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.*;
-import static pl.umk.mat.git2befit.security.SecurityConstraints.TOKEN_PREFIX;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.TOKEN_PREFIX;
 
 @Service
 public class GoogleLogin {

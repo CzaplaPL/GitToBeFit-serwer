@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.messaging.email.EmailMessage;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
 import pl.umk.mat.git2befit.model.Entity.User;
-import pl.umk.mat.git2befit.model.PasswordUpdateForm;
+import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 
@@ -26,7 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static pl.umk.mat.git2befit.security.SecurityConstraints.SECRET;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.SECRET;
 
 @Service
 public class UserService {
