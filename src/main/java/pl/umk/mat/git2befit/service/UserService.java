@@ -187,11 +187,9 @@ public class UserService {
                 if (!user.isEnable()) {
                     user.setEnable(true);
                     userRepository.save(user);
-                    String msg = Files.readString(Path.of("src/main/resources/verification.messages/success.txt"));
-                    System.out.println(msg);
-                    response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
                 }
-                //TODO dodac obsluge, gdy user jest juz aktywowany ale klika dalej w link
+                String msg = Files.readString(Path.of("src/main/resources/verification.messages/success.txt"));
+                response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             } else {
                 String msg = Files.readString(Path.of("src/main/resources/verification.messages/user-not-found.txt"));
                 response = ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
