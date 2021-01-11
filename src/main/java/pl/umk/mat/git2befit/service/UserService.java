@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.messaging.email.EmailMessage;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
-import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;

@@ -1,23 +1,19 @@
-package pl.umk.mat.git2befit.model.Entity.workout.equipment;
+package pl.umk.mat.git2befit.model.entity.workout.conditions;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "equipment_type")
-public class EquipmentType implements Serializable {
-    private static final long serialVersionUID = 2L;
+@Table(name = "training_types")
+public class TrainingType implements Serializable {
+    private static final long serialVersionUID = 8L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private long id;
     @Column(nullable = false, unique = true)
     private String name;
-    @Column
-    private String url;
 
-    public EquipmentType() { }
 
     public long getId() {
         return id;
@@ -35,21 +31,12 @@ public class EquipmentType implements Serializable {
         this.name = name;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-
     @Override
     public String toString() {
-        return "EquipmentType{" +
+        return "TrainingType{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", ulr='" + url + '\'' +
                 '}';
     }
 }
+

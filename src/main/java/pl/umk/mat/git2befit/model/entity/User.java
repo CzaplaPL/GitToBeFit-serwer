@@ -1,9 +1,8 @@
-package pl.umk.mat.git2befit.model.Entity;
+package pl.umk.mat.git2befit.model.entity;
 
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.List;
 
 
 @Entity

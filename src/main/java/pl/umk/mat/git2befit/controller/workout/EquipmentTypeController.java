@@ -4,7 +4,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.umk.mat.git2befit.model.Entity.workout.equipment.EquipmentType;
+import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.service.workout.EquipmentTypeService;
 
 import java.util.List;

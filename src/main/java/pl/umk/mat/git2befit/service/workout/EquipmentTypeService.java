@@ -3,7 +3,7 @@ package pl.umk.mat.git2befit.service.workout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.Entity.workout.equipment.EquipmentType;
+import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.repository.EquipmentTypeRepository;
 
 import java.util.List;

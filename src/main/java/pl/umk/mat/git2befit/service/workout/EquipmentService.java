@@ -3,7 +3,7 @@ package pl.umk.mat.git2befit.service.workout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.Entity.workout.equipment.Equipment;
+import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.repository.EquipmentRepository;
 
 import java.util.List;
@@ -23,7 +23,8 @@ public class EquipmentService {
     }
 
     public ResponseEntity<List<Equipment>> getEquipmentsOfSpecificType(long typeId) {
-        List<Equipment> equipmentList = equipmentRepository.findAllByEquipmentTypeId(typeId);
+//        List<Equipment> equipmentList = equipmentRepository.findAllByEquipmentTypeId(typeId);
+        List<Equipment> equipmentList = equipmentRepository.findAllByType_Id(typeId);
         return ResponseEntity.ok(equipmentList);
     }
 }

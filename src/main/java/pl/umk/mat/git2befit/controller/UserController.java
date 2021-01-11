@@ -3,10 +3,10 @@ package pl.umk.mat.git2befit.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.account.management.APIAuthModel;
-import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
-import pl.umk.mat.git2befit.service.LoginAPI.FacebookLogin;
-import pl.umk.mat.git2befit.service.LoginAPI.GoogleLogin;
+import pl.umk.mat.git2befit.service.login.FacebookLogin;
+import pl.umk.mat.git2befit.service.login.GoogleLogin;
 import pl.umk.mat.git2befit.service.UserService;
 
 @RestController

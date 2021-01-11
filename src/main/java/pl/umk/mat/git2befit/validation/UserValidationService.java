@@ -3,7 +3,7 @@ package pl.umk.mat.git2befit.validation;
 import org.apache.commons.mail.EmailException;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
-import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.entity.User;
 
 @Service
 public class UserValidationService {

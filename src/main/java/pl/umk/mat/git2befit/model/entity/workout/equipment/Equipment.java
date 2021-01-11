@@ -1,6 +1,6 @@
-package pl.umk.mat.git2befit.model.Entity.workout.equipment;
+package pl.umk.mat.git2befit.model.entity.workout.equipment;
 
-import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,7 +21,6 @@ public class Equipment implements Serializable {
     private EquipmentType type;
     @Column(nullable = false, unique = true)
     private String name;
-    @Column
     private String url;
 
     public Equipment() {}

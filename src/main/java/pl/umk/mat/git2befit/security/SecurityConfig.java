@@ -17,6 +17,8 @@ import pl.umk.mat.git2befit.filter.JWTAuthorizationFilter;
 import pl.umk.mat.git2befit.security.constraints.EquipmentConstraints;
 import pl.umk.mat.git2befit.security.constraints.EquipmentTypeConstraints;
 
+import static pl.umk.mat.git2befit.security.constraints.EquipmentConstraints.ALL_EQUIPMENTS;
+import static pl.umk.mat.git2befit.security.constraints.EquipmentTypeConstraints.ALL_EQUIPMENT_TYPES;
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 @Configuration
@@ -38,9 +40,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN, PASSWORD_REMIND).permitAll()
                 .antMatchers(HttpMethod.GET, EMAIL_VERIFICATION).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich sprzetow oraz wzgledem kategorii
-                .antMatchers(HttpMethod.GET, EquipmentConstraints.ALL_EQUIPMENTS).permitAll()
+                .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich kategorii
-                .antMatchers(HttpMethod.GET, EquipmentTypeConstraints.ALL_EQUIPMENT_TYPES).permitAll()
+                .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))

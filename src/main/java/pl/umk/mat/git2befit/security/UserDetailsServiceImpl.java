@@ -23,11 +23,11 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Optional<pl.umk.mat.git2befit.model.Entity.User> foundUser = userRepository.findByEmail(email);
+        Optional<pl.umk.mat.git2befit.model.entity.User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isEmpty()) {
             throw new UsernameNotFoundException(email);
         }
-        pl.umk.mat.git2befit.model.Entity.User user = foundUser.get();
+        pl.umk.mat.git2befit.model.entity.User user = foundUser.get();
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), emptyList());
 
 

@@ -1,10 +1,10 @@
-package pl.umk.mat.git2befit.model.Entity.workout;
+package pl.umk.mat.git2befit.model.entity.workout;
 
 
-import pl.umk.mat.git2befit.model.Entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.Entity.workout.conditions.ExerciseForm;
-import pl.umk.mat.git2befit.model.Entity.workout.conditions.TrainingType;
-import pl.umk.mat.git2befit.model.Entity.workout.equipment.Equipment;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
+import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 
 import javax.persistence.*;
 import java.io.Serializable;

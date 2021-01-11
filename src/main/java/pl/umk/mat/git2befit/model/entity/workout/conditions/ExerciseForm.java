@@ -1,19 +1,18 @@
-package pl.umk.mat.git2befit.model.Entity.workout.conditions;
+package pl.umk.mat.git2befit.model.entity.workout.conditions;
 
 import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "training_types")
-public class TrainingType implements Serializable {
-    private static final long serialVersionUID = 8L;
+@Table(name = "exercise_forms")
+public class ExerciseForm implements Serializable {
+    private static final long serialVersionUID = 6L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
     @Column(nullable = false, unique = true)
     private String name;
-
 
     public long getId() {
         return id;
@@ -33,10 +32,9 @@ public class TrainingType implements Serializable {
 
     @Override
     public String toString() {
-        return "TrainingType{" +
+        return "ExerciseForm{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
                 '}';
     }
 }
-

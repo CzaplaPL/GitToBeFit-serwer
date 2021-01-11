@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.service.LoginAPI;
+package pl.umk.mat.git2befit.service.login;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.server.ResponseStatusException;
 import pl.umk.mat.git2befit.model.account.management.FacebookUser;
-import pl.umk.mat.git2befit.model.Entity.User;
+import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 import pl.umk.mat.git2befit.security.PasswordGenerator;
