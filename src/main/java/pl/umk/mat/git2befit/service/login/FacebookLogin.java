@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.service.login;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,9 +36,9 @@ public class FacebookLogin {
     public ResponseEntity<?> loginWithFacebookToken(String facebookToken) {
         FacebookUser facebookUser = validateFacebookToken(facebookToken);
 
-        if(facebookUser.getEmail().isEmpty())
-            return ResponseEntity.badRequest().build();
-
+        if(facebookUser.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().header("Cause", "user not found").build();
+        }
         Optional<User> userOptional = userRepository.findByEmail(facebookUser.getEmail());
 
         createUserIfNotExists(facebookUser, userOptional);

@@ -25,11 +25,9 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         Optional<pl.umk.mat.git2befit.model.entity.User> foundUser = userRepository.findByEmail(email);
         if (foundUser.isEmpty()) {
-            throw new UsernameNotFoundException(email);
+            throw new UsernameNotFoundException("qwertyuioiuytrewqertyuioiuytr");
         }
         pl.umk.mat.git2befit.model.entity.User user = foundUser.get();
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), emptyList());
-
-
     }
 }
