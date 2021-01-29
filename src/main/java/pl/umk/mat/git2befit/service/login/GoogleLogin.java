@@ -42,7 +42,7 @@ public class GoogleLogin {
             if (payload.isPresent()) {
                 Optional<User> user = createUserIfNotExists(payload.get());
                 String tokenJWT = JWTGenerator.generate(payload.get().getEmail());
-                return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + tokenJWT).build();
+                return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + tokenJWT).build();
             } else {
                 return ResponseEntity.badRequest().header("Cause", "user not found").build();
             }
