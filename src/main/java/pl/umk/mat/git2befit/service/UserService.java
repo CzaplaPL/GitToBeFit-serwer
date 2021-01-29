@@ -54,6 +54,11 @@ public class UserService {
         boolean isEquals = compareEmailAndPassword(savedUserOptional.get(), passwordUpdateForm);
         if (isEquals) {
             User user = savedUserOptional.get();
+            try {
+                UserValidationService.validatePassword(passwordUpdateForm.getNewPassword());
+            } catch (WeakPasswordException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "new password weak").build();
+            }
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
 
             userRepository.save(user);
@@ -98,7 +103,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
         } catch (Exception e) {
             log.error("Unexpected error occured in registerUserFromApp method", e);
-            return ResponseEntity.badRequest().header("Cause", "unexpected error").build();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Cause", "unexpected error").build();
         }
     }
 
@@ -110,9 +115,8 @@ public class UserService {
 
     public ResponseEntity<?> getUserIdByEmail(String email) {
         Optional<User> foundUser = userRepository.findByEmail(email);
-        return foundUser.isPresent() ?
-                ResponseEntity.ok().header("idUser", String.valueOf(foundUser.get().getId())).build() :
-                ResponseEntity.notFound().header("Cause", "user not found").build();
+        return foundUser.map(user -> ResponseEntity.ok().header("idUser", String.valueOf(user.getId())).build())
+                .orElseGet(() -> ResponseEntity.notFound().header("Cause", "user not found").build());
     }
 
     public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
@@ -157,9 +161,10 @@ public class UserService {
         if (dbUser.isPresent()) {
             User user = dbUser.get();
             if (isPasswordEquals(user.getPassword(), form.getPassword())) {
-                user.setEmail(form.getEmail());
-                user.setEnable(false);
                 try {
+                    UserValidationService.validateEmail(form.getEmail());
+                    user.setEmail(form.getEmail());
+                    user.setEnable(false);
                     userRepository.save(user);
                     String token = JWTGenerator.generateVerificationToken(user.getId());
                     sendEmailWithVerificationToken(form.getEmail(), token);
@@ -169,6 +174,8 @@ public class UserService {
                     return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
                 } catch (DataIntegrityViolationException e) {
                     return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicated email").build();
+                } catch (EmailValidationException e) {
+                    return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "wrong email").build();
                 }
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "wrong password").build();

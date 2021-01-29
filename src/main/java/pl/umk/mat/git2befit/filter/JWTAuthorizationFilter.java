@@ -39,6 +39,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
             chain.doFilter(request, response);
         }catch (TokenExpiredException e){
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.addHeader("Cause", "Token expired");
         }
 
     }
