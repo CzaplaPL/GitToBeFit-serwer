@@ -34,16 +34,16 @@ public class FacebookLogin {
     public ResponseEntity<?> loginWithFacebookToken(String facebookToken) {
         FacebookUser facebookUser = validateFacebookToken(facebookToken);
 
-        if(facebookUser.getEmail().isEmpty())
-            return ResponseEntity.badRequest().build();
-
+        if(facebookUser.getEmail().isEmpty()) {
+            return ResponseEntity.badRequest().header("Cause", "user not found").build();
+        }
         Optional<User> userOptional = userRepository.findByEmail(facebookUser.getEmail());
 
         createUserIfNotExists(facebookUser, userOptional);
 
         String token = JWTGenerator.generate(facebookUser.getEmail());
 
-        return ResponseEntity.ok().header(HEADER_STRING, TOKEN_PREFIX + token)
+        return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + token)
                 .header("idUser", userOptional.get().getId().toString())
                 .header("email", userOptional.get().getEmail())
                 .build();

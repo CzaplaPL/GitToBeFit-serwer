@@ -14,11 +14,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
 import pl.umk.mat.git2befit.filter.JWTAuthorizationFilter;
-import pl.umk.mat.git2befit.security.constraints.EquipmentConstraints;
-import pl.umk.mat.git2befit.security.constraints.EquipmentTypeConstraints;
 
-import static pl.umk.mat.git2befit.security.constraints.EquipmentConstraints.ALL_EQUIPMENTS;
-import static pl.umk.mat.git2befit.security.constraints.EquipmentTypeConstraints.ALL_EQUIPMENT_TYPES;
+
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 @Configuration

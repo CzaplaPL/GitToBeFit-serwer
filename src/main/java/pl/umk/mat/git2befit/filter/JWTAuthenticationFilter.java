@@ -15,7 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.HEADER_STRING;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.AUTHORIZATION;
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.TOKEN_PREFIX;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
@@ -45,6 +45,6 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         String token = JWTGenerator.generate((((org.springframework.security.core.userdetails.User) authResult.getPrincipal()).getUsername()));
-        response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+        response.addHeader(AUTHORIZATION, TOKEN_PREFIX + token);
     }
 }
