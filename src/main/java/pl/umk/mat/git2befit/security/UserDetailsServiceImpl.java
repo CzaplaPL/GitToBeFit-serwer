@@ -28,6 +28,9 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
             throw new UsernameNotFoundException("qwertyuioiuytrewqertyuioiuytr");
         }
         pl.umk.mat.git2befit.model.entity.User user = foundUser.get();
+        if(!foundUser.get().isEnable())
+            throw new UsernameNotFoundException("inactive");
+
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), emptyList());
     }
 }

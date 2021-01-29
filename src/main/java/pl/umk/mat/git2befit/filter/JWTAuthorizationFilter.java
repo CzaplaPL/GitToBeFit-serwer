@@ -25,7 +25,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader(HEADER_STRING);
+        String header = request.getHeader(AUTHORIZATION);
 
         if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response);
@@ -45,7 +45,7 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) throws TokenExpiredException {
-        String token = request.getHeader(HEADER_STRING);
+        String token = request.getHeader(AUTHORIZATION);
         if (token != null) {
             String client = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
                     .build()
