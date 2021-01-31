@@ -73,4 +73,9 @@ public class UserController {
     public ResponseEntity<?> delete(@PathVariable long id) {
         return userService.deleteUser(id);
     }
+
+    @PostMapping("/token-verification/{token}")
+    public ResponseEntity<?> verify(@PathVariable String token){
+        return userService.verify(token);
+    }
 }

@@ -2,6 +2,7 @@ package pl.umk.mat.git2befit.service;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import net.bytebuddy.utility.RandomString;
 import org.apache.commons.mail.EmailException;
@@ -31,7 +32,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Optional;
 
-import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.SECRET;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 @Service
 public class UserService {
@@ -226,5 +227,25 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Cause", "message error").build();
         }
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Cause", "unexpected error").build();
+    }
+
+    public ResponseEntity<?> verify(String token) {
+        try {
+            String email = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
+                    .build()
+                    .verify(token)
+                    .getSubject();
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+
+            if(userOptional.isPresent()){
+                String newToken = JWTGenerator.generate(email);
+                return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + newToken).build();
+            }else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+        }catch (JWTVerificationException e){
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
     }
 }
