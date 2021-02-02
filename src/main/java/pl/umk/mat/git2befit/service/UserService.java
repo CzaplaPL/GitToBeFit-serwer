@@ -233,7 +233,7 @@ public class UserService {
         try {
             String email = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
                     .build()
-                    .verify(token)
+                    .verify(token.replace(TOKEN_PREFIX, ""))
                     .getSubject();
 
             Optional<User> userOptional = userRepository.findByEmail(email);
@@ -242,10 +242,10 @@ public class UserService {
                 String newToken = JWTGenerator.generate(email);
                 return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + newToken).build();
             }else {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "user not found").build();
             }
         }catch (JWTVerificationException e){
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "token is not valid").build();
         }
     }
 }

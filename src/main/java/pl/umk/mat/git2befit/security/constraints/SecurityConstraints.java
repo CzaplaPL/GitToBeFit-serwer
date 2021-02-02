@@ -15,4 +15,5 @@ public interface SecurityConstraints {
     String PASSWORD_REMIND = "/user/remind-password";
     String ALL_EQUIPMENTS = "/equipment";
     String ALL_EQUIPMENT_TYPES = "/equipment-type";
+    String TOKEN_VERIFICATION ="/user/token-verification";
 }
