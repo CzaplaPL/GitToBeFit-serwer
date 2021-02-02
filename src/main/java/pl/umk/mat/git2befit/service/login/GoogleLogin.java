@@ -72,10 +72,9 @@ public class GoogleLogin {
                 .setAudience(Collections.singleton(GOOGLE_CLIENT_ID))
                 .build();
 
-        GoogleIdToken idToken;
-        idToken = verifier.verify(idTokenString);
+        GoogleIdToken idToken = verifier.verify(idTokenString);
         if(idToken == null) {
-            return Optional.empty();
+            throw new GeneralSecurityException("idToken is null");
         } else {
             return Optional.ofNullable(idToken.getPayload());
         }

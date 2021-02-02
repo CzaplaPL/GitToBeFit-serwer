@@ -15,9 +15,6 @@ public class Equipment implements Serializable {
     private long id;
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(referencedColumnName = "id")
-    private User user;
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(referencedColumnName = "id")
     private EquipmentType type;
     @Column(nullable = false, unique = true)
     private String name;
@@ -31,14 +28,6 @@ public class Equipment implements Serializable {
 
     public void setId(long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public EquipmentType getType() {
@@ -69,7 +58,6 @@ public class Equipment implements Serializable {
     public String toString() {
         return "Equipment{" +
                 "id=" + id +
-                ", user=" + user +
                 ", type=" + type +
                 ", name='" + name + '\'' +
                 ", url='" + url + '\'' +

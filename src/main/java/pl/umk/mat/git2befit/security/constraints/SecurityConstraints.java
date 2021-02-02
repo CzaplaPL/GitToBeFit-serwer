@@ -13,7 +13,7 @@ public interface SecurityConstraints {
     String GOOGLE_CLIENT_ID = "167652090961-5dkah0ddinbeh8clnq81ieg3h2onkvjp.apps.googleusercontent.com";
     String EMAIL_VERIFICATION = "/user/activation/{token}";
     String PASSWORD_REMIND = "/user/remind-password";
+    String TOKEN_VERIFICATION = "/user/token-verification";
     String ALL_EQUIPMENTS = "/equipment";
     String ALL_EQUIPMENT_TYPES = "/equipment-type";
-    String TOKEN_VERIFICATION ="/user/token-verification";
 }

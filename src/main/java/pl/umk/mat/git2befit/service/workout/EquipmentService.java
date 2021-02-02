@@ -23,7 +23,6 @@ public class EquipmentService {
     }
 
     public ResponseEntity<List<Equipment>> getEquipmentsOfSpecificType(long typeId) {
-//        List<Equipment> equipmentList = equipmentRepository.findAllByEquipmentTypeId(typeId);
         List<Equipment> equipmentList = equipmentRepository.findAllByType_Id(typeId);
         return ResponseEntity.ok(equipmentList);
     }
