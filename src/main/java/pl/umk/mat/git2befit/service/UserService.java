@@ -208,16 +208,16 @@ public class UserService {
                     user.setEnable(true);
                     userRepository.save(user);
                 }
-                String msg = Files.readString(Path.of("src/main/resources/verification.messages/success.txt"));
+                String msg = Files.readString(Path.of("./verification-messages/success.txt"));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             } else {
-                String msg = Files.readString(Path.of("src/main/resources/verification.messages/user-not-found.txt"));
+                String msg = Files.readString(Path.of("./verification-messages/user-not-found.txt"));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             }
         } catch (TokenExpiredException e) {
             String msg = null;
             try {
-                msg = Files.readString(Path.of("src/main/resources/verification.messages/token-expired.txt"));
+                msg = Files.readString(Path.of("./verification-messages/token-expired.txt"));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             } catch (IOException ioException) {
                 log.error("Error occured in sending email message.", ioException);

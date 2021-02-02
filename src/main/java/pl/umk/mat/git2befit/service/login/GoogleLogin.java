@@ -74,7 +74,11 @@ public class GoogleLogin {
 
         GoogleIdToken idToken;
         idToken = verifier.verify(idTokenString);
-        return Optional.ofNullable(idToken.getPayload());
+        if(idToken == null) {
+            return Optional.empty();
+        } else {
+            return Optional.ofNullable(idToken.getPayload());
+        }
     }
 
 }
