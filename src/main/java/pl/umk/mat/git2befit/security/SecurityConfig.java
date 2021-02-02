@@ -34,7 +34,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.requiresChannel(channel -> channel
                 .anyRequest().requiresSecure())
                 .cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN, PASSWORD_REMIND).permitAll()
+                .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN, PASSWORD_REMIND, TOKEN_VERIFICATION).permitAll()
                 .antMatchers(HttpMethod.GET, EMAIL_VERIFICATION).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich sprzetow oraz wzgledem kategorii
                 .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS).permitAll()

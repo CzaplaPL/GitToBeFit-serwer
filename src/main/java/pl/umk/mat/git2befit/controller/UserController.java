@@ -63,7 +63,6 @@ public class UserController {
         return userService.activateUser(token);
     }
 
-
     @PostMapping("/remind-password")
     public ResponseEntity<?> remindPassword(@RequestParam String email) {
         return userService.sendNewGeneratedPasswordByEmail(email);
@@ -74,8 +73,8 @@ public class UserController {
         return userService.deleteUser(id);
     }
 
-    @PostMapping("/token-verification/{token}")
-    public ResponseEntity<?> verify(@PathVariable String token){
+    @PostMapping("/token-verification")
+    public ResponseEntity<?> verify(@RequestHeader String token){
         return userService.verify(token);
     }
 }
