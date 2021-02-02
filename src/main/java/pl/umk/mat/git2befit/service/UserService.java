@@ -88,18 +88,20 @@ public class UserService {
             UserValidationService.validateUser(user);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setEnable(false);
-            User tmp = userRepository.save(user);
-            String token = JWTGenerator.generateVerificationToken(tmp.getId());
-            sendEmailWithVerificationToken(tmp.getEmail(), token);
+            Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
+            if(userByEmail.isEmpty()) {
+                User tmp = userRepository.save(user);
+                String token = JWTGenerator.generateVerificationToken(tmp.getId());
+                sendEmailWithVerificationToken(tmp.getEmail(), token);
+                return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
+            }
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicate entry").build();
 
-            return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
         } catch (EmailValidationException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad email").build();
         } catch (WeakPasswordException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "weak password").build();
-        } catch (DataIntegrityViolationException ex) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicate entry").build();
-        } catch (EmailException e) {
+        }  catch (EmailException e) {
             log.error("Error while sending verification email", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
         } catch (Exception e) {
