@@ -11,6 +11,7 @@ import org.apache.commons.mail.SimpleEmail;
  * @implNote To create {@code EmailMessage} object you have to use Builder class.
  * @author Kacper
  */
+@Deprecated
 public class EmailMessage {
     private Email email;
 

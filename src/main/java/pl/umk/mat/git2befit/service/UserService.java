@@ -18,10 +18,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.exceptions.EmailValidationException;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
-import pl.umk.mat.git2befit.messaging.email.EmailMessage;
+import pl.umk.mat.git2befit.messaging.email.EmailMessageFacade;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
-import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
+import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 import pl.umk.mat.git2befit.validation.UserValidationService;
@@ -38,7 +38,7 @@ import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -130,14 +130,14 @@ public class UserService {
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
             try {
-                userRepository.save(user);
-
-                EmailMessage emailMessage = new EmailMessage.Builder()
-                        .address(email)
-                        .subject("Przypomnienie hasła")
-                        .message(message)
-                        .build();
+//                EmailMessage emailMessage = new EmailMessage.Builder()
+//                        .address(email)
+//                        .subject("Przypomnienie hasła")
+//                        .message(message)
+//                        .build();
+                EmailMessageFacade emailMessage = new EmailMessageFacade("Przypomnienie hasła", message, email);
                 emailMessage.sendEmail();
+                userRepository.save(user);
                 return ResponseEntity.ok().build();
             } catch (EmailException e) {
                 log.error("Error while sending verification email", e);
@@ -187,12 +187,15 @@ public class UserService {
     }
 
     private void sendEmailWithVerificationToken(String email, String token) throws EmailException {
-        EmailMessage msg = new EmailMessage.Builder()
-                .address(email)
-                .subject("Weryfikacja konta")
-                .message(MessageGenerator.getVerificationMessage(token))
-                .build();
-        msg.sendEmail();
+//        EmailMessage msg = new EmailMessage.Builder()
+//                .address(email)
+//                .subject("Weryfikacja konta")
+//                .message(MessageGenerator.getVerificationMessage(token))
+//                .build();
+        EmailMessageFacade emailToSend = new EmailMessageFacade("Weryfikacja konta",
+                MessageGenerator.getVerificationMessage(token),
+                email);
+        emailToSend.sendEmail();
     }
 
     public ResponseEntity<?> activateUser(String token) {
@@ -215,7 +218,7 @@ public class UserService {
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             }
         } catch (TokenExpiredException e) {
-            String msg = null;
+            String msg;
             try {
                 msg = Files.readString(Path.of("./verification-messages/token-expired.txt"));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
@@ -238,13 +241,13 @@ public class UserService {
 
             Optional<User> userOptional = userRepository.findByEmail(email);
 
-            if(userOptional.isPresent()){
+            if (userOptional.isPresent()) {
                 String newToken = JWTGenerator.generate(email);
                 return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + newToken).build();
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "user not found").build();
             }
-        }catch (JWTVerificationException e){
+        } catch (JWTVerificationException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "token is not valid").build();
         }
     }

@@ -71,7 +71,6 @@ public class GoogleLogin {
         GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(new NetHttpTransport(), new JacksonFactory())
                 .setAudience(Collections.singleton(GOOGLE_CLIENT_ID))
                 .build();
-
         GoogleIdToken idToken = verifier.verify(idTokenString);
         if(idToken == null) {
             throw new GeneralSecurityException("idToken is null");
