@@ -130,11 +130,6 @@ public class UserService {
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
             try {
-//                EmailMessage emailMessage = new EmailMessage.Builder()
-//                        .address(email)
-//                        .subject("Przypomnienie hasła")
-//                        .message(message)
-//                        .build();
                 EmailMessageFacade emailMessage = new EmailMessageFacade("Przypomnienie hasła", message, email);
                 emailMessage.sendEmail();
                 userRepository.save(user);
@@ -187,11 +182,6 @@ public class UserService {
     }
 
     private void sendEmailWithVerificationToken(String email, String token) throws EmailException {
-//        EmailMessage msg = new EmailMessage.Builder()
-//                .address(email)
-//                .subject("Weryfikacja konta")
-//                .message(MessageGenerator.getVerificationMessage(token))
-//                .build();
         EmailMessageFacade emailToSend = new EmailMessageFacade("Weryfikacja konta",
                 MessageGenerator.getVerificationMessage(token),
                 email);

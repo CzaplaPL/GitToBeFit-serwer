@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
+import pl.umk.mat.git2befit.model.simplified.SimplifiedEquipment;
 import pl.umk.mat.git2befit.service.workout.EquipmentService;
 
 import java.util.List;
@@ -20,7 +20,7 @@ public class EquipmentController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Equipment>> getEquipmentsOfSpecificType(@RequestParam Long typeId) {
+    public ResponseEntity<List<SimplifiedEquipment>> getEquipmentsOfSpecificType(@RequestParam Long typeId) {
         return equipmentService.getEquipmentsOfSpecificType(typeId);
     }
 }
