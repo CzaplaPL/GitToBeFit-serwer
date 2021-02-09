@@ -3,6 +3,8 @@ package pl.umk.mat.git2befit.model.training.generation.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
+import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 
 @Component
 public class TrainingPlanManufacture {
@@ -13,8 +15,8 @@ public class TrainingPlanManufacture {
         this.trainingPlanFactory = trainingPlanFactory;
     }
 
-    public ResponseEntity<?> createTrainingPlan(){
-        TrainingPlanInterface trainingPlanInterface = trainingPlanFactory.createPlan("SPLIT");
-        return ResponseEntity.ok(trainingPlanInterface);
+    public TrainingPlan createTrainingPlan(TrainingForm trainingForm){
+        TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
+        return trainingPlan.create(trainingForm);
     }
 }

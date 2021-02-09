@@ -7,6 +7,7 @@ import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.repository.EquipmentRepository;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Service
 public class EquipmentService {

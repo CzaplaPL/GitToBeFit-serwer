@@ -5,9 +5,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class TrainingPlanFactory {
 
-    public TrainingPlanInterface createPlan(String type) {
+    public TrainingPlanInterface createPlan(String trainingType) throws IllegalArgumentException{
 
-        return switch (type) {
+        return switch (trainingType) {
             case "SPLIT" -> new SplitTrainingPlan();
             case "FBW" -> new FBWTrainingPlan();
             case "CARDIO" -> new CardioTrainingPlan();

@@ -46,9 +46,6 @@ public class Exercise implements Serializable {
                joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
                inverseJoinColumns = {@JoinColumn(name="equipment_id", referencedColumnName="id")}
     )
-
-
-
     private List<Equipment> equipmentsNeeded;
 
     public long getId() {

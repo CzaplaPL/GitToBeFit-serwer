@@ -1,12 +1,11 @@
 package pl.umk.mat.git2befit.model.training.generation.model;
 
-import org.springframework.web.bind.annotation.GetMapping;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 
 @Entity
@@ -15,17 +14,45 @@ public class TrainingPlan implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private long id;
+    @Column(nullable = false)
+    private long trainingId;
+    /*@ManyToMany(fetch = FetchType.EAGER)
+    private List<Exercise> exercises = new ArrayList<>();*/
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<ExerciseExecution> exercisesExecutions;
 
-    @ManyToMany
-    /*@JoinTable(name = "exersises_in_plan",
-            joinColumns = {@JoinColumn(name="exersise_id",referencedColumnName="id")},
-            inverseJoinColumns = {@JoinColumn(name="training_plan_id",referencedColumnName="id")}
-    )*/
-    //private List<Exercise> exerciseList;
-    private Map<Exercise, ExerciseFormat> format;
-
-
-    public TrainingPlan() {
+    public List<ExerciseExecution> getExercisesExecutions() {
+        return exercisesExecutions;
     }
+
+    public void setExercisesExecutions(List<ExerciseExecution> exercisesExecutions) {
+        this.exercisesExecutions = exercisesExecutions;
+    }
+
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
+    public long getTrainingId() {
+        return trainingId;
+    }
+
+    public void setTrainingId(long trainingId) {
+        this.trainingId = trainingId;
+    }
+/*
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
+    }
+*/
 }
