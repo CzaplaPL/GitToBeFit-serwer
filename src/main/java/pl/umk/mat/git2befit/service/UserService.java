@@ -24,6 +24,7 @@ import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
+import pl.umk.mat.git2befit.security.PasswordGenerator;
 import pl.umk.mat.git2befit.validation.UserValidationService;
 
 import java.io.IOException;
@@ -125,7 +126,7 @@ public class UserService {
         if (dbUser.isEmpty()) {
             return ResponseEntity.notFound().header("Cause", "user not found").build();
         } else {
-            String newPassword = RandomString.make(10);
+            String newPassword = PasswordGenerator.generateRandomPassword();
             String message = MessageGenerator.getPasswordChangingMessage(newPassword);
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
@@ -138,7 +139,7 @@ public class UserService {
                 log.error("Error while sending verification email", e);
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
             } catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).header("save error").build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause","save error").build();
             }
         }
     }
