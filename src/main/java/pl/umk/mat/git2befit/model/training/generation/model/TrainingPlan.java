@@ -1,10 +1,7 @@
 package pl.umk.mat.git2befit.model.training.generation.model;
 
-import pl.umk.mat.git2befit.model.entity.workout.Exercise;
-
 import javax.persistence.*;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 
