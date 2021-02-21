@@ -1,6 +1,7 @@
 package pl.umk.mat.git2befit.security;
 
 import com.github.curiousoddman.rgxgen.RgxGen;
+import com.github.curiousoddman.rgxgen.config.RgxGenProperties;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
 import pl.umk.mat.git2befit.validation.UserValidationService;
 
