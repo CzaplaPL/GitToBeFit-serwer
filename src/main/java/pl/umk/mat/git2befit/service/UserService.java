@@ -90,7 +90,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setEnable(false);
             Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
-            if(userByEmail.isEmpty()) {
+            if (userByEmail.isEmpty()) {
                 User tmp = userRepository.save(user);
                 String token = JWTGenerator.generateVerificationToken(tmp.getId());
                 sendEmailWithVerificationToken(tmp.getEmail(), token);
@@ -102,7 +102,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad email").build();
         } catch (WeakPasswordException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "weak password").build();
-        }  catch (EmailException e) {
+        } catch (EmailException e) {
             log.error("Error while sending verification email", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
         } catch (Exception e) {
@@ -141,16 +141,22 @@ public class UserService {
                 log.error("Error while sending verification email", e);
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
             } catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause","save error").build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "save error").build();
             }
         }
     }
 
-    public ResponseEntity<?> deleteUser(long id) {
-        try {
-            userRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        } catch (EmptyResultDataAccessException e) {
+    public ResponseEntity<?> deleteUser(long id, String password) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User userFromDb = user.get();
+            if (isPasswordEquals(userFromDb.getPassword(), password)) {
+                userRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "wrong password").build();
+            }
+        } else {
             return ResponseEntity.notFound().header("Cause", "user not found").build();
         }
     }
