@@ -44,7 +44,8 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     }
 
     private List<Exercise> getExerciseListFilteredByTrainingType(){
-        return exerciseRepository.getAllByExerciseForm_Name(TRAINING_TYPE);
+       // return exerciseRepository.getAllByExerciseForm_Name(TRAINING_TYPE);
+        return null;
     }
 
     private List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises){
@@ -72,7 +73,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         for(String s: bodyParts){
             //lista ćwiczeń na daną partię
             List<Exercise> collect = exercises.stream()
-                    .filter(exercise -> exercise.getBodyParts().get(0).getName().equals(s)).collect(Collectors.toList());
+                    .filter(exercise -> exercise.getBodyPart().getName().equals(s)).collect(Collectors.toList());
             int i;
             int amountOfExercices = 0;
             if(smallBodyParts.contains(s)) {

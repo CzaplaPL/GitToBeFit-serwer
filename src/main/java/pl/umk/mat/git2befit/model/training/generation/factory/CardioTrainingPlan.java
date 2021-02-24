@@ -31,7 +31,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         // wylosowanie odpowiedniej ilosci cwiczen
 
         //todo podobnie jak u michala, moze byc wydzielone do oddzielnej klasy
-        this.allExercises = exerciseRepository.getAllByExerciseForm_Name(TRAINING_TYPE);
+        //this.allExercises = exerciseRepository.getAllByExerciseForm_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = getFilteredListOfExercises(trainingForm.getEquipmentIDs());
 
         int duration = trainingForm.getDuration();
@@ -66,20 +66,20 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {
         //todo abstrakcyjne partie (rece/nogi/plecy) czy dokladne
-        List<BodyPart> bodyParts = exercise.getBodyParts();
+        /*List<BodyPart> bodyParts = exercise.getBodyParts();
         for (BodyPart bodyPart : bodyParts) {
-            boolean any = rolledExercises.stream().anyMatch(ex -> ex.getBodyParts().contains(bodyPart));
+            boolean any = rolledExercises.stream().anyMatch(ex -> ex.getBodyPart().contains(bodyPart));
             if (any)
                 return true;
-        }
+        }*/
         return false;
     }
 
     //todo do ustalenia, jak zapisujemy w treningu, ile jest obwodow
     private List<ExerciseExecution> getExercisesExecutionsInCircuit(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
-        for (Exercise exercise : rolledExercises) {
-            String form = exercise.getExerciseForm().getName().toUpperCase();
+        /*for (Exercise exercise : rolledExercises) {
+            //String form = exercise.getExerciseForm().getName().toUpperCase();
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             //todo dodac nazwy typow cwiczen
             // powtorzenia
@@ -91,13 +91,13 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 exerciseExecution.setTime(2137);
             }
             execList.add(exerciseExecution);
-        }
+        }*/
         return execList;
     }
 
     private List<ExerciseExecution> getExercisesExecutionsWithSeries(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
-        for (Exercise exercise : rolledExercises) {
+        /*for (Exercise exercise : rolledExercises) {
             String form = exercise.getExerciseForm().getName().toUpperCase();
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             //todo dodac nazwy typow cwiczen
@@ -113,7 +113,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 exerciseExecution.setTime(2137);
             }
             execList.add(exerciseExecution);
-        }
+        }*/
         return execList;
     }
 
