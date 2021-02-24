@@ -20,19 +20,15 @@ public class Exercise implements Serializable {
     private long id;
     @Column(unique = true)
     private String name;
-    private String description;
+    private String descriptionOfStartPosition;
     private String descriptionOfCorrectExecution;
+    private String hints;
     @ManyToOne(fetch = FetchType.EAGER)
     private ExerciseForm exerciseForm;
     private String videoUrl;
     private String photoUrl;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @Column(nullable = false)
-    @JoinTable(name = "body_parts_of_exercises",
-            joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name="body_part_id", referencedColumnName="id")}
-    )
-    private List<BodyPart> bodyParts;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private BodyPart bodyPart;
     @ManyToMany(fetch = FetchType.LAZY)
     @Column(nullable = false)
     @JoinTable(name = "training_types_of_exercises",
@@ -47,6 +43,21 @@ public class Exercise implements Serializable {
                inverseJoinColumns = {@JoinColumn(name="equipment_id", referencedColumnName="id")}
     )
     private List<Equipment> equipmentsNeeded;
+
+    public Exercise(){}
+
+    public Exercise(long id, String name, String descriptionOfStartPosition, String descriptionOfCorrectExecution, String hints, ExerciseForm exerciseForm, String videoUrl, BodyPart bodyPart, List<TrainingType> trainingTypes, List<Equipment> equipmentsNeeded) {
+        this.id = id;
+        this.name = name;
+        this.descriptionOfStartPosition = descriptionOfStartPosition;
+        this.descriptionOfCorrectExecution = descriptionOfCorrectExecution;
+        this.hints = hints;
+        this.exerciseForm = exerciseForm;
+        this.videoUrl = videoUrl;
+        this.bodyPart = bodyPart;
+        this.trainingTypes = trainingTypes;
+        this.equipmentsNeeded = equipmentsNeeded;
+    }
 
     public long getId() {
         return id;
@@ -64,12 +75,12 @@ public class Exercise implements Serializable {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
+    public String getDescriptionOfStartPosition() {
+        return descriptionOfStartPosition;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionOfStartPosition(String descriptionOfStartPosition) {
+        this.descriptionOfStartPosition = descriptionOfStartPosition;
     }
 
     public String getDescriptionOfCorrectExecution() {
@@ -78,6 +89,14 @@ public class Exercise implements Serializable {
 
     public void setDescriptionOfCorrectExecution(String descriptionOfCorrectExecution) {
         this.descriptionOfCorrectExecution = descriptionOfCorrectExecution;
+    }
+
+    public String getHints() {
+        return hints;
+    }
+
+    public void setHints(String hints) {
+        this.hints = hints;
     }
 
     public ExerciseForm getExerciseForm() {
@@ -104,12 +123,12 @@ public class Exercise implements Serializable {
         this.photoUrl = photoUrl;
     }
 
-    public List<BodyPart> getBodyParts() {
-        return bodyParts;
+    public BodyPart getBodyPart() {
+        return bodyPart;
     }
 
-    public void setBodyParts(List<BodyPart> bodyParts) {
-        this.bodyParts = bodyParts;
+    public void setBodyPart(BodyPart bodyParts) {
+        this.bodyPart = bodyParts;
     }
 
     public List<TrainingType> getTrainingTypes() {
@@ -126,21 +145,5 @@ public class Exercise implements Serializable {
 
     public void setEquipmentsNeeded(List<Equipment> equipmentsNeeded) {
         this.equipmentsNeeded = equipmentsNeeded;
-    }
-
-    @Override
-    public String toString() {
-        return "Exercise{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", descriptionOfCorrectExecution='" + descriptionOfCorrectExecution + '\'' +
-                ", exerciseForm=" + exerciseForm +
-                ", videoUrl='" + videoUrl + '\'' +
-                ", photoUrl='" + photoUrl + '\'' +
-                ", bodyParts=" + bodyParts +
-                ", trainingTypes=" + trainingTypes +
-                ", equipmentsNeeded=" + equipmentsNeeded +
-                '}';
     }
 }

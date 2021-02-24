@@ -54,6 +54,13 @@ public class Equipment implements Serializable {
         this.url = url;
     }
 
+    public Equipment(long id, EquipmentType type, String name, String url) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.url = url;
+    }
+
     @Override
     public String toString() {
         return "Equipment{" +

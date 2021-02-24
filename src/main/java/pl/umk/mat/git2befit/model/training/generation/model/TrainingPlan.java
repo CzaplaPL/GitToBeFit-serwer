@@ -17,8 +17,6 @@ public class TrainingPlan implements Serializable {
     private long id;
     @Column(nullable = false)
     private long trainingId;
-    /*@ManyToMany(fetch = FetchType.EAGER)
-    private List<Exercise> exercises = new ArrayList<>();*/
     @ManyToMany(fetch = FetchType.EAGER)
     private List<ExerciseExecution> exercisesExecutions;
 
@@ -29,7 +27,6 @@ public class TrainingPlan implements Serializable {
     public void setExercisesExecutions(List<ExerciseExecution> exercisesExecutions) {
         this.exercisesExecutions = exercisesExecutions;
     }
-
 
     public long getId() {
         return id;

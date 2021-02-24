@@ -30,6 +30,13 @@ public class ExerciseForm implements Serializable {
         this.name = name;
     }
 
+    public ExerciseForm(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public ExerciseForm(){}
+
     @Override
     public String toString() {
         return "ExerciseForm{" +
