@@ -4,11 +4,11 @@ import java.util.List;
 
 public class TrainingForm {
     private List<Long> equipmentIDs;
-    private String trainingType;
+    private String trainingType; //
     private List<String> bodyParts;
-    private int daysCount;
-    private String scheduleType;
-    private int duration;
+    private int daysCount; //
+    private String scheduleType; //
+    private int duration; //
 
     public List<Long> getEquipmentIDs() {
         return equipmentIDs;

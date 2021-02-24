@@ -62,6 +62,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         //if na każdą partię
         //"CHEST, SIXPACK, BACK, THIGHS, CALVES, BUTTOCKS, BICEPS, TRICEPS, SHOULDERS";
 
+        //todo moze byc wydzielone do klasy ze stalymi
         List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS","SHOULDER");
         List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
         Random random = new Random();

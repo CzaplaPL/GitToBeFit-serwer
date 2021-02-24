@@ -18,12 +18,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.exceptions.EmailValidationException;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
-import pl.umk.mat.git2befit.messaging.email.EmailMessage;
+import pl.umk.mat.git2befit.messaging.email.EmailMessageFacade;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
-import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
+import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
+import pl.umk.mat.git2befit.security.PasswordGenerator;
 import pl.umk.mat.git2befit.validation.UserValidationService;
 
 import java.io.IOException;
@@ -38,7 +39,7 @@ import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private Logger log = LoggerFactory.getLogger(UserService.class);
+    private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
     public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
@@ -89,7 +90,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setEnable(false);
             Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
-            if(userByEmail.isEmpty()) {
+            if (userByEmail.isEmpty()) {
                 User tmp = userRepository.save(user);
                 String token = JWTGenerator.generateVerificationToken(tmp.getId());
                 sendEmailWithVerificationToken(tmp.getEmail(), token);
@@ -101,7 +102,7 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad email").build();
         } catch (WeakPasswordException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "weak password").build();
-        }  catch (EmailException e) {
+        } catch (EmailException e) {
             log.error("Error while sending verification email", e);
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
         } catch (Exception e) {
@@ -127,34 +128,35 @@ public class UserService {
         if (dbUser.isEmpty()) {
             return ResponseEntity.notFound().header("Cause", "user not found").build();
         } else {
-            String newPassword = RandomString.make(10);
+            String newPassword = PasswordGenerator.generateRandomPassword();
             String message = MessageGenerator.getPasswordChangingMessage(newPassword);
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
             try {
-                userRepository.save(user);
-
-                EmailMessage emailMessage = new EmailMessage.Builder()
-                        .address(email)
-                        .subject("Przypomnienie hasła")
-                        .message(message)
-                        .build();
+                EmailMessageFacade emailMessage = new EmailMessageFacade("Przypomnienie hasła", message, email);
                 emailMessage.sendEmail();
+                userRepository.save(user);
                 return ResponseEntity.ok().build();
             } catch (EmailException e) {
                 log.error("Error while sending verification email", e);
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
             } catch (DataIntegrityViolationException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).header("save error").build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "save error").build();
             }
         }
     }
 
-    public ResponseEntity<?> deleteUser(long id) {
-        try {
-            userRepository.deleteById(id);
-            return ResponseEntity.ok().build();
-        } catch (EmptyResultDataAccessException e) {
+    public ResponseEntity<?> deleteUser(long id, String password) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            User userFromDb = user.get();
+            if (isPasswordEquals(userFromDb.getPassword(), password)) {
+                userRepository.deleteById(id);
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "wrong password").build();
+            }
+        } else {
             return ResponseEntity.notFound().header("Cause", "user not found").build();
         }
     }
@@ -189,12 +191,10 @@ public class UserService {
     }
 
     private void sendEmailWithVerificationToken(String email, String token) throws EmailException {
-        EmailMessage msg = new EmailMessage.Builder()
-                .address(email)
-                .subject("Weryfikacja konta")
-                .message(MessageGenerator.getVerificationMessage(token))
-                .build();
-        msg.sendEmail();
+        EmailMessageFacade emailToSend = new EmailMessageFacade("Weryfikacja konta",
+                MessageGenerator.getVerificationMessage(token),
+                email);
+        emailToSend.sendEmail();
     }
 
     public ResponseEntity<?> activateUser(String token) {
@@ -217,7 +217,7 @@ public class UserService {
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
             }
         } catch (TokenExpiredException e) {
-            String msg = null;
+            String msg;
             try {
                 msg = Files.readString(Path.of("./verification-messages/token-expired.txt"));
                 return ResponseEntity.ok().contentType(MediaType.TEXT_HTML).body(msg);
@@ -240,13 +240,13 @@ public class UserService {
 
             Optional<User> userOptional = userRepository.findByEmail(email);
 
-            if(userOptional.isPresent()){
+            if (userOptional.isPresent()) {
                 String newToken = JWTGenerator.generate(email);
                 return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + newToken).build();
-            }else {
+            } else {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "user not found").build();
             }
-        }catch (JWTVerificationException e){
+        } catch (JWTVerificationException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "token is not valid").build();
         }
     }
