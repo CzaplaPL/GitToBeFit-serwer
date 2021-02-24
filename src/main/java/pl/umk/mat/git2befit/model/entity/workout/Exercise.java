@@ -2,7 +2,7 @@ package pl.umk.mat.git2befit.model.entity.workout;
 
 
 import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.ScheduleType;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 
@@ -24,7 +24,7 @@ public class Exercise implements Serializable {
     private String descriptionOfCorrectExecution;
     private String hints;
     @ManyToOne(fetch = FetchType.EAGER)
-    private ExerciseForm exerciseForm;
+    private ScheduleType scheduleType;
     private String videoUrl;
     private String photoUrl;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -46,14 +46,25 @@ public class Exercise implements Serializable {
 
     public Exercise(){}
 
-    public Exercise(long id, String name, String descriptionOfStartPosition, String descriptionOfCorrectExecution, String hints, ExerciseForm exerciseForm, String videoUrl, BodyPart bodyPart, List<TrainingType> trainingTypes, List<Equipment> equipmentsNeeded) {
+    public Exercise(long id,
+                    String name,
+                    String descriptionOfStartPosition,
+                    String descriptionOfCorrectExecution,
+                    String hints,
+                    ScheduleType scheduleType,
+                    String videoUrl,
+                    String photoUrl,
+                    BodyPart bodyPart,
+                    List<TrainingType> trainingTypes,
+                    List<Equipment> equipmentsNeeded) {
         this.id = id;
         this.name = name;
         this.descriptionOfStartPosition = descriptionOfStartPosition;
         this.descriptionOfCorrectExecution = descriptionOfCorrectExecution;
         this.hints = hints;
-        this.exerciseForm = exerciseForm;
+        this.scheduleType = scheduleType;
         this.videoUrl = videoUrl;
+        this.photoUrl = photoUrl;
         this.bodyPart = bodyPart;
         this.trainingTypes = trainingTypes;
         this.equipmentsNeeded = equipmentsNeeded;
@@ -99,12 +110,12 @@ public class Exercise implements Serializable {
         this.hints = hints;
     }
 
-    public ExerciseForm getExerciseForm() {
-        return exerciseForm;
+    public ScheduleType getScheduleType() {
+        return scheduleType;
     }
 
-    public void setExerciseForm(ExerciseForm exerciseForm) {
-        this.exerciseForm = exerciseForm;
+    public void setScheduleType(ScheduleType scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public String getVideoUrl() {
@@ -127,8 +138,8 @@ public class Exercise implements Serializable {
         return bodyPart;
     }
 
-    public void setBodyPart(BodyPart bodyParts) {
-        this.bodyPart = bodyParts;
+    public void setBodyPart(BodyPart bodyPart) {
+        this.bodyPart = bodyPart;
     }
 
     public List<TrainingType> getTrainingTypes() {

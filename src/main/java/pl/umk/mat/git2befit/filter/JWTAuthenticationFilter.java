@@ -37,7 +37,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             creds.getPassword(),
                             new ArrayList<>())
             );
+            //todo teoretycznie, jesli bedziemy chwytac wyjatek authenticationexception to sprawdzajac wiadomosc w srodku powinnismy byc w stanie dobrac odpowiednie bloki cause
         } catch (IOException e) {
+            //todo zrobić loga i poprawic
             throw new RuntimeException(e);
         }
     }

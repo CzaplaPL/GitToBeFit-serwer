@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.ScheduleType;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
@@ -17,6 +17,7 @@ import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
+import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,9 +46,13 @@ public class TrainingPlanController {
                 trainingPlans.add(trainingPlan);
             }
             ExerciseExecution exerciseExecution = new ExerciseExecution();
-            exerciseExecution.setExercise(  new Exercise(i, "cwiczenie" + i, "start" + i, "execution" + i, "hints1 /n hint2"
-                    , new ExerciseForm(i, "exerciseForm" + i)
-                    , "videURl" + i
+            exerciseExecution.setExercise(  new Exercise(i,
+                    "cwiczenie" + i,
+                    "start" + i,
+                    "execution" + i,
+                    "hints1 /n hint2"
+                    , new ScheduleType(i, "exerciseForm" + i)
+                    , "videURl" + i, "photo"+i
                     , new BodyPart(i, "bodyPart" + i)
                     , List.of(new TrainingType(i, "TrainingType" + i))
                     , List.of(new Equipment(i, new EquipmentType(i, "kategoria"+i, "urlPhoto" + i)
@@ -64,5 +69,6 @@ public class TrainingPlanController {
 
         //TrainingPlan trainingPlan = manufacture.createTrainingPlan(trainingForm);
         return ResponseEntity.ok(training);
+
     }
 }

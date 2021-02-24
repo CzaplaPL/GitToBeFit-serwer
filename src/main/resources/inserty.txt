@@ -1,7 +1,28 @@
-INSERT into equipment_type(name) values ('Silownia');
-INSERT into equipment_type(name) values ('Fitness');
-INSERT into equipment_type(name) values ('Na zewnatrz');
+insert into equipment_type(name, url) VALUES ('Maszyna', '020-treadmill-2.png');
+insert into equipment_type(name, url) VALUES ('Sprzet fitness', 'jumping-rope.png');
+insert into equipment_type(name, url) VALUES ('Ciezary', '037-dumbbell-2.png');
+insert into equipment_type(name, url) VALUES ('Kalistenika', '049-rings.png');
 
-INSERT INTO equipment(name, type_id) values ('Ławeczka', 1);
-INSERT INTO equipment(name, type_id) values ('Bieżnia', 2);
-INSERT INTO equipment(name, type_id) values ('Skakanka', 3);
+insert into equipment(name, url, type_id) VALUES ('Bieznia', '044-treadmill.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Box', 'box.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Laweczka treningowa plaska', 'bench.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Laweczka treningowa regulowana', '009-machine-4.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Rower stacjonarny', '043-stationary-bike.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Step', '027-step.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Steper', 'stepper.png', 1);
+insert into equipment(name, url, type_id) VALUES ('Wyciag gorny', '035-machine.png', 1);
+
+insert into equipment(name, url, type_id) VALUES ('Ekspander klatki piersiowej', 'chest-expander.png', 2);
+insert into equipment(name, url, type_id) VALUES ('Mata treningowa', '041-yoga-mat.png', 2);
+insert into equipment(name, url, type_id) VALUES ('Pilka gimnastyczna', '034-medicine-ball.png', 2);
+insert into equipment(name, url, type_id) VALUES ('Roller', '036-dumbbell-3.png', 2);
+insert into equipment(name, url, type_id) VALUES ('Skakanka', '028-jumping-rope.png', 2);
+insert into equipment(name, url, type_id) VALUES ('Tasma treningowa', '031-measuring-tape.png', 2);
+
+insert into equipment(name, url, type_id) VALUES ('Gryf', 'barbell-bar.png', 3);
+insert into equipment(name, url, type_id) VALUES ('Hantle', 'dumbbells-with-weights.png', 3);
+insert into equipment(name, url, type_id) VALUES ('Kettlebell', '050-kettlebell.png', 3);
+insert into equipment(name, url, type_id) VALUES ('Sztanga gieta', '040-dumbbell.png', 3);
+
+insert into equipment(name, url, type_id) VALUES ('Drazek do podciagania', '045-pull-up-bar.png', 4);
+insert into equipment(name, url, type_id) VALUES ('Drazek do dipsow', 'dips.png', 4);

@@ -69,8 +69,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id) {
-        return userService.deleteUser(id);
+    public ResponseEntity<?> delete(@PathVariable long id, @RequestHeader String password) {
+        return userService.deleteUser(id, password);
     }
 
     @PostMapping("/token-verification")
