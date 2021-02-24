@@ -46,4 +46,14 @@ public class ExerciseExecution {
         this.count = count;
     }
 
+    @Override
+    public String toString() {
+        return "ExerciseExecution{" +
+                "id=" + id +
+                ", time=" + time +
+                ", series=" + series +
+                ", count=" + count +
+                ", exercise=" + exercise +
+                '}';
+    }
 }

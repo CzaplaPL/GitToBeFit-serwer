@@ -31,6 +31,13 @@ public class BodyPart implements Serializable {
         this.name = name;
     }
 
+    public BodyPart(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public BodyPart(){}
+
     @Override
     public String toString() {
         return "BodyPart{" +

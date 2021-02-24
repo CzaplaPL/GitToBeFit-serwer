@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.model.entity.workout.conditions;
 
+import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -30,6 +32,13 @@ public class TrainingType implements Serializable {
     public void setName(String name) {
         this.name = name;
     }
+
+    public TrainingType(long id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
+    public TrainingType(){}
 
     @Override
     public String toString() {

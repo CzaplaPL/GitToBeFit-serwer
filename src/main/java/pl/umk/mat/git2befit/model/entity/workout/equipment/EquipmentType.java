@@ -17,6 +17,12 @@ public class EquipmentType implements Serializable {
 
     public EquipmentType() { }
 
+    public EquipmentType(long id, String name, String url) {
+        this.id = id;
+        this.name = name;
+        this.url = url;
+    }
+
     public long getId() {
         return id;
     }
