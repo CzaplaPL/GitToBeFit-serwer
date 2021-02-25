@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
 
-//todo spradzic, czy na pewno uwzglednione jest to, ze trening ma byc obwodowy (chodzi o czas treningu)
 @Component
 public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
@@ -26,11 +25,6 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
     @Override
     public TrainingPlan create(TrainingForm trainingForm) {
-        // sciagnij wszystkie elementy na podstawie typu treningu - git
-        // przefiltruj wzgledem odpowiedniego sprzetu - git
-        // na podstawie okreslonego czasu wyznacz liczbe cwiczen do wylosowanias
-        // wylosowanie odpowiedniej ilosci cwiczen
-
         this.allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = getFilteredListOfExercises(trainingForm.getEquipmentIDs());
 
@@ -91,12 +85,12 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             exerciseExecution.setExercise(exercise);
             //todo podmienic nazwy
             if (scheduleType.equals("")) {
-                exerciseExecution.setSeries(1);
+                exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
             } else if (scheduleType.equals("czasowy")) {
                 exerciseExecution.setCount(0);
-                exerciseExecution.setSeries(1);
+                exerciseExecution.setSeries(3);
                 exerciseExecution.setTime(30); // w sekundach
             }
             execList.add(exerciseExecution);
