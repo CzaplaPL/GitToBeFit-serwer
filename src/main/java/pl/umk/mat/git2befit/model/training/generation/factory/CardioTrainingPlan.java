@@ -75,7 +75,6 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
     }
 
-    //todo do ustalenia, jak zapisujemy w treningu, ile jest obwodow
     private List<ExerciseExecution> getExercisesExecutionsInCircuit(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
         for (Exercise exercise : rolledExercises) {
@@ -83,12 +82,11 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            //todo podmienic nazwy
-            if (scheduleType.equals("")) {
+            if (scheduleType.equals("SERIES")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
-            } else if (scheduleType.equals("czasowy")) {
+            } else if (scheduleType.equals("TIME")) {
                 exerciseExecution.setCount(0);
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setTime(30); // w sekundach
@@ -105,12 +103,11 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            //todo podmienic nazwy
-            if (scheduleType.equals("powtorzenia")) {
+            if (scheduleType.equals("SERIES")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
-            } else if (scheduleType.equals("czasowy")) {
+            } else if (scheduleType.equals("TIME")) {
                 exerciseExecution.setSeries(0);
                 exerciseExecution.setCount(3);
                 exerciseExecution.setTime(30);
