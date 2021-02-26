@@ -4,8 +4,8 @@ import javax.persistence.*;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "schedule_types")
-public class ScheduleType implements Serializable {
+@Table(name = "exercise_forms")
+public class ExerciseForm implements Serializable {
     private static final long serialVersionUID = 6L;
 
     @Id
@@ -30,9 +30,9 @@ public class ScheduleType implements Serializable {
         this.name = name;
     }
 
-    public ScheduleType(){}
+    public ExerciseForm(){}
 
-    public ScheduleType(long id, String name) {
+    public ExerciseForm(long id, String name) {
         this.id = id;
         this.name = name;
     }
