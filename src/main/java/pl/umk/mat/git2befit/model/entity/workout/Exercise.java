@@ -20,8 +20,14 @@ public class Exercise implements Serializable {
     private long id;
     @Column(unique = true)
     private String name;
+    @Lob
+    @Column(length=2000)
     private String descriptionOfStartPosition;
+    @Lob
+    @Column(length=2000)
     private String descriptionOfCorrectExecution;
+    @Lob
+    @Column(length=2000)
     private String hints;
     @ManyToOne(fetch = FetchType.EAGER)
     private ExerciseForm exerciseForm;

@@ -40,7 +40,7 @@ public class EquipmentService {
     }
 
     public ResponseEntity<?> getNoEquipment() {
-        Optional<Equipment> noEquipOptional = equipmentRepository.findEquipmentByNameIsIn("Bez sprzetu");
+        Optional<Equipment> noEquipOptional = equipmentRepository.findEquipmentByName("Bez sprzetu");
         if (noEquipOptional.isPresent()) {
             Equipment noEquip = noEquipOptional.get();
             return ResponseEntity.ok().header("id", String.valueOf(noEquip.getId())).build();
