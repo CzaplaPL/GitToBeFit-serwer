@@ -4,13 +4,11 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import net.bytebuddy.utility.RandomString;
 import org.apache.commons.mail.EmailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -251,5 +249,15 @@ public class UserService {
         } catch (JWTVerificationException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "token is not valid").build();
         }
+    }
+
+    public ResponseEntity<?> isAccountActivated(String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            return ResponseEntity.ok().header("activation", String.valueOf(user.get().isEnable())).build();
+        } else {
+            return ResponseEntity.notFound().header("Cause", "user not found").build();
+        }
+
     }
 }

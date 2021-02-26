@@ -77,4 +77,9 @@ public class UserController {
     public ResponseEntity<?> verify(@RequestHeader String token){
         return userService.verify(token);
     }
+
+    @PostMapping("/activation")
+    public ResponseEntity<?> isAccountActivated(@RequestHeader String email) {
+        return userService.isAccountActivated(email);
+    }
 }
