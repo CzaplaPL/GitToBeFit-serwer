@@ -2,7 +2,7 @@ package pl.umk.mat.git2befit.model.entity.workout;
 
 
 import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.ScheduleType;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 
@@ -24,7 +24,7 @@ public class Exercise implements Serializable {
     private String descriptionOfCorrectExecution;
     private String hints;
     @ManyToOne(fetch = FetchType.EAGER)
-    private ScheduleType scheduleType;
+    private ExerciseForm exerciseForm;
     private String videoUrl;
     private String photoUrl;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,7 +51,7 @@ public class Exercise implements Serializable {
                     String descriptionOfStartPosition,
                     String descriptionOfCorrectExecution,
                     String hints,
-                    ScheduleType scheduleType,
+                    ExerciseForm exerciseForm,
                     String videoUrl,
                     String photoUrl,
                     BodyPart bodyPart,
@@ -62,7 +62,7 @@ public class Exercise implements Serializable {
         this.descriptionOfStartPosition = descriptionOfStartPosition;
         this.descriptionOfCorrectExecution = descriptionOfCorrectExecution;
         this.hints = hints;
-        this.scheduleType = scheduleType;
+        this.exerciseForm = exerciseForm;
         this.videoUrl = videoUrl;
         this.photoUrl = photoUrl;
         this.bodyPart = bodyPart;
@@ -110,12 +110,12 @@ public class Exercise implements Serializable {
         this.hints = hints;
     }
 
-    public ScheduleType getScheduleType() {
-        return scheduleType;
+    public ExerciseForm getScheduleType() {
+        return exerciseForm;
     }
 
-    public void setScheduleType(ScheduleType scheduleType) {
-        this.scheduleType = scheduleType;
+    public void setScheduleType(ExerciseForm exerciseForm) {
+        this.exerciseForm = exerciseForm;
     }
 
     public String getVideoUrl() {
