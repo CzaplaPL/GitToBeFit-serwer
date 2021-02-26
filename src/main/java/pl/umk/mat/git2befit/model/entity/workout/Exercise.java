@@ -175,7 +175,7 @@ public class Exercise implements Serializable {
                 Objects.equals(descriptionOfStartPosition, exercise.descriptionOfStartPosition) &&
                 Objects.equals(descriptionOfCorrectExecution, exercise.descriptionOfCorrectExecution) &&
                 Objects.equals(hints, exercise.hints) &&
-                Objects.equals(scheduleType, exercise.scheduleType) &&
+                Objects.equals(exerciseForm, exercise.exerciseForm) &&
                 Objects.equals(videoUrl, exercise.videoUrl) &&
                 Objects.equals(photoUrl, exercise.photoUrl) &&
                 Objects.equals(bodyPart, exercise.bodyPart) &&
@@ -185,6 +185,6 @@ public class Exercise implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, descriptionOfStartPosition, descriptionOfCorrectExecution, hints, scheduleType, videoUrl, photoUrl, bodyPart, trainingTypes, equipmentsNeeded);
+        return Objects.hash(id, name, descriptionOfStartPosition, descriptionOfCorrectExecution, hints, exerciseForm, videoUrl, photoUrl, bodyPart, trainingTypes, equipmentsNeeded);
     }
 }
