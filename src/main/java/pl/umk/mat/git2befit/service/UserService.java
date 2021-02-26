@@ -168,6 +168,8 @@ public class UserService {
             if (isPasswordEquals(user.getPassword(), form.getPassword())) {
                 try {
                     UserValidationService.validateEmail(form.getEmail());
+                    if (form.getEmail().equals(user.getEmail()))
+                        throw new DataIntegrityViolationException("the same emails");
                     user.setEmail(form.getEmail());
                     user.setEnable(false);
                     userRepository.save(user);

@@ -23,4 +23,9 @@ public class EquipmentController {
     public ResponseEntity<List<SimplifiedEquipment>> getEquipmentsOfSpecificType(@RequestParam Long typeId) {
         return equipmentService.getEquipmentsOfSpecificType(typeId);
     }
+
+    @GetMapping("/no-equipment")
+    public ResponseEntity<?> getNoEquipment() {
+        return equipmentService.getNoEquipment();
+    }
 }
