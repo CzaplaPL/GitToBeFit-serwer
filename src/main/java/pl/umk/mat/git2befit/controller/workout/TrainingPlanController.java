@@ -1,6 +1,5 @@
 package pl.umk.mat.git2befit.controller.workout;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -8,7 +7,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.ScheduleType;
+import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
@@ -17,7 +16,6 @@ import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
-import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,7 +49,7 @@ public class TrainingPlanController {
                     "start" + i,
                     "execution" + i,
                     "hints1 /n hint2"
-                    , new ScheduleType(i, "exerciseForm" + i)
+                    , new ExerciseForm(i, "exerciseForm" + i)
                     , "videURl" + i, "photo"+i
                     , new BodyPart(i, "bodyPart" + i)
                     , List.of(new TrainingType(i, "TrainingType" + i))
