@@ -14,8 +14,8 @@ import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.model.training.generation.factory.TrainingPlanManufacture;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
+import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +31,17 @@ public class TrainingPlanController {
 
     @PostMapping("/generate")
     public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm){
-        List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
+        /*List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
         List<TrainingPlan> trainingPlans = new ArrayList<>();
 
         for (int i = 1; i <= 9; i++) {
             if(i%3 == 0){
-                TrainingPlan trainingPlan = new TrainingPlan();
-                trainingPlan.setId(11);
-                trainingPlan.setId(1);
-                trainingPlan.setExercisesExecutions(exerciseExecutions);
+                TrainingPlan training = new TrainingPlan();
+                training.setId(11);
+                training.setId(1);
+                training.setExercisesExecutions(exerciseExecutions);
                 exerciseExecutions.clear();
-                trainingPlans.add(trainingPlan);
+                trainingPlans.add(training);
             }
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             exerciseExecution.setExercise(  new Exercise(i,
@@ -62,11 +62,12 @@ public class TrainingPlanController {
             System.out.println(exerciseExecution.getExercise().getId());
 
         }
-        Training training = new Training(trainingForm, trainingPlans);
-        System.out.println(trainingPlans.toString());
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+        System.out.println(trainingPlans.toString());*/
 
-        //TrainingPlan trainingPlan = manufacture.createTrainingPlan(trainingForm);
-        return ResponseEntity.ok(training);
+        List<Training> training = manufacture.createTrainingPlan(trainingForm);
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, training);
+        return ResponseEntity.ok(trainingPlan);
 
     }
 }

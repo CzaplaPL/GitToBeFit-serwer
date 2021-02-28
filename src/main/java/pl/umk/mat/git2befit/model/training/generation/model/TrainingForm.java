@@ -4,11 +4,11 @@ import java.util.List;
 
 public class TrainingForm {
     private List<Long> equipmentIDs;
-    private String trainingType; //
+    private String trainingType;
     private List<String> bodyParts;
-    private int daysCount; //
-    private String scheduleType; //
-    private int duration; //
+    private int daysCount;
+    private String exerciseForm;
+    private int duration;
 
     public List<Long> getEquipmentIDs() {
         return equipmentIDs;
@@ -42,12 +42,12 @@ public class TrainingForm {
         this.daysCount = daysCount;
     }
 
-    public String getScheduleType() {
-        return scheduleType;
+    public String getExerciseForm() {
+        return exerciseForm;
     }
 
-    public void setScheduleType(String scheduleType) {
-        this.scheduleType = scheduleType;
+    public void setExerciseForm(String exerciseForm) {
+        this.exerciseForm = exerciseForm;
     }
 
     public int getDuration() {

@@ -1,9 +1,8 @@
 package pl.umk.mat.git2befit.model.training.generation.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
+import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -20,19 +18,24 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FITNESS";
     private static final int SINGLE_STEP = 3;
     private static final List<String> BODY_PARTS = List.of("CHEST", "SIXPACK", "BACK",  "LEGS", "ARMS");
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+
+    private final ExerciseRepository exerciseRepository;
+
     private List<Exercise> allExercises;
 
+    public FitnessTrainingPlan(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
+
     @Override
-    public TrainingPlan create(TrainingForm trainingForm) {
+    public List<Training> create(TrainingForm trainingForm) {
         this.allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = getFilteredListOfExercises(trainingForm.getEquipmentIDs());
 
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
-        TrainingPlan trainingPlan = new TrainingPlan();
+        Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
         for (String bodyPart : BODY_PARTS) {
             List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises, bodyPart);
@@ -40,7 +43,7 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
 //                randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.get())
             }
         }
-        return trainingPlan;
+        return List.of(training);
     }
 
     private List<Exercise> getFilteredListOfExercises(List<Long> equipmentIndexList) {
