@@ -55,7 +55,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 }
             }
         }
-        String scheduleType = trainingForm.getExerciseForm().toUpperCase();
+        String scheduleType = trainingForm.getScheduleType().toUpperCase();
         switch (scheduleType) {
             case "SERIES" -> {
                 List<ExerciseExecution> exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);

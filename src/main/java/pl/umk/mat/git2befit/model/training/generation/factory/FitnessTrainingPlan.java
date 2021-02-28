@@ -49,11 +49,9 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             }
         }
         List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
-        String scheduleType = trainingForm.getExerciseForm().toUpperCase();
+        String scheduleType = trainingForm.getScheduleType().toUpperCase();
         switch (scheduleType) {
-            case "SERIES" -> {
-                exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);
-            }
+            case "SERIES" -> exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);
             case "CIRCUIT" -> {
                 exercisesExecutions = getExercisesExecutionsInCircuit(rolledExercises);
             }
