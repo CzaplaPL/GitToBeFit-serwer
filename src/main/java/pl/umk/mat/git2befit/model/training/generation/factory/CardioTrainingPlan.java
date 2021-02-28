@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
-//todo spradzic, czy na pewno uwzglednione jest to, ze trening ma byc obwodowy (chodzi o czas treningu)
+
 @Component
 public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
@@ -25,13 +25,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
     @Override
     public TrainingPlan create(TrainingForm trainingForm) {
-        // sciagnij wszystkie elementy na podstawie typu treningu - git
-        // przefiltruj wzgledem odpowiedniego sprzetu - git
-        // na podstawie okreslonego czasu wyznacz liczbe cwiczen do wylosowanias
-        // wylosowanie odpowiedniej ilosci cwiczen
-
-        //todo podobnie jak u michala, moze byc wydzielone do oddzielnej klasy
-        //this.allExercises = exerciseRepository.getAllByExerciseForm_Name(TRAINING_TYPE);
+        this.allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = getFilteredListOfExercises(trainingForm.getEquipmentIDs());
 
         int duration = trainingForm.getDuration();
@@ -39,13 +33,24 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
         TrainingPlan trainingPlan = new TrainingPlan();
         List<Exercise> rolledExercises = new ArrayList<>();
-        //todo obsluzyc jak jest za malo cwiczen
-        //todo brak warunku zakonczenia petli, moze sie nie zakonczyc
-        while (rolledExercises.size() < exercisesToGet) {
-            int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
-            Exercise exercise = filteredListOfExercises.get(actualRandom);
-            if (checkIfBodyPartIsNotOverloaded(rolledExercises, exercise)) {
-                rolledExercises.add(exercise);
+        if (filteredListOfExercises.size() <= exercisesToGet) {
+            rolledExercises.addAll(filteredListOfExercises);
+        } else {
+            int counter = 0;
+            while (rolledExercises.size() < exercisesToGet &&
+                    counter < filteredListOfExercises.size()) {
+                int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
+                Exercise exercise = filteredListOfExercises.get(actualRandom);
+                if (checkIfBodyPartIsNotOverloaded(rolledExercises, exercise)) {
+                    rolledExercises.add(exercise);
+                }
+                counter++;
+            }
+            for (int i = 0; ((i < filteredListOfExercises.size()) && (rolledExercises.size() != exercisesToGet)); i++) {
+                Exercise actualExercise = filteredListOfExercises.get(i);
+                if (!rolledExercises.contains(actualExercise)) {
+                    rolledExercises.add(actualExercise);
+                }
             }
         }
         String scheduleType = trainingForm.getScheduleType().toUpperCase();
@@ -53,73 +58,68 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             case "SERIES" -> {
                 List<ExerciseExecution> exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);
                 trainingPlan.setExercisesExecutions(exercisesExecutions);
-                break;
             }
             case "CIRCUIT" -> {
                 List<ExerciseExecution> exerciseExecutions = getExercisesExecutionsInCircuit(rolledExercises);
                 trainingPlan.setExercisesExecutions(exerciseExecutions);
-                break;
             }
         }
         return trainingPlan;
     }
 
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {
-        //todo abstrakcyjne partie (rece/nogi/plecy) czy dokladne
-        /*List<BodyPart> bodyParts = exercise.getBodyParts();
-        for (BodyPart bodyPart : bodyParts) {
-            boolean any = rolledExercises.stream().anyMatch(ex -> ex.getBodyPart().contains(bodyPart));
-            if (any)
-                return true;
-        }*/
-        return false;
+        BodyPart bodyPartToFind = exercise.getBodyPart();
+        return rolledExercises.stream()
+                .map(Exercise::getBodyPart)
+                .noneMatch(bodyPart -> bodyPart.equals(bodyPartToFind));
+
     }
 
-    //todo do ustalenia, jak zapisujemy w treningu, ile jest obwodow
     private List<ExerciseExecution> getExercisesExecutionsInCircuit(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
-        /*for (Exercise exercise : rolledExercises) {
-            //String form = exercise.getExerciseForm().getName().toUpperCase();
+        for (Exercise exercise : rolledExercises) {
+            String scheduleType = exercise.getScheduleType().getName().toUpperCase();
             ExerciseExecution exerciseExecution = new ExerciseExecution();
-            //todo dodac nazwy typow cwiczen
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (form.equals("powtorzenia")) {
-                exerciseExecution.setSeries(1);
+            if (scheduleType.equals("SERIES")) {
+                exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
-            } else if (form.equals("czasowy")) {
-                exerciseExecution.setTime(2137);
+                exerciseExecution.setTime(0);
+            } else if (scheduleType.equals("TIME")) {
+                exerciseExecution.setCount(0);
+                exerciseExecution.setSeries(3);
+                exerciseExecution.setTime(30); // w sekundach
             }
             execList.add(exerciseExecution);
-        }*/
+        }
         return execList;
     }
 
     private List<ExerciseExecution> getExercisesExecutionsWithSeries(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
-        /*for (Exercise exercise : rolledExercises) {
-            String form = exercise.getExerciseForm().getName().toUpperCase();
+        for (Exercise exercise : rolledExercises) {
+            String scheduleType = exercise.getScheduleType().getName().toUpperCase();
             ExerciseExecution exerciseExecution = new ExerciseExecution();
-            //todo dodac nazwy typow cwiczen
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (form.equals("powtorzenia")) {
+            if (scheduleType.equals("SERIES")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
-            } else if (form.equals("czasowy")) {
+            } else if (scheduleType.equals("TIME")) {
                 exerciseExecution.setSeries(0);
-                exerciseExecution.setCount(0);
-                exerciseExecution.setTime(2137);
+                exerciseExecution.setCount(3);
+                exerciseExecution.setTime(30);
             }
             execList.add(exerciseExecution);
-        }*/
+        }
         return execList;
     }
 
     private List<Exercise> getFilteredListOfExercises(List<Long> equipmentIndexList) {
         Map<Long, Exercise> exercisesMap = allExercises.stream()
                 .collect(Collectors.toMap(Exercise::getId, exercise -> exercise));
-        return equipmentIndexList.stream().map(aLong -> exercisesMap.get(aLong)).collect(Collectors.toList());
+        return equipmentIndexList.stream().map(exercisesMap::get).collect(Collectors.toList());
     }
 }

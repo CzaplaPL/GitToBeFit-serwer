@@ -1,6 +1,7 @@
 package pl.umk.mat.git2befit.service.login;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,14 +40,20 @@ public class FacebookLogin {
         }
         Optional<User> userOptional = userRepository.findByEmail(facebookUser.getEmail());
 
-        createUserIfNotExists(facebookUser, userOptional);
+        try {
+            createUserIfNotExists(facebookUser, userOptional);
+            if (userOptional.isEmpty())
+                userOptional = userRepository.findByEmail(facebookUser.getEmail());
 
-        String token = JWTGenerator.generate(facebookUser.getEmail());
+            String token = JWTGenerator.generate(facebookUser.getEmail());
 
-        return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + token)
-                .header("idUser", userOptional.get().getId().toString())
-                .header("email", userOptional.get().getEmail())
-                .build();
+            return ResponseEntity.ok().header(AUTHORIZATION, TOKEN_PREFIX + token)
+                    .header("idUser", userOptional.get().getId().toString())
+                    .header("email", userOptional.get().getEmail())
+                    .build();
+        } catch (DataIntegrityViolationException exception) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicate email").build();
+        }
     }
 
     private FacebookUser validateFacebookToken(String facebookToken) {
@@ -59,7 +66,7 @@ public class FacebookLogin {
                 .block();
     }
 
-    private void createUserIfNotExists(FacebookUser facebookUser, Optional<User> userOptional) {
+    private void createUserIfNotExists(FacebookUser facebookUser, Optional<User> userOptional) throws DataIntegrityViolationException {
         if (userOptional.isEmpty()){
             userRepository.save(new User(facebookUser.getEmail(), encodePassword(PasswordGenerator.generateRandomPassword()), true));
         }
