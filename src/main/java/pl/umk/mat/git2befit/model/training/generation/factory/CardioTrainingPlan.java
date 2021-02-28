@@ -84,7 +84,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (scheduleType.equals("SERIES")) {
+            if (scheduleType.equals("REPEAT")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
@@ -105,7 +105,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (scheduleType.equals("SERIES")) {
+            if (scheduleType.equals("REPEAT")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
