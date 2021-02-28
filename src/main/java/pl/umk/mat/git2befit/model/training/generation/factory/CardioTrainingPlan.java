@@ -6,7 +6,6 @@ import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
