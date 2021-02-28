@@ -1,11 +1,13 @@
 package pl.umk.mat.git2befit.model.simplified;
 
+import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
+
 public class SimplifiedEquipment {
     private long id;
     private String name;
     private String url;
 
-    public SimplifiedEquipment(pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment equipment) {
+    public SimplifiedEquipment(Equipment equipment) {
         this.id = equipment.getId();
         this.name = equipment.getName();
         this.url = equipment.getUrl();

@@ -1,10 +1,10 @@
 package pl.umk.mat.git2befit.model.training.generation.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
+import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
@@ -20,18 +20,21 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
     private final static int SINGLE_STEP = 3;
     private List<Exercise> allExercises;
-    @Autowired
-    private ExerciseRepository exerciseRepository;
+    private final ExerciseRepository exerciseRepository;
+
+    public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
+        this.exerciseRepository = exerciseRepository;
+    }
 
     @Override
-    public TrainingPlan create(TrainingForm trainingForm) {
+    public List<Training> create(TrainingForm trainingForm) {
         this.allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = getFilteredListOfExercises(trainingForm.getEquipmentIDs());
 
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
-        TrainingPlan trainingPlan = new TrainingPlan();
+        Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
         if (filteredListOfExercises.size() <= exercisesToGet) {
             rolledExercises.addAll(filteredListOfExercises);
@@ -53,18 +56,18 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 }
             }
         }
-        String scheduleType = trainingForm.getScheduleType().toUpperCase();
+        String scheduleType = trainingForm.getExerciseForm().toUpperCase();
         switch (scheduleType) {
             case "SERIES" -> {
                 List<ExerciseExecution> exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);
-                trainingPlan.setExercisesExecutions(exercisesExecutions);
+                training.setExercisesExecutions(exercisesExecutions);
             }
             case "CIRCUIT" -> {
                 List<ExerciseExecution> exerciseExecutions = getExercisesExecutionsInCircuit(rolledExercises);
-                trainingPlan.setExercisesExecutions(exerciseExecutions);
+                training.setExercisesExecutions(exerciseExecutions);
             }
         }
-        return trainingPlan;
+        return List.of(training);
     }
 
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {

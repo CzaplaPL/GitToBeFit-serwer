@@ -1,24 +1,23 @@
 package pl.umk.mat.git2befit.model.training.generation.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
+import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
 public class SplitTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "SPLIT";
+
 
     private final ExerciseRepository exerciseRepository;
 
@@ -30,14 +29,14 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
 
     @Override
-    public List<TrainingPlan> create(TrainingForm trainingForm) {
+    public List<Training> create(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
-        TrainingPlan plan = new TrainingPlan();
+        Training plan = new Training();
 
         List<Exercise> temp = getExerciseListFilteredByTrainingType();
 
         List<Exercise> availableExercises = filterAllByAvailableEquipment(temp);
-        List<TrainingPlan> exerciseExecutions = assignExercisesToBodyPart(availableExercises);
+        List<Training> exerciseExecutions = assignExercisesToBodyPart(availableExercises);
 
         //typ treningu +
         //filtrowanie sprzętu+
@@ -68,7 +67,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         }).collect(Collectors.toList());
     }
 
-    private List<TrainingPlan> assignExercisesToBodyPart(List<Exercise> exercises){
+    private List<Training> assignExercisesToBodyPart(List<Exercise> exercises){
         //if na każdą partię
         //"CHEST, SIXPACK, BACK, THIGHS, CALVES, BUTTOCKS, BICEPS, TRICEPS, SHOULDERS";
 
@@ -78,14 +77,14 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         Random random = new Random();
         List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
         List<String> trainingFormBodyParts = trainingForm.getBodyParts();
-        List<TrainingPlan> trainingPlanList = new ArrayList<>();
+        List<Training> trainingList = new ArrayList<>();
 
 
         for(String s: trainingFormBodyParts){
             //lista ćwiczeń na daną partię
             List<Exercise> collect = exercises.stream()
                     .filter(exercise -> exercise.getBodyPart().getName().equals(s)).collect(Collectors.toList());
-            int i = 0;;
+            int i = 0;
             int amountOfExercises = 0;
 
             if(smallBodyParts.contains(s)) {
@@ -107,11 +106,11 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
                     i++;
 
                     if(i%2 == 0){
-                        TrainingPlan trainingPlan = new TrainingPlan();
-                        trainingPlan.setExercisesExecutions(exerciseExecutionList);
-                        //id autogenerowane z bazy
-                        trainingPlan.setId(1);
-                        trainingPlanList.add(trainingPlan);
+                        Training training = new Training();
+                        training.setExercisesExecutions(exerciseExecutionList);
+                        //todo id autogenerowane z bazy
+                        training.setId(1);
+                        trainingList.add(training);
                         exerciseExecutionList = new ArrayList<>();
                     }
 
@@ -121,7 +120,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
                 }
             }
        // }
-        return trainingPlanList;
+        return trainingList;
     }
 
 }

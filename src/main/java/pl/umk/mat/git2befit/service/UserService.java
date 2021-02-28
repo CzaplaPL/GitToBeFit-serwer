@@ -20,6 +20,7 @@ import pl.umk.mat.git2befit.exceptions.EmailValidationException;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
 import pl.umk.mat.git2befit.messaging.email.EmailMessageFacade;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
+import pl.umk.mat.git2befit.model.account.management.LoginForm;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
@@ -255,11 +256,20 @@ public class UserService {
 
     public ResponseEntity<?> isAccountActivated(String email) {
         Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent()) {
-            return ResponseEntity.ok().header("activation", String.valueOf(user.get().isEnable())).build();
-        } else {
-            return ResponseEntity.notFound().header("Cause", "user not found").build();
-        }
+        return user.map(value -> ResponseEntity.ok().header("activation", String.valueOf(value.isEnable())).build())
+                .orElseGet(() -> ResponseEntity.notFound().header("Cause", "user not found").build());
+    }
 
+    public ResponseEntity<?> loginUser(LoginForm loginForm) {
+        Optional<User> userByEmail = userRepository.findByEmail(loginForm.getEmail());
+        if(userByEmail.isEmpty())
+            return ResponseEntity.badRequest().header("Cause", "user not exists").build();
+        if (!isPasswordEquals(userByEmail.get().getPassword(), loginForm.getPassword())) {
+            return ResponseEntity.badRequest().header("Cause", "bad password").build();
+        }
+        if (!userByEmail.get().isEnable())
+            return ResponseEntity.badRequest().header("Cause", "account is disabled").build();
+
+        return ResponseEntity.ok().header("Authorization", TOKEN_PREFIX + JWTGenerator.generate(userByEmail.get().getEmail())).build();
     }
 }

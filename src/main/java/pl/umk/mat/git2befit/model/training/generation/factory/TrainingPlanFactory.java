@@ -17,9 +17,9 @@ public class TrainingPlanFactory {
 
         return switch (trainingType) {
             case "SPLIT" -> new SplitTrainingPlan(exerciseRepository);
-            case "FBW" -> new FBWTrainingPlan();
-            case "CARDIO" -> new CardioTrainingPlan();
-            case "FITNESS" -> new FitnessTrainingPlan();
+            case "FBW" -> new FBWTrainingPlan(exerciseRepository);
+            case "CARDIO" -> new CardioTrainingPlan(exerciseRepository);
+            case "FITNESS" -> new FitnessTrainingPlan(exerciseRepository);
             default -> throw new IllegalArgumentException("");
         };
     }

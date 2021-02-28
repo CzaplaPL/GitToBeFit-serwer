@@ -1,8 +1,8 @@
 package pl.umk.mat.git2befit.model.training.generation.factory;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 
@@ -17,7 +17,7 @@ public class TrainingPlanManufacture {
         this.trainingPlanFactory = trainingPlanFactory;
     }
 
-    public List<TrainingPlan> createTrainingPlan(TrainingForm trainingForm){
+    public List<Training> createTrainingPlan(TrainingForm trainingForm){
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
         return trainingPlan.create(trainingForm);
     }

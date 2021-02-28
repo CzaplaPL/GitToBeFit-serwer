@@ -1,32 +1,53 @@
 package pl.umk.mat.git2befit.model.training.generation.model;
 
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
 
+
+@Entity
 public class Training implements Serializable {
-    private static final long serialVersionUID = 984651L;
+    private static final long serialVersionUID = 51L;
 
-    private TrainingForm trainingForm;
-    private List<TrainingPlan> planList;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+    //klucz dla Training Planu
+    @Column(nullable = false)
+    private long trainingId;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private List<ExerciseExecution> exercisesExecutions;
 
-    public Training(TrainingForm trainingForm, List<TrainingPlan> planList) {
-        this.trainingForm = trainingForm;
-        this.planList = planList;
+    public List<ExerciseExecution> getExercisesExecutions() {
+        return exercisesExecutions;
     }
 
-    public TrainingForm getTrainingForm() {
-        return trainingForm;
+    public void setExercisesExecutions(List<ExerciseExecution> exercisesExecutions) {
+        this.exercisesExecutions = exercisesExecutions;
     }
 
-    public void setTrainingForm(TrainingForm trainingForm) {
-        this.trainingForm = trainingForm;
+    public long getId() {
+        return id;
     }
 
-    public List<TrainingPlan> getPlanList() {
-        return planList;
+    public void setId(long id) {
+        this.id = id;
     }
 
-    public void setPlanList(List<TrainingPlan> planList) {
-        this.planList = planList;
+    public long getTrainingId() {
+        return trainingId;
     }
+
+    public void setTrainingId(long trainingId) {
+        this.trainingId = trainingId;
+    }
+/*
+    public List<Exercise> getExercises() {
+        return exercises;
+    }
+
+    public void setExercises(List<Exercise> exercises) {
+        this.exercises = exercises;
+    }
+*/
 }

@@ -1,7 +1,5 @@
 package pl.umk.mat.git2befit.model.entity.workout.conditions;
 
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
-
 import javax.persistence.*;
 import java.io.Serializable;
 
