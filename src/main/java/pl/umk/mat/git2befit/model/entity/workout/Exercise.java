@@ -33,16 +33,16 @@ public class Exercise implements Serializable {
     private ExerciseForm exerciseForm;
     private String videoUrl;
     private String photoUrl;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private BodyPart bodyPart;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(/*fetch = FetchType.EAGER*/)
     @Column(nullable = false)
     @JoinTable(name = "training_types_of_exercises",
             joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
             inverseJoinColumns = {@JoinColumn(name="training_type_id", referencedColumnName="id")}
     )
     private List<TrainingType> trainingTypes;
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(/*fetch = FetchType.EAGER*/)
     @Column(nullable = false)
     @JoinTable(name = "exercise_equipment",
                joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
@@ -162,5 +162,12 @@ public class Exercise implements Serializable {
 
     public void setEquipmentsNeeded(List<Equipment> equipmentsNeeded) {
         this.equipmentsNeeded = equipmentsNeeded;
+    }
+
+    @Override
+    public String toString() {
+        return "Exercise{" +
+                "id=" + id +
+                ", name= " + name + " bodyPart= " + bodyPart.getName() ;
     }
 }

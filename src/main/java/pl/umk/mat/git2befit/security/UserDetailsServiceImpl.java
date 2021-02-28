@@ -31,6 +31,8 @@ public class UserDetailsServiceImpl  implements UserDetailsService {
         if(!foundUser.get().isEnable())
             throw new UsernameNotFoundException("inactive");
 
+
+
         return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), emptyList());
     }
 }

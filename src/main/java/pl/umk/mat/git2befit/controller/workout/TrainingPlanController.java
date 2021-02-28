@@ -65,7 +65,8 @@ public class TrainingPlanController {
         Training training = new Training(trainingForm, trainingPlans);
         System.out.println(trainingPlans.toString());
 
-        //TrainingPlan trainingPlan = manufacture.createTrainingPlan(trainingForm);
+        /*List<TrainingPlan> trainingPlan = manufacture.createTrainingPlan(trainingForm);
+        Training training = new Training(trainingForm, trainingPlan);*/
         return ResponseEntity.ok(training);
 
     }

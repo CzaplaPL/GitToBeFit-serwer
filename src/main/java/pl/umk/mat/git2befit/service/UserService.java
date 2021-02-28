@@ -4,28 +4,29 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
-import net.bytebuddy.utility.RandomString;
 import org.apache.commons.mail.EmailException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 import pl.umk.mat.git2befit.exceptions.EmailValidationException;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
 import pl.umk.mat.git2befit.messaging.email.EmailMessageFacade;
 import pl.umk.mat.git2befit.messaging.email.MessageGenerator;
+import pl.umk.mat.git2befit.model.account.management.LoginForm;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.repository.UserRepository;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 import pl.umk.mat.git2befit.security.PasswordGenerator;
 import pl.umk.mat.git2befit.validation.UserValidationService;
+
 
 import java.io.IOException;
 import java.net.URI;
@@ -40,11 +41,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final Logger log = LoggerFactory.getLogger(UserService.class);
+    private final WebClient webClient;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, WebClient webClient) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.webClient = webClient;
     }
 
     public ResponseEntity<?> updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
@@ -251,5 +254,18 @@ public class UserService {
         } catch (JWTVerificationException e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).header("Cause", "token is not valid").build();
         }
+    }
+
+    public ResponseEntity<?> loginUser(LoginForm loginForm) {
+        Optional<User> userByEmail = userRepository.findByEmail(loginForm.getEmail());
+        if(userByEmail.isEmpty())
+            return ResponseEntity.badRequest().header("Cause", "user not exists").build();
+        if (!isPasswordEquals(userByEmail.get().getPassword(), loginForm.getPassword())) {
+            return ResponseEntity.badRequest().header("Cause", "bad password").build();
+        }
+        if (!userByEmail.get().isEnable())
+            return ResponseEntity.badRequest().header("Cause", "account is disabled").build();
+
+        return ResponseEntity.ok().header("Authorization", TOKEN_PREFIX + JWTGenerator.generate(userByEmail.get().getEmail())).build();
     }
 }

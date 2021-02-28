@@ -6,6 +6,8 @@ import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 
+import java.util.List;
+
 @Component
 public class TrainingPlanManufacture {
     private TrainingPlanFactory trainingPlanFactory;
@@ -15,7 +17,7 @@ public class TrainingPlanManufacture {
         this.trainingPlanFactory = trainingPlanFactory;
     }
 
-    public TrainingPlan createTrainingPlan(TrainingForm trainingForm){
+    public List<TrainingPlan> createTrainingPlan(TrainingForm trainingForm){
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
         return trainingPlan.create(trainingForm);
     }

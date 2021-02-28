@@ -2,7 +2,9 @@ package pl.umk.mat.git2befit.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import pl.umk.mat.git2befit.model.account.management.APIAuthModel;
+import pl.umk.mat.git2befit.model.account.management.LoginForm;
 import pl.umk.mat.git2befit.model.entity.User;
 import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
 import pl.umk.mat.git2befit.service.login.FacebookLogin;
@@ -31,6 +33,11 @@ public class UserController {
     @PostMapping("/login/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody APIAuthModel googleAuthModel) {
         return googleLogin.loginUserWithGoogleToken(googleAuthModel.getIdToken());
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginWithApp(@RequestBody LoginForm loginForm) {
+        return userService.loginUser(loginForm);
     }
 
     @PostMapping("/signup")

@@ -3,9 +3,11 @@ package pl.umk.mat.git2befit.model.training.generation.model;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class ExerciseExecution {
+public class ExerciseExecution implements Serializable {
+    private static final long serialVersionUID = 984652L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
