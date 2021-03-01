@@ -37,7 +37,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN, PASSWORD_REMIND, TOKEN_VERIFICATION, "/user/login", USER_ACTIVATION_VERIFICATION).permitAll()
                 .antMatchers(HttpMethod.GET, EMAIL_VERIFICATION).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich sprzetow oraz wzgledem kategorii
-                .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS).permitAll()
+                .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS, NO_EQUIPMENT).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich kategorii
                 .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES).permitAll()
                 // Zezwolenie na dostep do pobrania treningu

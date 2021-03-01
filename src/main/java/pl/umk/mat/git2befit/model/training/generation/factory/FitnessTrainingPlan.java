@@ -3,6 +3,7 @@ package pl.umk.mat.git2befit.model.training.generation.factory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
+import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
@@ -14,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 public class FitnessTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FITNESS";
     private static final int SINGLE_STEP = 3;
-    private static final List<String> BODY_PARTS = List.of("CHEST", "SIXPACK", "BACK",  "LEGS", "ARMS");
+    private static final List<String> BODY_PARTS = List.of("CHEST", "SIXPACK", "BACK", "LEGS", "ARMS");
 
     private final ExerciseRepository exerciseRepository;
 
@@ -61,9 +63,14 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
     }
 
     private List<Exercise> getFilteredListOfExercises(List<Long> equipmentIndexList) {
-        Map<Long, Exercise> exercisesMap = allExercises.stream()
+        return allExercises.stream()
+                .filter(exercise -> exercise.getEquipmentsNeeded().stream()
+                    .map(equipment -> equipment.getId())
+                    .anyMatch(aLong -> equipmentIndexList.contains(aLong)))
+                .collect(Collectors.toList());
+        /*Map<Long, Exercise> exercisesMap = allExercises.stream()
                 .collect(Collectors.toMap(Exercise::getId, exercise -> exercise));
-        return equipmentIndexList.stream().map(exercisesMap::get).collect(Collectors.toList());
+        return equipmentIndexList.stream().map(exercisesMap::get).collect(Collectors.toList());*/
     }
 
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {
