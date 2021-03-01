@@ -1,5 +1,5 @@
 # Git2BeFit - serwer aplikacji
-Projekt Git2BeFit jest projektem tworzonym w ramach Programowania zespołowego.
+Git2BeFit jest projektem tworzonym w ramach Programowania zespołowego.
 
 ## Ogólne
 Projekt tworzony przez:
