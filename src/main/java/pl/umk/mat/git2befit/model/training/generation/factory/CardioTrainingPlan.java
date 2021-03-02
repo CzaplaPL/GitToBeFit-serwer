@@ -6,7 +6,6 @@ import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
@@ -56,7 +55,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 }
             }
         }
-        String scheduleType = trainingForm.getExerciseForm().toUpperCase();
+        String scheduleType = trainingForm.getScheduleType().toUpperCase();
         switch (scheduleType) {
             case "SERIES" -> {
                 List<ExerciseExecution> exercisesExecutions = getExercisesExecutionsWithSeries(rolledExercises);
@@ -85,7 +84,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (scheduleType.equals("SERIES")) {
+            if (scheduleType.equals("REPEAT")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
@@ -106,7 +105,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             ExerciseExecution exerciseExecution = new ExerciseExecution();
             // powtorzenia
             exerciseExecution.setExercise(exercise);
-            if (scheduleType.equals("SERIES")) {
+            if (scheduleType.equals("REPEAT")) {
                 exerciseExecution.setSeries(3);
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
