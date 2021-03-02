@@ -23,42 +23,42 @@ public class TrainingPlanController {
 
     @PostMapping("/generate")
     public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm){
-        /*List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
-        List<TrainingPlan> trainingPlans = new ArrayList<>();
+        List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
+        List<Training> trainingPlans = new ArrayList<>();
+        if(trainingForm == null) {
+            for (int i = 1; i <= 9; i++) {
+                if (i % 3 == 0) {
+                    Training training = new Training();
+                    training.setId(11);
+                    training.setId(1);
+                    training.setExercisesExecutions(exerciseExecutions);
+                    exerciseExecutions.clear();
+                    trainingPlans.add(training);
+                }
+                ExerciseExecution exerciseExecution = new ExerciseExecution();
+                exerciseExecution.setExercise(new Exercise(i,
+                        "cwiczenie" + i,
+                        "start" + i,
+                        "execution" + i,
+                        "hints1 /n hint2"
+                        , new ExerciseForm(i, "exerciseForm" + i)
+                        , "videURl" + i, "photo" + i
+                        , new BodyPart(i, "bodyPart" + i)
+                        , List.of(new TrainingType(i, "TrainingType" + i))
+                        , List.of(new Equipment(i, new EquipmentType(i, "kategoria" + i, "urlPhoto" + i)
+                        , "name" + i, "urlVideo" + i)))
+                );
+                exerciseExecution.setCount(8);
+                exerciseExecution.setSeries(3);
+                exerciseExecutions.add(exerciseExecution);
+                System.out.println(exerciseExecution.getExercise().getId());
 
-        for (int i = 1; i <= 9; i++) {
-            if(i%3 == 0){
-                TrainingPlan training = new TrainingPlan();
-                training.setId(11);
-                training.setId(1);
-                training.setExercisesExecutions(exerciseExecutions);
-                exerciseExecutions.clear();
-                trainingPlans.add(training);
             }
-            ExerciseExecution exerciseExecution = new ExerciseExecution();
-            exerciseExecution.setExercise(  new Exercise(i,
-                    "cwiczenie" + i,
-                    "start" + i,
-                    "execution" + i,
-                    "hints1 /n hint2"
-                    , new ExerciseForm(i, "exerciseForm" + i)
-                    , "videURl" + i, "photo"+i
-                    , new BodyPart(i, "bodyPart" + i)
-                    , List.of(new TrainingType(i, "TrainingType" + i))
-                    , List.of(new Equipment(i, new EquipmentType(i, "kategoria"+i, "urlPhoto" + i)
-                    , "name" + i, "urlVideo" + i)))
-            );
-            exerciseExecution.setCount(8);
-            exerciseExecution.setSeries(3);
-            exerciseExecutions.add(exerciseExecution);
-            System.out.println(exerciseExecution.getExercise().getId());
-
+        }else {
+            trainingPlans = manufacture.createTrainingPlan(trainingForm);
         }
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
-        System.out.println(trainingPlans.toString());*/
 
-        List<Training> training = manufacture.createTrainingPlan(trainingForm);
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, training);
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
         return ResponseEntity.ok(trainingPlan);
 
     }
