@@ -7,7 +7,7 @@ public class TrainingForm {
     private String trainingType;
     private List<String> bodyParts;
     private int daysCount;
-    private String exerciseForm;
+    private String scheduleType;
     private int duration;
 
     public List<Long> getEquipmentIDs() {
@@ -42,12 +42,12 @@ public class TrainingForm {
         this.daysCount = daysCount;
     }
 
-    public String getExerciseForm() {
-        return exerciseForm;
+    public String getScheduleType() {
+        return scheduleType;
     }
 
-    public void setExerciseForm(String exerciseForm) {
-        this.exerciseForm = exerciseForm;
+    public void setScheduleType(String scheduleType) {
+        this.scheduleType = scheduleType;
     }
 
     public int getDuration() {

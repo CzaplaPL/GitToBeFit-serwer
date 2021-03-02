@@ -6,7 +6,6 @@ import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
@@ -22,6 +21,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     private final ExerciseRepository exerciseRepository;
 
     private TrainingForm trainingForm;
+
 
     public SplitTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -93,33 +93,31 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
                amountOfExercises = 4;
             }
 
-            //if(smallBodyParts.contains(s)) {
-                //problem kiedy jest za mało ćwiczeń
-                while (i < amountOfExercises) {
-                    ExerciseExecution exerciseExecution = new ExerciseExecution();
-                    int randomInt = random.nextInt(collect.size());
-                    exerciseExecution.setExercise(collect.get(randomInt));
-                    exerciseExecution.setSeries(3);
-                    exerciseExecution.setCount(8);
-                    collect.remove(randomInt);
-                    exerciseExecutionList.add(exerciseExecution);
-                    i++;
+            //problem kiedy jest za mało ćwiczeń
+            while (i < amountOfExercises) {
+                ExerciseExecution exerciseExecution = new ExerciseExecution();
+                int randomInt = random.nextInt(collect.size());
+                exerciseExecution.setExercise(collect.get(randomInt));
+                exerciseExecution.setSeries(3);
+                exerciseExecution.setCount(8);
+                collect.remove(randomInt);
+                exerciseExecutionList.add(exerciseExecution);
+                i++;
 
-                    if(i%2 == 0){
-                        Training training = new Training();
-                        training.setExercisesExecutions(exerciseExecutionList);
-                        //todo id autogenerowane z bazy
-                        training.setId(1);
-                        trainingList.add(training);
-                        exerciseExecutionList = new ArrayList<>();
-                    }
-
-                    //Tutaj przypisać po dwa na trainingPlan
-
-
+                if(i%2 == 0){
+                    Training training = new Training();
+                    training.setExercisesExecutions(exerciseExecutionList);
+                    //todo id autogenerowane z bazy
+                    training.setId(1);
+                    trainingList.add(training);
+                    exerciseExecutionList = new ArrayList<>();
                 }
+
+                //Tutaj przypisać po dwa na trainingPlan
+
+
             }
-       // }
+        }
         return trainingList;
     }
 
