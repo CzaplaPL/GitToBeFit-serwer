@@ -3,7 +3,7 @@ package pl.umk.mat.git2befit.validation;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.exceptions.EmailValidationException;
 import pl.umk.mat.git2befit.exceptions.WeakPasswordException;
-import pl.umk.mat.git2befit.model.entity.User;
+import pl.umk.mat.git2befit.model.user.entity.User;
 
 import java.util.regex.Pattern;
 

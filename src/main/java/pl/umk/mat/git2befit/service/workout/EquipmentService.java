@@ -4,15 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.simplified.SimplifiedEquipment;
-import pl.umk.mat.git2befit.repository.EquipmentRepository;
+import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
+import pl.umk.mat.git2befit.model.workout.simplified.SimplifiedEquipment;
+import pl.umk.mat.git2befit.repository.workout.EquipmentRepository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static pl.umk.mat.git2befit.model.entity.workout.equipment.ServerLocationConstraints.EQUIPMENT_PHOTO_PREFIX;
+import static pl.umk.mat.git2befit.model.workout.equipment.ServerLocationConstraints.EQUIPMENT_PHOTO_PREFIX;
 
 @Service
 public class EquipmentService {
