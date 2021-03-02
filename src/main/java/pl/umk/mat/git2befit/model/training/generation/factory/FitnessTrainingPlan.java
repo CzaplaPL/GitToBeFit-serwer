@@ -1,22 +1,15 @@
 package pl.umk.mat.git2befit.model.training.generation.factory;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.entity.workout.Exercise;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
 import pl.umk.mat.git2befit.model.training.generation.model.Training;
 import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
 import pl.umk.mat.git2befit.repository.ExerciseRepository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
