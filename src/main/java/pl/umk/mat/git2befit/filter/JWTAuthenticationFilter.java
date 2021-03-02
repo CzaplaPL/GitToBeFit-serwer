@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.umk.mat.git2befit.model.entity.User;
+import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 
 import javax.servlet.FilterChain;

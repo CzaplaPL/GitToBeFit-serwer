@@ -2,14 +2,13 @@ package pl.umk.mat.git2befit.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
-import pl.umk.mat.git2befit.model.account.management.APIAuthModel;
-import pl.umk.mat.git2befit.model.account.management.LoginForm;
-import pl.umk.mat.git2befit.model.entity.User;
-import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
-import pl.umk.mat.git2befit.service.login.FacebookLogin;
-import pl.umk.mat.git2befit.service.login.GoogleLogin;
-import pl.umk.mat.git2befit.service.UserService;
+import pl.umk.mat.git2befit.model.user.management.APIAuthModel;
+import pl.umk.mat.git2befit.model.user.management.LoginForm;
+import pl.umk.mat.git2befit.model.user.entity.User;
+import pl.umk.mat.git2befit.model.user.management.PasswordUpdateForm;
+import pl.umk.mat.git2befit.service.user.login.FacebookLogin;
+import pl.umk.mat.git2befit.service.user.login.GoogleLogin;
+import pl.umk.mat.git2befit.service.user.UserService;
 
 @RestController
 @RequestMapping("/user")

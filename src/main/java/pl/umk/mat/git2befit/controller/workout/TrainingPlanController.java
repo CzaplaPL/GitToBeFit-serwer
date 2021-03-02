@@ -5,19 +5,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.umk.mat.git2befit.model.entity.workout.Exercise;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.ExerciseForm;
-import pl.umk.mat.git2befit.model.entity.workout.conditions.TrainingType;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
-import pl.umk.mat.git2befit.model.training.generation.factory.TrainingPlanManufacture;
-import pl.umk.mat.git2befit.model.training.generation.model.ExerciseExecution;
-import pl.umk.mat.git2befit.model.training.generation.model.Training;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingPlan;
-import pl.umk.mat.git2befit.model.training.generation.model.TrainingForm;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
+import pl.umk.mat.git2befit.model.workout.training.Training;
+import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
+import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
