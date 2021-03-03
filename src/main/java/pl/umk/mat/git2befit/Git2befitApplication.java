@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.bootloader;
+package pl.umk.mat.git2befit;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

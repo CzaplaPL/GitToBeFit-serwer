@@ -35,4 +35,3 @@ build/
 logs/*.log
 logs/archived/*.log
 
-src/main/resources/application.properties
