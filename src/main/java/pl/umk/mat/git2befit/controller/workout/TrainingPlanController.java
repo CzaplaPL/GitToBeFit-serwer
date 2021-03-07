@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.controller.workout;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -59,7 +60,11 @@ public class TrainingPlanController {
 
             }
         }else {
-            trainingPlans = manufacture.createTrainingPlan(trainingForm);
+            try {
+                trainingPlans = manufacture.createTrainingPlan(trainingForm);
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "type not implemented").build();
+            }
         }
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
