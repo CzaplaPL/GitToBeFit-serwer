@@ -17,7 +17,6 @@ import java.util.concurrent.ThreadLocalRandom;
 public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
     private final static int SINGLE_STEP = 3;
-    private List<Exercise> allExercises;
     private final ExerciseRepository exerciseRepository;
 
     public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
@@ -26,7 +25,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
     @Override
     public List<Training> create(TrainingForm trainingForm) {
-        this.allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
+        List<Exercise> allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = filterAllByAvailableEquipment(allExercises, trainingForm.getEquipmentIDs());
 
         int duration = trainingForm.getDuration();
