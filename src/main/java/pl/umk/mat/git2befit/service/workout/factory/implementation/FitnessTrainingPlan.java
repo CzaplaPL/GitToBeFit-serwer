@@ -62,7 +62,7 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
 
         // jezeli na zadna partie nie ma cwiczen, to sa pobierane cwiczenia z brakiem sprzetu
         if (noExerciseCounter == bodyPartsFromForm.size()) {
-            filteredListOfExercises = exerciseRepository.getAllWithNoEquipment();
+            filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
         }
         noExerciseCounter = 0;
         int tempIndex = 0;
@@ -83,7 +83,7 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
                 noExerciseCounter++;
             }
             // sprawdzanie, czy iterator po liscie partii ciala nie wyszedl poza zasieg
-            if (tempIndex < bodyPartsFromForm.size()) {
+            if (tempIndex < bodyPartsFromForm.size() - 1) {
                 tempIndex++;
             } else { // reset
                 tempIndex = 0;

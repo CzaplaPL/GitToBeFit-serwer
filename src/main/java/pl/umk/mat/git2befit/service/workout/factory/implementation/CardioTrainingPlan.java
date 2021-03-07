@@ -30,9 +30,11 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
-        ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
         Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
+
+        ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
+        // w przypadku, gdy lista cwiczen jest mniejsza niz wymagana to dodaje wszystko do listy
         if (filteredListOfExercises.size() <= exercisesToGet) {
             rolledExercises.addAll(filteredListOfExercises);
         } else {
@@ -52,6 +54,9 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                     rolledExercises.add(actualExercise);
                 }
             }
+        }
+        if (rolledExercises.size() < exercisesToGet) {
+
         }
         List<ExerciseExecution> exerciseExecutions = getExercisesExecutions(rolledExercises);
         training.setExercisesExecutions(exerciseExecutions);
