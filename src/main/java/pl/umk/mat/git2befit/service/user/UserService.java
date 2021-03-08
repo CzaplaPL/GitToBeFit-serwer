@@ -252,12 +252,6 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<?> isAccountActivated(String email) {
-        Optional<User> user = userRepository.findByEmail(email);
-        return user.map(value -> ResponseEntity.ok().header("activation", String.valueOf(value.isEnable())).build())
-                .orElseGet(() -> ResponseEntity.notFound().header("Cause", "user not found").build());
-    }
-
     public ResponseEntity<?> loginUser(LoginForm loginForm) {
         Optional<User> userByEmail = userRepository.findByEmail(loginForm.getEmail());
         if(userByEmail.isEmpty())

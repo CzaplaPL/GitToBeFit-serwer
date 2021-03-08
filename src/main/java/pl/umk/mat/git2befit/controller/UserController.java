@@ -84,8 +84,4 @@ public class UserController {
         return userService.verify(token);
     }
 
-    @PostMapping("/activation")
-    public ResponseEntity<?> isAccountActivated(@RequestHeader String email) {
-        return userService.isAccountActivated(email);
-    }
 }
