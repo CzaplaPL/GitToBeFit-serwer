@@ -3,13 +3,13 @@ package pl.umk.mat.git2befit.service.workout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.entity.workout.equipment.EquipmentType;
-import pl.umk.mat.git2befit.repository.EquipmentTypeRepository;
+import pl.umk.mat.git2befit.model.workout.equipment.EquipmentType;
+import pl.umk.mat.git2befit.repository.workout.EquipmentTypeRepository;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pl.umk.mat.git2befit.model.entity.workout.equipment.ServerLocationConstraints.EQUIPMENT_TYPE_PHOTO_PREFIX;
+import static pl.umk.mat.git2befit.model.workout.equipment.ServerLocationConstraints.EQUIPMENT_TYPE_PHOTO_PREFIX;
 
 @Service
 public class EquipmentTypeService {

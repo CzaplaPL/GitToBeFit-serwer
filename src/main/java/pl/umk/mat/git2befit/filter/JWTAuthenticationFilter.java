@@ -6,7 +6,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.umk.mat.git2befit.model.entity.User;
+import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.security.JWTGenerator;
 
 import javax.servlet.FilterChain;
@@ -24,7 +24,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
-        setFilterProcessesUrl("/user/login");
+        setFilterProcessesUrl("/user/login-step");
     }
 
     @Override
@@ -37,7 +37,9 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             creds.getPassword(),
                             new ArrayList<>())
             );
+            //todo teoretycznie, jesli bedziemy chwytac wyjatek authenticationexception to sprawdzajac wiadomosc w srodku powinnismy byc w stanie dobrac odpowiednie bloki cause
         } catch (IOException e) {
+            //todo zrobić loga i poprawic
             throw new RuntimeException(e);
         }
     }

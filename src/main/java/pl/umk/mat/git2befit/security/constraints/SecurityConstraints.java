@@ -14,6 +14,11 @@ public interface SecurityConstraints {
     String EMAIL_VERIFICATION = "/user/activation/{token}";
     String PASSWORD_REMIND = "/user/remind-password";
     String TOKEN_VERIFICATION = "/user/token-verification";
+    String USER_ACTIVATION_VERIFICATION = "/user/activation";
+
     String ALL_EQUIPMENTS = "/equipment";
+    String NO_EQUIPMENT = "/equipment/no-equipment";
     String ALL_EQUIPMENT_TYPES = "/equipment-type";
+
+    String TRAINING_GENERATION = "/training-plan/generate";
 }

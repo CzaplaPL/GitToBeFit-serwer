@@ -2,12 +2,13 @@ package pl.umk.mat.git2befit.controller;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.model.account.management.APIAuthModel;
-import pl.umk.mat.git2befit.model.entity.User;
-import pl.umk.mat.git2befit.model.account.management.PasswordUpdateForm;
-import pl.umk.mat.git2befit.service.login.FacebookLogin;
-import pl.umk.mat.git2befit.service.login.GoogleLogin;
-import pl.umk.mat.git2befit.service.UserService;
+import pl.umk.mat.git2befit.model.user.management.APIAuthModel;
+import pl.umk.mat.git2befit.model.user.management.LoginForm;
+import pl.umk.mat.git2befit.model.user.entity.User;
+import pl.umk.mat.git2befit.model.user.management.PasswordUpdateForm;
+import pl.umk.mat.git2befit.service.user.login.FacebookLogin;
+import pl.umk.mat.git2befit.service.user.login.GoogleLogin;
+import pl.umk.mat.git2befit.service.user.UserService;
 
 @RestController
 @RequestMapping("/user")
@@ -31,6 +32,11 @@ public class UserController {
     @PostMapping("/login/google")
     public ResponseEntity<?> loginWithGoogle(@RequestBody APIAuthModel googleAuthModel) {
         return googleLogin.loginUserWithGoogleToken(googleAuthModel.getIdToken());
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> loginWithApp(@RequestBody LoginForm loginForm) {
+        return userService.loginUser(loginForm);
     }
 
     @PostMapping("/signup")
@@ -69,12 +75,17 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable long id) {
-        return userService.deleteUser(id);
+    public ResponseEntity<?> delete(@PathVariable long id, @RequestHeader String password) {
+        return userService.deleteUser(id, password);
     }
 
     @PostMapping("/token-verification")
     public ResponseEntity<?> verify(@RequestHeader String token){
         return userService.verify(token);
+    }
+
+    @PostMapping("/activation")
+    public ResponseEntity<?> isAccountActivated(@RequestHeader String email) {
+        return userService.isAccountActivated(email);
     }
 }

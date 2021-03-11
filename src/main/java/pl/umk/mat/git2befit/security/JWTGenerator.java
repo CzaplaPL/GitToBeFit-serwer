@@ -8,6 +8,9 @@ import java.util.Date;
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 public class JWTGenerator {
+
+    private JWTGenerator(){}
+
     public static String generate(String email){
         return JWT.create()
                 .withSubject(email)
