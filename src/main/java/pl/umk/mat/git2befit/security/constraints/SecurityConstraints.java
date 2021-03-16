@@ -15,6 +15,7 @@ public interface SecurityConstraints {
     String PASSWORD_REMIND = "/user/remind-password";
     String TOKEN_VERIFICATION = "/user/token-verification";
     String USER_ACTIVATION_VERIFICATION = "/user/activation";
+    String SEND_RENEW = "/user/activation/renew";
 
     String ALL_EQUIPMENTS = "/equipment";
     String NO_EQUIPMENT = "/equipment/no-equipment";

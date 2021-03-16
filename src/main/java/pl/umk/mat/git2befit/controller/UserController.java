@@ -84,8 +84,9 @@ public class UserController {
         return userService.verify(token);
     }
 
-    @PostMapping("/activation")
-    public ResponseEntity<?> isAccountActivated(@RequestHeader String email) {
-        return userService.isAccountActivated(email);
+    @PostMapping("/activation/renew")
+    public ResponseEntity<?> sendAgainActivation(@RequestBody User user){
+        return userService.sendAgainActivationToken(user);
     }
+
 }

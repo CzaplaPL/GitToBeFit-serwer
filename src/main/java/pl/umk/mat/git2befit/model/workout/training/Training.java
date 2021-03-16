@@ -2,6 +2,7 @@ package pl.umk.mat.git2befit.model.workout.training;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -12,12 +13,15 @@ public class Training implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    //klucz dla Training Planu
     @Column(nullable = false)
     private long trainingId;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<ExerciseExecution> exercisesExecutions;
+    private List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
 
+    public void addExerciseExecution(List<ExerciseExecution> exerciseExecutions){
+        this.exercisesExecutions = new ArrayList<>(getExercisesExecutions());
+        this.exercisesExecutions.addAll(exerciseExecutions);
+    }
     public List<ExerciseExecution> getExercisesExecutions() {
         return exercisesExecutions;
     }
@@ -41,16 +45,5 @@ public class Training implements Serializable {
     public void setTrainingId(long trainingId) {
         this.trainingId = trainingId;
     }
-/*
-    public List<Exercise> getExercises() {
-        return exercises;
-    }
 
-    public void setExercises(List<Exercise> exercises) {
-        this.exercises = exercises;
-    }
-*/
 }
-/*
-
- */
