@@ -63,7 +63,7 @@ public class TrainingPlanController {
             try {
                 trainingPlans = manufacture.createTrainingPlan(trainingForm);
             } catch (IllegalArgumentException e) {
-                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "type not implemented").build();
+                return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
             }
         }
 

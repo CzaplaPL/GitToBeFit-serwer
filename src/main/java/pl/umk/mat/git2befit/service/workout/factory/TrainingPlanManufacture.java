@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.validation.TrainingFormValidationService;
 
 import java.util.List;
 
@@ -16,7 +17,8 @@ public class TrainingPlanManufacture {
         this.trainingPlanFactory = trainingPlanFactory;
     }
 
-    public List<Training> createTrainingPlan(TrainingForm trainingForm){
+    public List<Training> createTrainingPlan(TrainingForm trainingForm) throws IllegalArgumentException{
+        TrainingFormValidationService.validate(trainingForm);
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
         return trainingPlan.create(trainingForm);
     }
