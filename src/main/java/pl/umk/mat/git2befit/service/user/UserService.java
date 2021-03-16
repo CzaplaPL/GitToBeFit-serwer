@@ -264,4 +264,18 @@ public class UserService {
 
         return ResponseEntity.ok().header("Authorization", TOKEN_PREFIX + JWTGenerator.generate(userByEmail.get().getEmail())).build();
     }
+
+    public ResponseEntity<?> sendAgainActivationToken(User user) {
+        Optional<User> savedUser = userRepository.findByEmail(user.getEmail());
+        if(savedUser.isPresent() && !savedUser.get().isEnable()){
+            try {
+                sendEmailWithVerificationToken(user.getEmail(), JWTGenerator.generate(user.getEmail()));
+                return ResponseEntity.ok().build();
+            } catch (EmailException e) {
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();
+            }
+        }else {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }
