@@ -7,7 +7,6 @@ import pl.umk.mat.git2befit.model.user.entity.User;
 
 import java.util.regex.Pattern;
 
-@Service
 public class UserValidationService {
 
     private final static Pattern EMAIL = Pattern.compile("^[\\w!#$%&'*+/=?`{|}~^-]+(?:\\.[\\w!#$%&'*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}$");
