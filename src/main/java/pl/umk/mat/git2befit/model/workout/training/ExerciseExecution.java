@@ -3,17 +3,15 @@ package pl.umk.mat.git2befit.model.workout.training;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@Entity
+@Embeddable
 public class ExerciseExecution implements Serializable {
     private static final long serialVersionUID = 984652L;
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+
+    @ManyToOne
+    private Exercise exercise;
     private int time;
     private int series;
     private int count;
-    @ManyToOne
-    private Exercise exercise;
 
     public Exercise getExercise() {
         return exercise;
@@ -49,11 +47,10 @@ public class ExerciseExecution implements Serializable {
     @Override
     public String toString() {
         return "ExerciseExecution{" +
-                "id=" + id +
+                "exercise=" + exercise +
                 ", time=" + time +
                 ", series=" + series +
                 ", count=" + count +
-                ", exercise=" + exercise +
                 '}';
     }
 }
