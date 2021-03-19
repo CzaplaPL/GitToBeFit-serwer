@@ -12,6 +12,7 @@ import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
 import java.util.ArrayList;
@@ -21,9 +22,11 @@ import java.util.List;
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
     private TrainingPlanManufacture manufacture;
+    private TrainingPlanService service;
 
-    public TrainingPlanController(TrainingPlanManufacture manufacture) {
+    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
         this.manufacture = manufacture;
+        this.service = service;
     }
 
     @PostMapping("/generate")
@@ -70,5 +73,10 @@ public class TrainingPlanController {
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
         return ResponseEntity.ok(trainingPlan);
 
+    }
+
+    @PostMapping("/save")
+    public ResponseEntity<?> save(TrainingPlan trainingPlan) {
+        return service.save(trainingPlan);
     }
 }

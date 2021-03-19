@@ -3,6 +3,7 @@ package pl.umk.mat.git2befit.converter;
 import javax.persistence.AttributeConverter;
 import javax.persistence.Converter;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,6 +20,6 @@ public class LongListConverter implements AttributeConverter<List<Long>, String>
     public List<Long> convertToEntityAttribute(String s) {
         return s != null ? Arrays.stream(s.split(SPLIT_CHAR))
                 .map(Long::parseLong)
-                .collect(Collectors.toList()) : List.of();
+                .collect(Collectors.toList()) : Collections.emptyList();
     }
 }
