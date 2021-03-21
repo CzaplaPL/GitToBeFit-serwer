@@ -2,10 +2,7 @@ package pl.umk.mat.git2befit.controller.workout;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
 import pl.umk.mat.git2befit.model.workout.conditions.ExerciseForm;
 import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
@@ -21,12 +18,12 @@ import java.util.List;
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
-    private TrainingPlanManufacture manufacture;
-    private TrainingPlanService service;
+    private final TrainingPlanManufacture manufacture;
+    private final TrainingPlanService trainingPlanService;
 
     public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
         this.manufacture = manufacture;
-        this.service = service;
+        this.trainingPlanService = service;
     }
 
     @PostMapping("/generate")
@@ -72,11 +69,18 @@ public class TrainingPlanController {
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
         return ResponseEntity.ok(trainingPlan);
-
     }
 
     @PostMapping("/save")
-    public ResponseEntity<?> save(TrainingPlan trainingPlan) {
-        return service.save(trainingPlan);
+    public ResponseEntity<?> save(
+            @RequestBody TrainingPlan trainingPlan,
+            @RequestParam long userId
+    ) {
+        return trainingPlanService.save(trainingPlan, userId);
+    }
+
+    @GetMapping
+    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestParam long userId) {
+        return trainingPlanService.getAllTrainingPlansByUserId(userId);
     }
 }

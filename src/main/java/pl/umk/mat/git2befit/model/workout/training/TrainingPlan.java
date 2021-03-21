@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.model.workout.training;
 
+import pl.umk.mat.git2befit.model.user.entity.User;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
@@ -15,6 +17,8 @@ public class TrainingPlan implements Serializable {
     private TrainingForm trainingForm;
     @OneToMany
     private List<Training> planList;
+    @ManyToOne
+    private User user;
 
     public TrainingPlan() {}
 
@@ -45,5 +49,13 @@ public class TrainingPlan implements Serializable {
 
     public void setPlanList(List<Training> planList) {
         this.planList = planList;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }
