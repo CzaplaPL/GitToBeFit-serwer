@@ -70,7 +70,6 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
         // todo czy jezeli brakuje nam np 2 cwiczen do kompletu to tez sciagamy te bez sprzetu?
         // dopoki nie wylosowano odpowiedniej ilosci cwiczen i dopoki sa cwiczenia na jakakolwiek partie ciala
         while (rolledExercises.size() != exercisesToGet && noExerciseCounter != bodyPartsFromForm.size()) {
-
             // filtrowanie cwiczen na dana partie ciala
             List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises,
                     bodyPartsFromForm.get(tempIndex));

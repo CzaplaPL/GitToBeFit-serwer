@@ -8,15 +8,14 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Component
 public class SplitTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "SPLIT";
-
+    private final List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS");
+    private final List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
 
     private final ExerciseRepository exerciseRepository;
 
@@ -31,78 +30,121 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     @Override
     public List<Training> create(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
-        Training plan = new Training();
+        List<Exercise> exerciseListFilteredByTrainingType = getExerciseListFilteredByTrainingType();
+        List<Exercise> exercisesWithoutEquipment = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
+        List<Exercise> exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
-        List<Exercise> temp = getExerciseListFilteredByTrainingType();
+        Map<String, List<ExerciseExecution>> trainingForBodyPart = assignExercisesToBodyPart(exercisesWithEquipment, exercisesWithoutEquipment);
 
-        List<Exercise> availableExercises = filterAllByAvailableEquipment(temp, trainingForm.getEquipmentIDs());
-        List<Training> exerciseExecutions = assignExercisesToBodyPart(availableExercises);
-
-        //typ treningu +
-        //filtrowanie sprzętu+
-        //dla każdej partii filtruj ćwiczenia z tej partii
-
-        //Przydział ćwiczeń do wybranej partii ciała
-
-        //Podział na dni treningowe
-
-
-        return exerciseExecutions;
+        return divideTrainingIntoDays(trainingForBodyPart);
     }
 
-    private List<Exercise> getExerciseListFilteredByTrainingType(){
+
+    private Training getTrainingForDay(Map<String, List<ExerciseExecution>> trainingForBodyPart, String ... bodyParts) {
+        Training training = new Training();
+        for (String part: bodyParts){
+            if(trainingForBodyPart.containsKey(part)) {
+                List<ExerciseExecution> exerciseExecutions = trainingForBodyPart.get(part);
+                training.addExerciseExecution(exerciseExecutions);
+            }
+        }
+        return training;
+    }
+
+    private List<Exercise> getExerciseListFilteredByTrainingType() {
         return exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
     }
 
-    private List<Training> assignExercisesToBodyPart(List<Exercise> exercises){
-        //if na każdą partię
-        //"CHEST, SIXPACK, BACK, THIGHS, CALVES, BUTTOCKS, BICEPS, TRICEPS, SHOULDERS";
-
-        //todo moze byc wydzielone do klasy ze stalymi
-        List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS","SHOULDER");
-        List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
-        Random random = new Random();
+    private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
         List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
+        Map<String, List<ExerciseExecution>> trainingForBodyPart = new HashMap<>();
+
         List<String> trainingFormBodyParts = trainingForm.getBodyParts();
-        List<Training> trainingList = new ArrayList<>();
 
+        for (String bodyPart : trainingFormBodyParts) {
 
-        for(String s: trainingFormBodyParts){
-            //lista ćwiczeń na daną partię
-            List<Exercise> collect = exercises.stream()
-                    .filter(exercise -> exercise.getBodyPart().getName().equals(s)).collect(Collectors.toList());
-            int i = 0;
-            int amountOfExercises = 0;
+            List<Exercise> exercisesWithEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
+            List<Exercise> exercisesWithoutEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
 
-            if(smallBodyParts.contains(s)) {
-                amountOfExercises = 3;
-            }else if(bigBodyParts.contains(s)){
-               amountOfExercises = 4;
+            int amountOfExercises = getAmountOfExercisesForBodyPart(bodyPart);
+
+            for (int i = 0; i < amountOfExercises; i++) {
+                try {
+                    ExerciseExecution exerciseExecution = getUniqueExercise(exercisesWithEquipmentFiltered, exercisesWithoutEquipmentFiltered);
+                    exerciseExecutionList.add(exerciseExecution);
+                }catch (IllegalStateException ignore){}
             }
 
-            //problem kiedy jest za mało ćwiczeń
-            while (i < amountOfExercises) {
-                ExerciseExecution exerciseExecution = new ExerciseExecution();
-                int randomInt = random.nextInt(collect.size());
-                exerciseExecution.setExercise(collect.get(randomInt));
-                exerciseExecution.setSeries(3);
-                exerciseExecution.setCount(8);
-                collect.remove(randomInt);
-                exerciseExecutionList.add(exerciseExecution);
-                i++;
+            trainingForBodyPart.put(bodyPart, exerciseExecutionList);
+            exerciseExecutionList = new ArrayList<>();
+        }
+        return trainingForBodyPart;
+    }
 
-                if(i%2 == 0){
-                    Training training = new Training();
-                    training.setExercisesExecutions(exerciseExecutionList);
-                    //todo id autogenerowane z bazy
-                    training.setId(1);
-                    trainingList.add(training);
-                    exerciseExecutionList = new ArrayList<>();
-                }
+    private List<Exercise> getExercisesFilteredByBodyPart(List<Exercise> exercises, String bodyPart) {
+        return exercises.stream()
+                .filter(exercise -> exercise.getBodyPart().getName().equals(bodyPart))
+                .collect(Collectors.toList());
+    }
 
-                //Tutaj przypisać po dwa na trainingPlan
+    private int getAmountOfExercisesForBodyPart(String bodyPart) {
+        int amountOfExercises;
+        if (smallBodyParts.contains(bodyPart))
+            amountOfExercises = 3;
+        else
+            amountOfExercises = 4;
+        return amountOfExercises;
+    }
 
+    private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFiltered, List<Exercise> exercisesWithoutEquipmentFiltered) throws IllegalStateException {
+        ExerciseExecution exerciseExecution = new ExerciseExecution();
+        Random random = new Random();
+        int randomInt;
 
+        if (isEnoughExercises(exercisesWithEquipmentFiltered)) {
+            randomInt = random.nextInt(exercisesWithEquipmentFiltered.size());
+            exerciseExecution.setExercise(exercisesWithEquipmentFiltered.get(randomInt));
+            exercisesWithEquipmentFiltered.remove(randomInt);
+        } else if (isEnoughExercises(exercisesWithoutEquipmentFiltered)) {
+            randomInt = random.nextInt(exercisesWithoutEquipmentFiltered.size());
+            exerciseExecution.setExercise(exercisesWithoutEquipmentFiltered.get(randomInt));
+            exercisesWithoutEquipmentFiltered.remove(randomInt);
+        }else {
+            throw new IllegalStateException();
+        }
+
+        exerciseExecution.setSeries(3);
+        exerciseExecution.setCount(8);
+
+        return exerciseExecution;
+    }
+
+    private boolean isEnoughExercises(List<Exercise> exercises) {
+        return exercises.size() != 0;
+    }
+
+    private List<Training> divideTrainingIntoDays(Map<String, List<ExerciseExecution>> trainingForBodyPart) {
+        int daysCount = trainingForm.getDaysCount();
+        List<Training> trainingList = new ArrayList<>();
+
+        switch (daysCount){
+            case 3 -> {
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "CHEST","BICEPS", "SIXPACK"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "BACK", "CALVES"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "THIGHS", "TRICEPS", "SHOULDERS"));
+            }
+            case 4 -> {
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "CHEST","BICEPS" ));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "BACK", "CALVES"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "THIGHS", "TRICEPS"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "SIXPACK","SHOULDERS"));
+            }
+            case 5-> {
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "CHEST","BICEPS" ));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "BACK"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "THIGHS"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "SIXPACK","SHOULDERS"));
+                trainingList.add(getTrainingForDay(trainingForBodyPart, "CALVES", "TRICEPS" ));
             }
         }
         return trainingList;
