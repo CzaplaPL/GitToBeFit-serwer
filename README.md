@@ -16,8 +16,7 @@ Projekt tworzony przez:
 * Hibernate/JPA
 
 ## Strona projektu
-* [Strona](http://git2befit.cba.pl)
-* [Dokumentacja API](http://git2befit.cba.pl/doc/index.html)
+* [Strona](https://aleks-2.mat.umk.pl/pz2020/zesp08/)
 
 ## Status
 Project is _in progress_
