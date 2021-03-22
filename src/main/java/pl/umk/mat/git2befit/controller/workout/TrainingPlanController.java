@@ -45,9 +45,9 @@ public class TrainingPlanController {
         List<Exercise> similarExercises;
         try {
             similarExercises = trainingService.getSimilarExercises(exercise.getId(), trainingForm);
+            return ResponseEntity.ok().body(similarExercises);
         }catch (IllegalArgumentException e){
             return ResponseEntity.notFound().header("Cause", e.getMessage()).build();
         }
-        return ResponseEntity.ok().body(similarExercises);
     }
 }

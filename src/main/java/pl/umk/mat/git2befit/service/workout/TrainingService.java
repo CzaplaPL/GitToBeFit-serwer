@@ -39,11 +39,13 @@ public class TrainingService {
     private List<Exercise> filterExercisesWithMatchingEquipment(List<Long> availableEquipmentIDs, List<Exercise> exercisesToReplace) {
         exercisesToReplace = exercisesToReplace.stream()
                 .filter(exercise -> {
-                    boolean temp = false;
+                    boolean temp;
                     for (Equipment equipment : exercise.getEquipmentsNeeded()) {
                         temp = availableEquipmentIDs.contains(equipment.getId());
+                        if(!temp)
+                            return false;
                     }
-                    return temp;
+                    return true;
                 })
                 .collect(Collectors.toList());
         return exercisesToReplace;
