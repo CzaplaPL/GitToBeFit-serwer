@@ -73,7 +73,7 @@ public class TrainingPlanController {
 
     @PostMapping("/save")
     public ResponseEntity<?> save(
-            @RequestBody TrainingPlan trainingPlan,
+            @RequestBody List<TrainingPlan> trainingPlan,
             @RequestParam long userId
     ) {
         return trainingPlanService.save(trainingPlan, userId);

@@ -20,12 +20,14 @@ public class TrainingPlanService {
         this.userRepository = userRepository;
     }
 
-    public ResponseEntity<?> save(TrainingPlan trainingPlan, long userId) {
+    public ResponseEntity<?> save(List<TrainingPlan> trainingPlans, long userId) {
         try {
             Optional<User> user = userRepository.findById(userId);
             if (user.isPresent()) {
-                trainingPlan.setUser(user.get());
-                this.trainingPlanRepository.save(trainingPlan);
+                trainingPlans.forEach(plan -> {
+                    plan.setUser(user.get());
+                    this.trainingPlanRepository.save(plan);
+                });
                 return ResponseEntity.ok().build();
             } else {
                 return ResponseEntity.badRequest().header("Cause", "user not found").build();

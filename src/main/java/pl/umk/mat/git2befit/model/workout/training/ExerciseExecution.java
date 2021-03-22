@@ -20,6 +20,7 @@ public class ExerciseExecution implements Serializable {
     public void setExercise(Exercise exercise) {
         this.exercise = exercise;
     }
+
     public int getTime() {
         return time;
     }

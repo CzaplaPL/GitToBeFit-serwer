@@ -77,7 +77,9 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 // sciaganie cwiczenia
                 Exercise exercise = filteredListOfExercises.get(actualRandom);
                 // dodanie cwiczenia
-                rolledExercises.add(exercise);
+                if (!rolledExercises.contains(exercise)) {
+                    rolledExercises.add(exercise);
+                }
                 // usuniecie cwiczenia z listy pozostalych
                 filteredListOfExercises.remove(exercise);
             }

@@ -62,12 +62,11 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
 
         // jezeli na zadna partie nie ma cwiczen, to sa pobierane cwiczenia z brakiem sprzetu
         if (noExerciseCounter == bodyPartsFromForm.size()) {
-            filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
+            filteredListOfExercises.addAll(exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE));
         }
         noExerciseCounter = 0;
         int tempIndex = 0;
         // wyrownywanie do odpowiedniego czasu
-        // todo czy jezeli brakuje nam np 2 cwiczen do kompletu to tez sciagamy te bez sprzetu?
         // dopoki nie wylosowano odpowiedniej ilosci cwiczen i dopoki sa cwiczenia na jakakolwiek partie ciala
         while (rolledExercises.size() != exercisesToGet && noExerciseCounter != bodyPartsFromForm.size()) {
             // filtrowanie cwiczen na dana partie ciala
