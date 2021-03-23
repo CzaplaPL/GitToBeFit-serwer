@@ -36,9 +36,14 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
         Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
-
+        List<String> bodyPartsFromForm;
         // zabezpieczenie, ze jezeli uzytkownik nie przeslal zadnej partii ciala to bedzie generowalo dla wszystkich
-        List<String> bodyPartsFromForm = trainingForm.getBodyParts().isEmpty() ? ALL_BODY_PARTS : trainingForm.getBodyParts();
+        if ((trainingForm.getBodyParts().size() == 1 && trainingForm.getBodyParts().get(0).isEmpty())
+                || trainingForm.getBodyParts().isEmpty()) {
+            bodyPartsFromForm = ALL_BODY_PARTS;
+        } else {
+            bodyPartsFromForm = trainingForm.getBodyParts();
+        }
 
         // licznik, czy na ktoras z partii ciala
         int noExerciseCounter = 0;
@@ -51,9 +56,10 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             if (!exercisesForSpecifiedBodyPart.isEmpty()) {
                 // randomowa liczba z przedzialu 0 <= liczba < filtrowane.size
                 int random = randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.size());
-                rolledExercises.add(exercisesForSpecifiedBodyPart.get(random));
+                Exercise exercise = exercisesForSpecifiedBodyPart.get(random);
+                rolledExercises.add(exercise);
                 // usuniecie wylosowanego cwiczenia zeby sie nie powtorzylo
-                filteredListOfExercises.remove(random);
+                filteredListOfExercises.remove(exercise);
             } else {
                 // oznaczenie, ze brak cwiczen
                 noExerciseCounter++;
@@ -62,21 +68,24 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
 
         // jezeli na zadna partie nie ma cwiczen, to sa pobierane cwiczenia z brakiem sprzetu
         if (noExerciseCounter == bodyPartsFromForm.size()) {
-            filteredListOfExercises.addAll(exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE));
+            filteredListOfExercises = filterExercisesWithNoEquip(
+                    exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE)
+            );
         }
         noExerciseCounter = 0;
         int tempIndex = 0;
         // wyrownywanie do odpowiedniego czasu
         // dopoki nie wylosowano odpowiedniej ilosci cwiczen i dopoki sa cwiczenia na jakakolwiek partie ciala
-        while (rolledExercises.size() != exercisesToGet && noExerciseCounter != bodyPartsFromForm.size()) {
+        while (rolledExercises.size() < exercisesToGet && noExerciseCounter != bodyPartsFromForm.size()) {
             // filtrowanie cwiczen na dana partie ciala
             List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises,
                     bodyPartsFromForm.get(tempIndex));
             // test, czy cos sie wylosowalo
             if (!exercisesForSpecifiedBodyPart.isEmpty()) {
                 int random = randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.size());
-                rolledExercises.add(exercisesForSpecifiedBodyPart.get(random));
-                filteredListOfExercises.remove(random);
+                Exercise exercise = exercisesForSpecifiedBodyPart.get(random);
+                rolledExercises.add(exercise);
+                filteredListOfExercises.remove(exercise);
             } else {
                 noExerciseCounter++;
             }
@@ -118,5 +127,11 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             execList.add(exerciseExecution);
         }
         return execList;
+    }
+
+    private List<Exercise> filterExercisesWithNoEquip(List<Exercise> list) {
+        return list.stream()
+                .filter(exercise -> exercise.getEquipmentsNeeded().size() == 1)
+                .collect(Collectors.toList());
     }
 }

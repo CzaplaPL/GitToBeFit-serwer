@@ -12,12 +12,14 @@ import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Component
 public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
     private final static int SINGLE_STEP = 3;
-    private final static int MAX_RAND_TRIES = 1000;
+    private final static int MAX_RAND_TRIES = 100;
     private final ExerciseRepository exerciseRepository;
 
     public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
@@ -51,13 +53,14 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                     // jesli nie jest to dodajemy cwiczenie
                     rolledExercises.add(exercise);
                     // usuwamy z listy, zeby nie moglo byc wiecej pobrane
-                    filteredListOfExercises.remove(actualRandom);
+                    filteredListOfExercises.remove(exercise);
+                } else {
+                    // licznik nieudanych losowan
+                    counter++;
                 }
-                // licznik obrotow petli
-                counter++;
             }
             // wypelnienie listy wylosowanych cwiczen do konca
-            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() != exercisesToGet) {
+            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() < exercisesToGet) {
                 // losowanie liczby z przedzialu od 0 do filtered.size
                 int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
                 // sciaganie cwiczenia
@@ -71,7 +74,8 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
         if (rolledExercises.size() < exercisesToGet) {
             filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() != exercisesToGet) {
+            filteredListOfExercises = filterExercisesWithNoEquip(filteredListOfExercises);
+            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() < exercisesToGet) {
                 // losowanie liczby z przedzialu od 0 do filtered.size
                 int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
                 // sciaganie cwiczenia
@@ -116,5 +120,11 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
             execList.add(exerciseExecution);
         }
         return execList;
+    }
+
+    private List<Exercise> filterExercisesWithNoEquip(List<Exercise> list) {
+        return list.stream()
+                .filter(exercise -> exercise.getEquipmentsNeeded().size() == 1)
+                .collect(Collectors.toList());
     }
 }
