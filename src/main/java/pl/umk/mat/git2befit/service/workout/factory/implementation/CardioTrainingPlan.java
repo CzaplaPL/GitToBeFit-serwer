@@ -1,18 +1,17 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
 import org.springframework.stereotype.Component;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
 import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.model.workout.training.Exercise;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Component
@@ -38,54 +37,38 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
 
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
         // w przypadku, gdy lista cwiczen jest mniejsza niz wymagana to dodaje wszystko do listy
-        if (filteredListOfExercises.size() <= exercisesToGet) {
-            rolledExercises.addAll(filteredListOfExercises);
-        } else {
-            int counter = 0;
-            // losowanie ćwiczeń tak, żeby się nie powtarzały
-            while (rolledExercises.size() < exercisesToGet && counter < MAX_RAND_TRIES) {
-                // losowanie liczby z przedzialu od 0 do filtered.size
+        int counter = 0;
+        boolean loadingNoEquip = false;
+        while(rolledExercises.size() < exercisesToGet) {
+            if (!filteredListOfExercises.isEmpty()) {
                 int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
                 // sciaganie cwiczenia
                 Exercise exercise = filteredListOfExercises.get(actualRandom);
                 // test, czy na dana partie ciala nie ma za duzo cwiczen
-                if (checkIfBodyPartIsNotOverloaded(rolledExercises, exercise)) {
-                    // jesli nie jest to dodajemy cwiczenie
-                    rolledExercises.add(exercise);
+
+                if (counter < MAX_RAND_TRIES) {
+                    if (checkIfBodyPartIsNotOverloaded(rolledExercises, exercise)) {
+                        // jesli nie jest to dodajemy cwiczenie
+                        if (!rolledExercises.contains(exercise))
+                            rolledExercises.add(exercise);
+                        // usuwamy z listy, zeby nie moglo byc wiecej pobrane
+                        filteredListOfExercises.remove(exercise);
+                    } else {
+                        counter++;
+                    }
+                } else {
+                    if (!rolledExercises.contains(exercise))
+                        rolledExercises.add(exercise);
                     // usuwamy z listy, zeby nie moglo byc wiecej pobrane
                     filteredListOfExercises.remove(exercise);
+                }
+            } else {
+                if (!loadingNoEquip) {
+                    filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
+                    loadingNoEquip = true;
                 } else {
-                    // licznik nieudanych losowan
-                    counter++;
+                    break;
                 }
-            }
-            // wypelnienie listy wylosowanych cwiczen do konca
-            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() < exercisesToGet) {
-                // losowanie liczby z przedzialu od 0 do filtered.size
-                int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
-                // sciaganie cwiczenia
-                Exercise exercise = filteredListOfExercises.get(actualRandom);
-                // dodanie cwiczenia
-                rolledExercises.add(exercise);
-                // usuniecie cwiczenia z listy pozostalych
-                filteredListOfExercises.remove(exercise);
-            }
-        }
-
-        if (rolledExercises.size() < exercisesToGet) {
-            filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-            filteredListOfExercises = filterExercisesWithNoEquip(filteredListOfExercises);
-            while (!filteredListOfExercises.isEmpty() && rolledExercises.size() < exercisesToGet) {
-                // losowanie liczby z przedzialu od 0 do filtered.size
-                int actualRandom = randomIndexGen.nextInt(filteredListOfExercises.size());
-                // sciaganie cwiczenia
-                Exercise exercise = filteredListOfExercises.get(actualRandom);
-                // dodanie cwiczenia
-                if (!rolledExercises.contains(exercise)) {
-                    rolledExercises.add(exercise);
-                }
-                // usuniecie cwiczenia z listy pozostalych
-                filteredListOfExercises.remove(exercise);
             }
         }
         List<ExerciseExecution> exerciseExecutions = getExercisesExecutions(rolledExercises);

@@ -18,6 +18,8 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FITNESS";
     private static final int SINGLE_STEP = 3;
     private static final List<String> ALL_BODY_PARTS = List.of("CHEST", "SIXPACK", "BACK", "LEGS", "ARMS");
+    private static final List<String> SPECIFIED_ARMS = List.of("SHOULDERS", "TRICEPS", "BICEPS");
+    private static final List<String> SPECIFIED_LEGS = List.of("THIGHS", "CALVES");
 
     private final ExerciseRepository exerciseRepository;
 
@@ -29,7 +31,6 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
     public List<Training> create(TrainingForm trainingForm) {
         List<Exercise> allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = filterAllByAvailableEquipment(allExercises, trainingForm.getEquipmentIDs());
-
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
 
@@ -45,56 +46,43 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             bodyPartsFromForm = trainingForm.getBodyParts();
         }
 
-        // licznik, czy na ktoras z partii ciala
-        int noExerciseCounter = 0;
+        boolean containsNoEquips = false;
 
         // na kazda partie ciala jest losowane jedno cwiczenie
-        for (String bodyPart : bodyPartsFromForm) {
-            // filtrowanie cwiczen na odpowiednia partie ciala (aktualnie obslugiwana)
-            List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises, bodyPart);
-            // sprawdzenie, czy na pewno cos jest
-            if (!exercisesForSpecifiedBodyPart.isEmpty()) {
-                // randomowa liczba z przedzialu 0 <= liczba < filtrowane.size
-                int random = randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.size());
-                Exercise exercise = exercisesForSpecifiedBodyPart.get(random);
-                rolledExercises.add(exercise);
-                // usuniecie wylosowanego cwiczenia zeby sie nie powtorzylo
-                filteredListOfExercises.remove(exercise);
-            } else {
-                // oznaczenie, ze brak cwiczen
-                noExerciseCounter++;
+        while (rolledExercises.size() < exercisesToGet) {
+            long counter = 0;
+            for (String bodyPart : bodyPartsFromForm) {
+                // filtrowanie cwiczen na odpowiednia partie ciala (aktualnie obslugiwana)
+                List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises, bodyPart);
+                // sprawdzenie, czy na pewno cos jest
+                if (!exercisesForSpecifiedBodyPart.isEmpty()) {
+                    // randomowa liczba z przedzialu 0 <= liczba < filtrowane.size
+                    int random = randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.size());
+                    Exercise exercise = exercisesForSpecifiedBodyPart.get(random);
+                    // sprawdzenie, czy takiego cwiczenia nie ma w srodku
+                    if (!rolledExercises.contains(exercise)) {
+                        rolledExercises.add(exercise);
+                    }
+                    // usuniecie wylosowanego cwiczenia zeby sie nie powtorzylo
+                    filteredListOfExercises.remove(exercise);
+                } else {
+                    counter++;
+                }
             }
-        }
-
-        // jezeli na zadna partie nie ma cwiczen, to sa pobierane cwiczenia z brakiem sprzetu
-        if (noExerciseCounter == bodyPartsFromForm.size()) {
-            filteredListOfExercises = filterExercisesWithNoEquip(
-                    exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE)
-            );
-        }
-        noExerciseCounter = 0;
-        int tempIndex = 0;
-        // wyrownywanie do odpowiedniego czasu
-        // dopoki nie wylosowano odpowiedniej ilosci cwiczen i dopoki sa cwiczenia na jakakolwiek partie ciala
-        while (rolledExercises.size() < exercisesToGet && noExerciseCounter != bodyPartsFromForm.size()) {
-            // filtrowanie cwiczen na dana partie ciala
-            List<Exercise> exercisesForSpecifiedBodyPart = getExercisesForSpecifiedBodyPart(filteredListOfExercises,
-                    bodyPartsFromForm.get(tempIndex));
-            // test, czy cos sie wylosowalo
-            if (!exercisesForSpecifiedBodyPart.isEmpty()) {
-                int random = randomIndexGen.nextInt(exercisesForSpecifiedBodyPart.size());
-                Exercise exercise = exercisesForSpecifiedBodyPart.get(random);
-                rolledExercises.add(exercise);
-                filteredListOfExercises.remove(exercise);
+            // jezeli nie ma cwiczen to wykonaj akcje
+            if (filteredListOfExercises.isEmpty()) {
+                // sprawdz czy zostaly pobrane cwiczenia bez sprzetu
+                if (!containsNoEquips) {
+                    filteredListOfExercises.addAll(exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE));
+                    containsNoEquips = true;
+                } else {
+                    break;
+                }
             } else {
-                noExerciseCounter++;
-            }
-            // sprawdzanie, czy iterator po liscie partii ciala nie wyszedl poza zasieg
-            if (tempIndex < bodyPartsFromForm.size() - 1) {
-                tempIndex++;
-            } else { // reset
-                tempIndex = 0;
-                noExerciseCounter = 0;
+                // sprawdzenie czy w puli sa jeszcze jakiekolwiek cwiczenia dla danej partii, jesli nie to wyjscie
+                if (counter == bodyPartsFromForm.size()) {
+                    break;
+                }
             }
         }
         List<ExerciseExecution> exercisesExecutions = getExercisesExecutions(rolledExercises);
@@ -103,9 +91,32 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
     }
 
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {
-        return exercises.stream()
-                .filter(exercise -> exercise.getBodyPart().getName().toUpperCase().equals(bodyPartName))
-                .collect(Collectors.toList());
+        List<Exercise> filtered = new ArrayList<>();
+        switch (bodyPartName) {
+            case "LEGS" -> {
+                for (String spec : SPECIFIED_LEGS) {
+                    List<Exercise> exercisesForBodyPart = exercises.stream()
+                            .filter(exercise -> exercise.getBodyPart().getName().toUpperCase().equals(spec))
+                            .collect(Collectors.toList());
+                    filtered.addAll(exercisesForBodyPart);
+                }
+                return filtered;
+            }
+            case "ARMS" -> {
+                for (String spec : SPECIFIED_ARMS) {
+                    List<Exercise> exercisesForBodyPart = exercises.stream()
+                            .filter(exercise -> exercise.getBodyPart().getName().toUpperCase().equals(spec))
+                            .collect(Collectors.toList());
+                    filtered.addAll(exercisesForBodyPart);
+                }
+                return filtered;
+            }
+            default -> {
+                return exercises.stream()
+                        .filter(exercise -> exercise.getBodyPart().getName().toUpperCase().equals(bodyPartName))
+                        .collect(Collectors.toList());
+            }
+        }
     }
 
     private List<ExerciseExecution> getExercisesExecutions(List<Exercise> rolledExercises) {
@@ -127,11 +138,5 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             execList.add(exerciseExecution);
         }
         return execList;
-    }
-
-    private List<Exercise> filterExercisesWithNoEquip(List<Exercise> list) {
-        return list.stream()
-                .filter(exercise -> exercise.getEquipmentsNeeded().size() == 1)
-                .collect(Collectors.toList());
     }
 }

@@ -7,7 +7,7 @@ import java.util.List;
 
 @Service
 public class TrainingFormValidationService {
-    private final static List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS","SHOULDERS", "CHEST", "BACK", "THIGHS");
+    private final static List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS","SHOULDERS", "CHEST", "BACK", "THIGHS", "LEGS", "ARMS");
     private final static List<String> trainingTypes = List.of("SPLIT", "FBW", "CARDIO", "FITNESS");
     private final static List<String> scheduleTypes = List.of("PER_DAY", "REPETITIVE", "SERIES", "CIRCUIT");
 

@@ -13,7 +13,7 @@ public class TrainingPlan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @ManyToOne
+    @OneToOne
     private TrainingForm trainingForm;
     @OneToMany
     private List<Training> planList;
