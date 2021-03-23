@@ -104,10 +104,4 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         }
         return execList;
     }
-
-    private List<Exercise> filterExercisesWithNoEquip(List<Exercise> list) {
-        return list.stream()
-                .filter(exercise -> exercise.getEquipmentsNeeded().size() == 1)
-                .collect(Collectors.toList());
-    }
 }
