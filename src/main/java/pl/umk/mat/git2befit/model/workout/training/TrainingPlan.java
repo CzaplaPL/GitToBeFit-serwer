@@ -13,9 +13,9 @@ public class TrainingPlan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private TrainingForm trainingForm;
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private List<Training> planList;
     @ManyToOne
     private User user;

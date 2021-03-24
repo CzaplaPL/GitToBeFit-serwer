@@ -27,10 +27,10 @@ public class TrainingPlanController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm){
+    public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm) {
         List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
         List<Training> trainingPlans = new ArrayList<>();
-        if(trainingForm == null) {
+        if (trainingForm == null) {
             for (int i = 1; i <= 9; i++) {
                 if (i % 3 == 0) {
                     Training training = new Training();
@@ -59,7 +59,7 @@ public class TrainingPlanController {
                 System.out.println(exerciseExecution.getExercise().getId());
 
             }
-        }else {
+        } else {
             try {
                 trainingPlans = manufacture.createTrainingPlan(trainingForm);
             } catch (IllegalArgumentException e) {
@@ -74,13 +74,21 @@ public class TrainingPlanController {
     @PostMapping("/save")
     public ResponseEntity<?> save(
             @RequestBody List<TrainingPlan> trainingPlan,
-            @RequestParam long userId
+            @RequestHeader long userId
     ) {
         return trainingPlanService.save(trainingPlan, userId);
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestParam long userId) {
+    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestHeader long userId) {
         return trainingPlanService.getAllTrainingPlansByUserId(userId);
+    }
+
+    @GetMapping("/{trainingPlanId}")
+    public ResponseEntity<?> getOneTrainingPlansByUserId(
+            @RequestHeader long userId,
+            @PathVariable long trainingPlanId
+    ) {
+        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
     }
 }
