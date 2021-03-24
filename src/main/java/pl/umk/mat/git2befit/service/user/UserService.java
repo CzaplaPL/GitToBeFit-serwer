@@ -269,7 +269,7 @@ public class UserService {
         Optional<User> savedUser = userRepository.findByEmail(email);
         if(savedUser.isPresent() && !savedUser.get().isEnable()){
             try {
-                sendEmailWithVerificationToken(email, JWTGenerator.generate(email));
+                sendEmailWithVerificationToken(email, JWTGenerator.generateVerificationToken(savedUser.get().getId()));
                 return ResponseEntity.ok().build();
             } catch (EmailException e) {
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).build();

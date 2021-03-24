@@ -36,16 +36,4 @@ public class TrainingPlanController {
         return ResponseEntity.ok(trainingPlan);
 
     }
-    @PostMapping("/replace-exercise/{id}")
-    public ResponseEntity<?> modifyTrainingPlan(@PathVariable Long id, @RequestBody TrainingForm trainingForm){
-        List<Exercise> similarExercises;
-        try {
-            similarExercises = trainingService.getSimilarExercises(id, trainingForm);
-            return ResponseEntity.ok().body(similarExercises);
-        }catch (IllegalArgumentException e){
-            return ResponseEntity.notFound().header("Cause", e.getMessage()).build();
-        }
-    }
-
-
 }
