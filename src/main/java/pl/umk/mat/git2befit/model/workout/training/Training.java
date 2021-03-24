@@ -13,9 +13,8 @@ public class Training implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(nullable = false)
-    private long trainingId;
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ElementCollection
+    @CollectionTable(name = "exercises_executions")
     private List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
 
     public void addExerciseExecution(List<ExerciseExecution> exerciseExecutions){
@@ -37,13 +36,4 @@ public class Training implements Serializable {
     public void setId(long id) {
         this.id = id;
     }
-
-    public long getTrainingId() {
-        return trainingId;
-    }
-
-    public void setTrainingId(long trainingId) {
-        this.trainingId = trainingId;
-    }
-
 }

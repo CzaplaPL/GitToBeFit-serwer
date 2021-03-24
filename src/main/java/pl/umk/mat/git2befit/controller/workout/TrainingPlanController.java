@@ -2,16 +2,14 @@ package pl.umk.mat.git2befit.controller.workout;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
 import pl.umk.mat.git2befit.model.workout.conditions.ExerciseForm;
 import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
 import java.util.ArrayList;
@@ -20,10 +18,12 @@ import java.util.List;
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
-    private TrainingPlanManufacture manufacture;
+    private final TrainingPlanManufacture manufacture;
+    private final TrainingPlanService trainingPlanService;
 
-    public TrainingPlanController(TrainingPlanManufacture manufacture) {
+    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
         this.manufacture = manufacture;
+        this.trainingPlanService = service;
     }
 
     @PostMapping("/generate")
@@ -69,6 +69,18 @@ public class TrainingPlanController {
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
         return ResponseEntity.ok(trainingPlan);
+    }
 
+    @PostMapping("/save")
+    public ResponseEntity<?> save(
+            @RequestBody List<TrainingPlan> trainingPlan,
+            @RequestParam long userId
+    ) {
+        return trainingPlanService.save(trainingPlan, userId);
+    }
+
+    @GetMapping
+    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestParam long userId) {
+        return trainingPlanService.getAllTrainingPlansByUserId(userId);
     }
 }
