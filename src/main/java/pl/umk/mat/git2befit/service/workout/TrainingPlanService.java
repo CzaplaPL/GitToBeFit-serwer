@@ -26,7 +26,7 @@ public class TrainingPlanService {
             if (user.isPresent()) {
                 trainingPlans.forEach(plan -> {
                     plan.setUser(user.get());
-                    this.trainingPlanRepository.save(plan);
+                    trainingPlanRepository.save(plan);
                 });
                 return ResponseEntity.ok().build();
             } else {
