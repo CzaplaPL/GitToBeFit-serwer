@@ -1,14 +1,32 @@
 package pl.umk.mat.git2befit.model.workout.training;
 
+import pl.umk.mat.git2befit.converter.LongListConverter;
+import pl.umk.mat.git2befit.converter.StringListConverter;
+
+import javax.persistence.*;
 import java.util.List;
 
+@Entity(name = "training_forms")
 public class TrainingForm {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @Convert(converter = LongListConverter.class)
     private List<Long> equipmentIDs;
     private String trainingType;
+    @Convert(converter = StringListConverter.class)
     private List<String> bodyParts;
     private int daysCount;
     private String scheduleType;
     private int duration;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public List<Long> getEquipmentIDs() {
         return equipmentIDs;

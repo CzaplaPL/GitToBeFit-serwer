@@ -9,6 +9,7 @@ import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "exercises")
@@ -169,5 +170,40 @@ public class Exercise implements Serializable {
         return "Exercise{" +
                 "id=" + id +
                 ", name= " + name + " bodyPart= " + bodyPart.getName() ;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Exercise exercise = (Exercise) o;
+        return id == exercise.id &&
+                Objects.equals(name, exercise.name) &&
+                Objects.equals(descriptionOfStartPosition, exercise.descriptionOfStartPosition) &&
+                Objects.equals(descriptionOfCorrectExecution, exercise.descriptionOfCorrectExecution) &&
+                Objects.equals(hints, exercise.hints) &&
+                Objects.equals(exerciseForm, exercise.exerciseForm) &&
+                Objects.equals(videoUrl, exercise.videoUrl) &&
+                Objects.equals(photoUrl, exercise.photoUrl) &&
+                Objects.equals(bodyPart, exercise.bodyPart) &&
+                Objects.equals(trainingTypes, exercise.trainingTypes) &&
+                Objects.equals(equipmentsNeeded, exercise.equipmentsNeeded);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(
+                id,
+                name,
+                descriptionOfStartPosition,
+                descriptionOfCorrectExecution,
+                hints,
+                exerciseForm,
+                videoUrl,
+                photoUrl,
+                bodyPart,
+                trainingTypes,
+                equipmentsNeeded
+        );
     }
 }
