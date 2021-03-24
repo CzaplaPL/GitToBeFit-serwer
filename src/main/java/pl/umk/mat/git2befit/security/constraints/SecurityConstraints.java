@@ -22,4 +22,5 @@ public interface SecurityConstraints {
     String ALL_EQUIPMENT_TYPES = "/equipment-type";
 
     String TRAINING_GENERATION = "/training-plan/generate";
+    String TRAINING_MODIFICATION = "/training-plan/replace-exercise/{id}";
 }

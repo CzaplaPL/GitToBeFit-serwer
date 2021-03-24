@@ -3,10 +3,7 @@ package pl.umk.mat.git2befit.controller.workout;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.service.workout.TrainingService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
@@ -39,15 +36,16 @@ public class TrainingPlanController {
         return ResponseEntity.ok(trainingPlan);
 
     }
-
-    @PostMapping("/modify/{id}")
-    public ResponseEntity<?> modifyTrainingPlan(Exercise exercise, @RequestBody TrainingForm trainingForm){
+    @PostMapping("/replace-exercise/{id}")
+    public ResponseEntity<?> modifyTrainingPlan(@PathVariable Long id, @RequestBody TrainingForm trainingForm){
         List<Exercise> similarExercises;
         try {
-            similarExercises = trainingService.getSimilarExercises(exercise.getId(), trainingForm);
+            similarExercises = trainingService.getSimilarExercises(id, trainingForm);
             return ResponseEntity.ok().body(similarExercises);
         }catch (IllegalArgumentException e){
             return ResponseEntity.notFound().header("Cause", e.getMessage()).build();
         }
     }
+
+
 }

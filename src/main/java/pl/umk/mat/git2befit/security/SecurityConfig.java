@@ -41,7 +41,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Zezwolenie na dostep do pobrania wszystkich kategorii
                 .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES).permitAll()
                 // Zezwolenie na dostep do pobrania treningu
-                .antMatchers(HttpMethod.POST, "/training-plan/**").permitAll()
+                .antMatchers(HttpMethod.POST, TRAINING_GENERATION).permitAll()
+                .antMatchers(HttpMethod.POST, TRAINING_MODIFICATION).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))
