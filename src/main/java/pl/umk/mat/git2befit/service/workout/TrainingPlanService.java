@@ -30,13 +30,12 @@ public class TrainingPlanService {
         this.exerciseRepository = exerciseRepository;
     }
 
-    public ResponseEntity<?> save(List<TrainingPlan> trainingPlans, long userId) {
+    public ResponseEntity<?> saveTrainingWithUserId(List<TrainingPlan> trainingPlans, long userId) {
         try {
             Optional<User> user = userRepository.findById(userId);
             if (user.isPresent()) {
                 trainingPlans.forEach(plan -> {
-                    plan.setUser(user.get());
-                    trainingPlanRepository.save(plan);
+                    assignUserAndSaveTraining(plan, user.get());
                 });
                 return ResponseEntity.ok().build();
             } else {
@@ -45,6 +44,27 @@ public class TrainingPlanService {
         } catch (Exception e) {
             return ResponseEntity.badRequest().header("Cause", "cant be saved").build();
         }
+    }
+
+    public ResponseEntity<?> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
+        try {
+            Optional<User> user = userRepository.findByEmail(email);
+            if (user.isPresent()) {
+                trainingPlans.forEach(plan -> {
+                    assignUserAndSaveTraining(plan, user.get());
+                });
+                return ResponseEntity.ok().build();
+            } else {
+                return ResponseEntity.badRequest().header("Cause", "user not found").build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().header("Cause", "cant be saved").build();
+        }
+    }
+
+    private void assignUserAndSaveTraining(TrainingPlan trainingPlan, User user) {
+        trainingPlan.setUser(user);
+        trainingPlanRepository.save(trainingPlan);
     }
 
     public List<TrainingPlan> getAllTrainingPlansByUserId(long userId) {

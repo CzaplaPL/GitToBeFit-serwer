@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.controller.workout;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,9 @@ import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 import java.util.ArrayList;
 import java.util.List;
 
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.SECRET;
+import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.TOKEN_PREFIX;
+
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
@@ -27,7 +32,10 @@ public class TrainingPlanController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm) {
+    public ResponseEntity<?> generate(
+            @RequestBody(required = false) TrainingForm trainingForm,
+            @RequestHeader(value = "Authorization", required = false) String authorizationToken
+    ) {
         List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
         List<Training> trainingPlans = new ArrayList<>();
         if (trainingForm == null) {
@@ -66,8 +74,16 @@ public class TrainingPlanController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
             }
         }
-
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+
+        if (authorizationToken != null) {
+            String email = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
+                    .build()
+                    .verify(authorizationToken.replace(TOKEN_PREFIX, ""))
+                    .getSubject();
+            trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
+        }
+
         return ResponseEntity.ok(trainingPlan);
     }
 
@@ -76,7 +92,7 @@ public class TrainingPlanController {
             @RequestBody List<TrainingPlan> trainingPlan,
             @RequestHeader long userId
     ) {
-        return trainingPlanService.save(trainingPlan, userId);
+        return trainingPlanService.saveTrainingWithUserId(trainingPlan, userId);
     }
 
     @GetMapping
