@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.service.workout;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,24 @@ public class TrainingPlanService {
 
     public List<TrainingPlan> getAllTrainingPlansByUserId(long userId) {
         return trainingPlanRepository.findAllByUserIdOrderByIdDesc(userId);
+    }
+
+    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, long userId) {
+        try {
+            Optional<User> user = userRepository.findById(userId);
+            if (user.isPresent()) {
+                Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findByIdAndUserId(trainingPlanId, user.get().getId());
+                return trainingPlan.map(ResponseEntity::ok)
+                        .orElse(ResponseEntity.notFound()
+                                .header("Cause", "training plan not found")
+                                .build()
+                        );
+            } else {
+                return ResponseEntity.badRequest().header("Cause", "user not found").build();
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "searching error").build();
+        }
     }
 
     public List<Exercise> getSimilarExercises(long id, TrainingForm trainingForm) throws IllegalArgumentException{
