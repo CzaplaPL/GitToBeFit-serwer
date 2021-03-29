@@ -13,6 +13,7 @@ public class TrainingPlan implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private String title;
     @OneToOne(cascade = {CascadeType.ALL}, orphanRemoval = true)
     private TrainingForm trainingForm;
     @OneToMany(cascade = {CascadeType.ALL}, orphanRemoval = true)
@@ -58,4 +59,14 @@ public class TrainingPlan implements Serializable {
     public void setUser(User user) {
         this.user = user;
     }
+
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
 }

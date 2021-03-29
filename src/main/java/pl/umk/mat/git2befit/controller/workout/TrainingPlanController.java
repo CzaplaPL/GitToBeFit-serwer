@@ -91,4 +91,14 @@ public class TrainingPlanController {
     ) {
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
     }
+
+    @PutMapping("/updateTrainingPlanTitle/{id}")
+    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
+        try{
+            trainingPlanService.updateTrainingPlan(title, id);
+            return ResponseEntity.ok().build();
+        }catch (IllegalArgumentException exception){
+            return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
+        }
+    }
 }
