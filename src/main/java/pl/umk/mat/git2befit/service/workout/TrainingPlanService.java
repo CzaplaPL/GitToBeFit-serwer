@@ -103,8 +103,9 @@ public class TrainingPlanService {
     }
 
     public void updateTrainingPlan(String title, Long id){
-        if (trainingPlanRepository.existsById(id)) {
-            TrainingPlan trainingPlan = trainingPlanRepository.findById(id).get();
+        Optional<TrainingPlan> trainingPlanOptional = trainingPlanRepository.findById(id);
+        if (trainingPlanOptional.isPresent()) {
+            TrainingPlan trainingPlan = trainingPlanOptional.get();
             trainingPlan.setTitle(title);
             trainingPlanRepository.save(trainingPlan);
         }

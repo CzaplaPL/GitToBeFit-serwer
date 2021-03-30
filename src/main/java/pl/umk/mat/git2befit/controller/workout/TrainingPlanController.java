@@ -68,6 +68,7 @@ public class TrainingPlanController {
         }
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+        trainingPlan.setTitle(trainingForm.getTrainingType());
         return ResponseEntity.ok(trainingPlan);
     }
 
@@ -92,7 +93,7 @@ public class TrainingPlanController {
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
     }
 
-    @PutMapping("/updateTrainingPlanTitle/{id}")
+    @PutMapping("/updateTitle/{id}")
     public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
         try{
             trainingPlanService.updateTrainingPlan(title, id);
