@@ -1,7 +1,6 @@
 package pl.umk.mat.git2befit.service.workout;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.user.entity.User;
@@ -21,29 +20,16 @@ import java.util.stream.Collectors;
 public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
-
     private final ExerciseRepository exerciseRepository;
 
-    public TrainingPlanService(TrainingPlanRepository trainingPlanRepository, UserRepository userRepository, ExerciseRepository exerciseRepository) {
+    public TrainingPlanService(
+            TrainingPlanRepository trainingPlanRepository,
+            UserRepository userRepository,
+            ExerciseRepository exerciseRepository
+    ) {
         this.trainingPlanRepository = trainingPlanRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
-    }
-
-    public ResponseEntity<?> saveTrainingWithUserId(List<TrainingPlan> trainingPlans, long userId) {
-        try {
-            Optional<User> user = userRepository.findById(userId);
-            if (user.isPresent()) {
-                trainingPlans.forEach(plan -> {
-                    assignUserAndSaveTraining(plan, user.get());
-                });
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.badRequest().header("Cause", "user not found").build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().header("Cause", "cant be saved").build();
-        }
     }
 
     public ResponseEntity<?> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
@@ -51,7 +37,8 @@ public class TrainingPlanService {
             Optional<User> user = userRepository.findByEmail(email);
             if (user.isPresent()) {
                 trainingPlans.forEach(plan -> {
-                    assignUserAndSaveTraining(plan, user.get());
+                    plan.setUser(user.get());
+                    trainingPlanRepository.save(plan);
                 });
                 return ResponseEntity.ok().build();
             } else {
@@ -62,18 +49,13 @@ public class TrainingPlanService {
         }
     }
 
-    private void assignUserAndSaveTraining(TrainingPlan trainingPlan, User user) {
-        trainingPlan.setUser(user);
-        trainingPlanRepository.save(trainingPlan);
-    }
-
     public List<TrainingPlan> getAllTrainingPlansByUserId(long userId) {
         return trainingPlanRepository.findAllByUserIdOrderByIdDesc(userId);
     }
 
-    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, long userId) {
+    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String userEmail) {
         try {
-            Optional<User> user = userRepository.findById(userId);
+            Optional<User> user = userRepository.findByEmail(userEmail);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findByIdAndUserId(trainingPlanId, user.get().getId());
                 return trainingPlan.map(ResponseEntity::ok)
