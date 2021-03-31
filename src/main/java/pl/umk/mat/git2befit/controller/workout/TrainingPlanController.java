@@ -68,6 +68,7 @@ public class TrainingPlanController {
         }
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+        trainingPlan.setTitle(trainingForm.getTrainingType());
         return ResponseEntity.ok(trainingPlan);
     }
 
@@ -90,5 +91,15 @@ public class TrainingPlanController {
             @PathVariable long trainingPlanId
     ) {
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
+    }
+
+    @PutMapping("/updateTitle/{id}")
+    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
+        try{
+            trainingPlanService.updateTrainingPlan(title, id);
+            return ResponseEntity.ok().build();
+        }catch (IllegalArgumentException exception){
+            return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
+        }
     }
 }
