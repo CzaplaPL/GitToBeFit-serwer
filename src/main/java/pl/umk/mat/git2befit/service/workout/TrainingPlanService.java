@@ -103,4 +103,15 @@ public class TrainingPlanService {
                 .collect(Collectors.toList());
         return exercisesToReplace;
     }
+
+    public void updateTrainingPlan(String title, Long id){
+        Optional<TrainingPlan> trainingPlanOptional = trainingPlanRepository.findById(id);
+        if (trainingPlanOptional.isPresent()) {
+            TrainingPlan trainingPlan = trainingPlanOptional.get();
+            trainingPlan.setTitle(title);
+            trainingPlanRepository.save(trainingPlan);
+        }
+        else
+            throw new IllegalArgumentException("TrainingPlan with id: " + id + " is unknown");
+    }
 }

@@ -77,6 +77,8 @@ public class TrainingPlanController {
             trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
         }
 
+        trainingPlan.setTitle(trainingForm.getTrainingType());
+
         return ResponseEntity.ok(trainingPlan);
     }
 
@@ -101,5 +103,15 @@ public class TrainingPlanController {
     ) {
         String email = JWTService.parseEmail(authorizationToken);
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
+    }
+
+    @PutMapping("/updateTitle/{id}")
+    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
+        try{
+            trainingPlanService.updateTrainingPlan(title, id);
+            return ResponseEntity.ok().build();
+        }catch (IllegalArgumentException exception){
+            return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
+        }
     }
 }
