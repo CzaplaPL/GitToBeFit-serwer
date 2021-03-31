@@ -9,6 +9,7 @@ import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.equipment.EquipmentType;
 import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
@@ -27,7 +28,10 @@ public class TrainingPlanController {
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm) {
+    public ResponseEntity<?> generate(
+            @RequestBody(required = false) TrainingForm trainingForm,
+            @RequestHeader(value = "Authorization", required = false) String authorizationToken
+    ) {
         List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
         List<Training> trainingPlans = new ArrayList<>();
         if (trainingForm == null) {
@@ -66,18 +70,25 @@ public class TrainingPlanController {
                 return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
             }
         }
-
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+
+        if (authorizationToken != null) {
+            String email = JWTService.parseEmail(authorizationToken);
+            trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
+        }
+
         trainingPlan.setTitle(trainingForm.getTrainingType());
+
         return ResponseEntity.ok(trainingPlan);
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> save(
             @RequestBody List<TrainingPlan> trainingPlan,
-            @RequestHeader long userId
+            @RequestHeader(value = "Authorization") String authorizationToken
     ) {
-        return trainingPlanService.save(trainingPlan, userId);
+        String email = JWTService.parseEmail(authorizationToken);
+        return trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
     }
 
     @GetMapping
@@ -87,10 +98,11 @@ public class TrainingPlanController {
 
     @GetMapping("/{trainingPlanId}")
     public ResponseEntity<?> getOneTrainingPlansByUserId(
-            @RequestHeader long userId,
+            @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
-        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
+        String email = JWTService.parseEmail(authorizationToken);
+        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
     }
 
     @PutMapping("/updateTitle/{id}")

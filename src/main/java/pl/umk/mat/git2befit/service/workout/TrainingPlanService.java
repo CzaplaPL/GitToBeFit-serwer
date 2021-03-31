@@ -1,7 +1,6 @@
 package pl.umk.mat.git2befit.service.workout;
 
 import org.springframework.http.HttpStatus;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.user.entity.User;
@@ -21,18 +20,21 @@ import java.util.stream.Collectors;
 public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
-
     private final ExerciseRepository exerciseRepository;
 
-    public TrainingPlanService(TrainingPlanRepository trainingPlanRepository, UserRepository userRepository, ExerciseRepository exerciseRepository) {
+    public TrainingPlanService(
+            TrainingPlanRepository trainingPlanRepository,
+            UserRepository userRepository,
+            ExerciseRepository exerciseRepository
+    ) {
         this.trainingPlanRepository = trainingPlanRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
     }
 
-    public ResponseEntity<?> save(List<TrainingPlan> trainingPlans, long userId) {
+    public ResponseEntity<?> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
         try {
-            Optional<User> user = userRepository.findById(userId);
+            Optional<User> user = userRepository.findByEmail(email);
             if (user.isPresent()) {
                 trainingPlans.forEach(plan -> {
                     plan.setUser(user.get());
@@ -51,9 +53,9 @@ public class TrainingPlanService {
         return trainingPlanRepository.findAllByUserIdOrderByIdDesc(userId);
     }
 
-    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, long userId) {
+    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String userEmail) {
         try {
-            Optional<User> user = userRepository.findById(userId);
+            Optional<User> user = userRepository.findByEmail(userEmail);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findByIdAndUserId(trainingPlanId, user.get().getId());
                 return trainingPlan.map(ResponseEntity::ok)
