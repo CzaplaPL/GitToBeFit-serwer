@@ -32,20 +32,16 @@ public class TrainingPlanService {
         this.exerciseRepository = exerciseRepository;
     }
 
-    public ResponseEntity<?> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
-        try {
-            Optional<User> user = userRepository.findByEmail(email);
-            if (user.isPresent()) {
-                trainingPlans.forEach(plan -> {
-                    plan.setUser(user.get());
-                    trainingPlanRepository.save(plan);
-                });
-                return ResponseEntity.ok().build();
-            } else {
-                return ResponseEntity.badRequest().header("Cause", "user not found").build();
-            }
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().header("Cause", "cant be saved").build();
+    public List<TrainingPlan> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
+        Optional<User> user = userRepository.findByEmail(email);
+        if (user.isPresent()) {
+            trainingPlans.forEach(plan -> {
+                plan.setUser(user.get());
+                trainingPlanRepository.save(plan);
+            });
+            return trainingPlans;
+        } else {
+            throw new IllegalArgumentException("user not exist");
         }
     }
 

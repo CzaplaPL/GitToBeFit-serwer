@@ -72,14 +72,16 @@ public class TrainingPlanController {
         }
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
 
+        trainingPlan.setTitle(trainingForm.getTrainingType());
+        List<TrainingPlan> savedTrainingPlan = null;
         if (authorizationToken != null) {
-            String email = JWTService.parseEmail(authorizationToken);
-            trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
+            try {
+                String email = JWTService.parseEmail(authorizationToken);
+                savedTrainingPlan = trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
+            } catch (Exception ignored) {}
         }
 
-        trainingPlan.setTitle(trainingForm.getTrainingType());
-
-        return ResponseEntity.ok(trainingPlan);
+        return ResponseEntity.ok(savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan);
     }
 
     @PostMapping("/save")
@@ -88,7 +90,14 @@ public class TrainingPlanController {
             @RequestHeader(value = "Authorization") String authorizationToken
     ) {
         String email = JWTService.parseEmail(authorizationToken);
-        return trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
+        try {
+            trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", exception.getMessage()).build();
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
@@ -101,6 +110,7 @@ public class TrainingPlanController {
             @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
+
         String email = JWTService.parseEmail(authorizationToken);
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
     }

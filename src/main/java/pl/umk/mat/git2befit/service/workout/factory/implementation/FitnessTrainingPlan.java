@@ -9,6 +9,7 @@ import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.Collectors;
@@ -86,6 +87,7 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             }
         }
         List<ExerciseExecution> exercisesExecutions = getExercisesExecutions(rolledExercises);
+        Collections.shuffle(exercisesExecutions);
         training.setExercisesExecutions(exercisesExecutions);
         return List.of(training);
     }
