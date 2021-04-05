@@ -102,7 +102,7 @@ public class TrainingPlanController {
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserId(
+    public List<TrainingPlan> getAllTrainingPlansByUserEmail(
             @RequestHeader(value = "Authorization") String authorizationToken
     ) {
         String email = JWTService.parseEmail(authorizationToken);
