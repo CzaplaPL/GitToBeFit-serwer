@@ -78,7 +78,8 @@ public class TrainingPlanController {
             try {
                 String email = JWTService.parseEmail(authorizationToken);
                 savedTrainingPlan = trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
 
         return ResponseEntity.ok(savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan);
@@ -110,17 +111,16 @@ public class TrainingPlanController {
             @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
-
         String email = JWTService.parseEmail(authorizationToken);
         return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
     }
 
     @PutMapping("/updateTitle/{id}")
-    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
-        try{
+    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title) {
+        try {
             trainingPlanService.updateTrainingPlan(title, id);
             return ResponseEntity.ok().build();
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
         }
     }
