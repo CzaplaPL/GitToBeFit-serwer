@@ -15,11 +15,9 @@ import java.util.List;
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
-    private final TrainingPlanManufacture manufacture;
     private final TrainingPlanService trainingPlanService;
 
-    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
-        this.manufacture = manufacture;
+    public TrainingPlanController(TrainingPlanService service) {
         this.trainingPlanService = service;
     }
 
@@ -28,27 +26,7 @@ public class TrainingPlanController {
             @RequestBody(required = false) TrainingForm trainingForm,
             @RequestHeader(value = "Authorization", required = false) String authorizationToken
     ) {
-        List<Training> trainingPlans;
-
-        try {
-            trainingPlans = manufacture.createTrainingPlan(trainingForm);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
-        }
-
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
-
-        trainingPlan.setTitle(trainingForm.getTrainingType());
-        List<TrainingPlan> savedTrainingPlan = null;
-        if (authorizationToken != null) {
-            try {
-                String email = JWTService.parseEmail(authorizationToken);
-                savedTrainingPlan = trainingPlanService.saveTrainingWithUserEmail(List.of(trainingPlan), email);
-            } catch (Exception ignored) {
-            }
-        }
-
-        return ResponseEntity.ok(savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan);
+        return trainingPlanService.generate(trainingForm, authorizationToken);
     }
 
     @PostMapping("/save")
