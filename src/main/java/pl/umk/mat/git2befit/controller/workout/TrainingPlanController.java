@@ -102,11 +102,10 @@ public class TrainingPlanController {
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserEmail(
+    public ResponseEntity<?> getAllTrainingPlansByUserEmail(
             @RequestHeader(value = "Authorization") String authorizationToken
     ) {
-        String email = JWTService.parseEmail(authorizationToken);
-        return trainingPlanService.getAllTrainingPlansByUserEmail(email);
+        return trainingPlanService.getAllTrainingPlansByUserEmail(authorizationToken);
     }
 
     @GetMapping("/{trainingPlanId}")
@@ -114,8 +113,7 @@ public class TrainingPlanController {
             @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
-        String email = JWTService.parseEmail(authorizationToken);
-        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
+        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, authorizationToken);
     }
 
     @PutMapping("/updateTitle/{id}")

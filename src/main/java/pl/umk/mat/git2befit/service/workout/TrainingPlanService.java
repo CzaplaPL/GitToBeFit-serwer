@@ -1,5 +1,8 @@
 package pl.umk.mat.git2befit.service.workout;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,8 @@ import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.repository.user.UserRepository;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
+import pl.umk.mat.git2befit.service.user.JWTService;
+import pl.umk.mat.git2befit.service.user.UserService;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +26,7 @@ public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
+    private final Logger log = LoggerFactory.getLogger(TrainingPlanService.class);
 
     public TrainingPlanService(
             TrainingPlanRepository trainingPlanRepository,
@@ -45,12 +51,22 @@ public class TrainingPlanService {
         }
     }
 
-    public List<TrainingPlan> getAllTrainingPlansByUserEmail(String email) {
-        return trainingPlanRepository.findAllByUser_Email(email);
+    public ResponseEntity<?> getAllTrainingPlansByUserEmail(String authorizationToken) {
+        try {
+            String email = JWTService.parseEmail(authorizationToken);
+            return ResponseEntity.ok(trainingPlanRepository.findAllByUser_Email(email));
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "server error").build();
+        }
     }
 
-    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String userEmail) {
+    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String authorizationToken) {
         try {
+            String userEmail = JWTService.parseEmail(authorizationToken);
+
             Optional<User> user = userRepository.findByEmail(userEmail);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findByIdAndUserId(trainingPlanId, user.get().getId());
@@ -62,7 +78,10 @@ public class TrainingPlanService {
             } else {
                 return ResponseEntity.badRequest().header("Cause", "user not found").build();
             }
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
         } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "searching error").build();
         }
     }
