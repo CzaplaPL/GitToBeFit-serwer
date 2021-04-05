@@ -132,5 +132,7 @@ public class TrainingPlanController {
     public ResponseEntity<?> deleteTrainingPlan(
             @PathVariable Long trainingPlanId,
             @RequestHeader(value = "Authorization") String authorizationToken
-    ) {}
+    ) {
+        return trainingPlanService.delete(trainingPlanId, authorizationToken);
+    }
 }

@@ -1,5 +1,8 @@
 package pl.umk.mat.git2befit.service.workout;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -11,6 +14,7 @@ import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.repository.user.UserRepository;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
+import pl.umk.mat.git2befit.service.user.JWTService;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,6 +25,7 @@ public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
+    private final Logger log = LoggerFactory.getLogger(TrainingPlanService.class);
 
     public TrainingPlanService(
             TrainingPlanRepository trainingPlanRepository,
@@ -109,5 +114,34 @@ public class TrainingPlanService {
         }
         else
             throw new IllegalArgumentException("TrainingPlan with id: " + id + " is unknown");
+    }
+
+    public ResponseEntity<?> delete(Long trainingPlanId, String authorizationToken) {
+        try {
+            String email = JWTService.parseEmail(authorizationToken);
+            Optional<User> user = userRepository.findByEmail(email);
+            if (user.isPresent()) {
+                Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findById(trainingPlanId);
+                if(!trainingPlan.isPresent())
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "training plan not found").build();
+                if (canBeDeletedByUser(trainingPlan.get(), user.get())) {
+                    trainingPlanRepository.delete(trainingPlan.get());
+                    return ResponseEntity.ok().build();
+                } else {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "user not allowed").build();
+                }
+            } else {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "user not found").build();
+            }
+        }catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "server error").build();
+        }
+    }
+
+    private boolean canBeDeletedByUser(TrainingPlan trainingPlan, User user) {
+        return trainingPlan.getUser().getId().equals(user.getId());
     }
 }
