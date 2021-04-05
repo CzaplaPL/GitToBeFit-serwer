@@ -92,8 +92,11 @@ public class TrainingPlanController {
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestHeader long userId) {
-        return trainingPlanService.getAllTrainingPlansByUserId(userId);
+    public List<TrainingPlan> getAllTrainingPlansByUserId(
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        String email = JWTService.parseEmail(authorizationToken);
+        return trainingPlanService.getAllTrainingPlansByUserEmail(email);
     }
 
     @GetMapping("/{trainingPlanId}")

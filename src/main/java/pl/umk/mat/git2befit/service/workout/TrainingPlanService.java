@@ -49,8 +49,8 @@ public class TrainingPlanService {
         }
     }
 
-    public List<TrainingPlan> getAllTrainingPlansByUserId(long userId) {
-        return trainingPlanRepository.findAllByUserIdOrderByIdDesc(userId);
+    public List<TrainingPlan> getAllTrainingPlansByUserEmail(String email) {
+        return trainingPlanRepository.findAllByUser_Email(email);
     }
 
     public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String userEmail) {
