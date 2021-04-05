@@ -50,12 +50,22 @@ public class TrainingPlanService {
         }
     }
 
-    public List<TrainingPlan> getAllTrainingPlansByUserEmail(String email) {
-        return trainingPlanRepository.findAllByUser_Email(email);
+    public ResponseEntity<?> getAllTrainingPlansByUserEmail(String authorizationToken) {
+        try {
+            String email = JWTService.parseEmail(authorizationToken);
+            return ResponseEntity.ok(trainingPlanRepository.findAllByUser_Email(email));
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "server error").build();
+        }
     }
 
-    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String userEmail) {
+    public ResponseEntity<?> getTrainingPlanByIdForUser(long trainingPlanId, String authorizationToken) {
         try {
+            String userEmail = JWTService.parseEmail(authorizationToken);
+
             Optional<User> user = userRepository.findByEmail(userEmail);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findByIdAndUserId(trainingPlanId, user.get().getId());
@@ -67,7 +77,10 @@ public class TrainingPlanService {
             } else {
                 return ResponseEntity.badRequest().header("Cause", "user not found").build();
             }
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
         } catch (Exception e) {
+            log.error(e.getMessage());
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "searching error").build();
         }
     }
