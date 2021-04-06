@@ -12,7 +12,6 @@ import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.stream.Collectors;
 
 @Component
 public class CardioTrainingPlan implements TrainingPlanInterface {
