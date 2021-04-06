@@ -57,8 +57,8 @@ public class TrainingPlanService {
                 savedTrainingPlan = saveTrainingWithUserEmail(List.of(trainingPlan), email);
             } catch (Exception ignored) {}
         }
-
-        return ResponseEntity.ok(savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan);
+        TrainingPlan trainingPlanToReturn = savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan;
+        return ResponseEntity.ok(trainingPlanToReturn);
     }
 
     public List<TrainingPlan> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
