@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
+import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.repository.user.UserRepository;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
 import pl.umk.mat.git2befit.service.user.JWTService;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,16 +27,42 @@ public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
+    private final TrainingPlanManufacture manufacture;
     private final Logger log = LoggerFactory.getLogger(TrainingPlanService.class);
 
     public TrainingPlanService(
             TrainingPlanRepository trainingPlanRepository,
             UserRepository userRepository,
-            ExerciseRepository exerciseRepository
+            ExerciseRepository exerciseRepository,
+            TrainingPlanManufacture manufacture
     ) {
         this.trainingPlanRepository = trainingPlanRepository;
         this.userRepository = userRepository;
         this.exerciseRepository = exerciseRepository;
+        this.manufacture = manufacture;
+    }
+
+    public ResponseEntity<?> generate(TrainingForm trainingForm, String authorizationToken) {
+        List<Training> trainingPlans;
+
+        try {
+            trainingPlans = manufacture.createTrainingPlan(trainingForm);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
+        }
+
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+
+        trainingPlan.setTitle(trainingForm.getTrainingType());
+        List<TrainingPlan> savedTrainingPlan = null;
+        if (authorizationToken != null) {
+            try {
+                String email = JWTService.parseEmail(authorizationToken);
+                savedTrainingPlan = saveTrainingWithUserEmail(List.of(trainingPlan), email);
+            } catch (Exception ignored) {}
+        }
+        TrainingPlan trainingPlanToReturn = savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan;
+        return ResponseEntity.ok(trainingPlanToReturn);
     }
 
     public List<TrainingPlan> saveTrainingWithUserEmail(List<TrainingPlan> trainingPlans, String email) {
