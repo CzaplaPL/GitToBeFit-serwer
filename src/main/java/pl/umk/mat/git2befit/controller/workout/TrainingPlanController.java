@@ -67,4 +67,12 @@ public class TrainingPlanController {
             return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
         }
     }
+
+    @DeleteMapping("/{trainingPlanId}")
+    public ResponseEntity<?> deleteTrainingPlan(
+            @PathVariable Long trainingPlanId,
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        return trainingPlanService.delete(trainingPlanId, authorizationToken);
+    }
 }
