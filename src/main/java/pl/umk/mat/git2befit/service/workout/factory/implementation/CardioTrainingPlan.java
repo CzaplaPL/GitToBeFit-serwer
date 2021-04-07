@@ -96,8 +96,8 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 exerciseExecution.setCount(8);
                 exerciseExecution.setTime(0);
             } else if (scheduleType.equals("TIME")) {
-                exerciseExecution.setSeries(0);
-                exerciseExecution.setCount(3);
+                exerciseExecution.setSeries(3);
+                exerciseExecution.setCount(0);
                 exerciseExecution.setTime(30);
             }
             execList.add(exerciseExecution);
