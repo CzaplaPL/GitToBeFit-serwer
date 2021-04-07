@@ -149,5 +149,4 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         }
         return trainingList;
     }
-
 }

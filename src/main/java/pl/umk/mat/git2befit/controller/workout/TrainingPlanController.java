@@ -44,8 +44,10 @@ public class TrainingPlanController {
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestHeader long userId) {
-        return trainingPlanService.getAllTrainingPlansByUserId(userId);
+    public ResponseEntity<?> getAllTrainingPlansByUserEmail(
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        return trainingPlanService.getAllTrainingPlansByUserEmail(authorizationToken);
     }
 
     @GetMapping("/{trainingPlanId}")
@@ -53,8 +55,7 @@ public class TrainingPlanController {
             @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
-        String email = JWTService.parseEmail(authorizationToken);
-        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, email);
+        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, authorizationToken);
     }
 
     @PutMapping("/updateTitle/{id}")
@@ -65,5 +66,13 @@ public class TrainingPlanController {
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
         }
+    }
+
+    @DeleteMapping("/{trainingPlanId}")
+    public ResponseEntity<?> deleteTrainingPlan(
+            @PathVariable Long trainingPlanId,
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        return trainingPlanService.delete(trainingPlanId, authorizationToken);
     }
 }
