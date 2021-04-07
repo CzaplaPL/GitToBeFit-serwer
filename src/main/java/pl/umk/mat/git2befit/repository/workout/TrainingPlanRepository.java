@@ -7,6 +7,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TrainingPlanRepository extends JpaRepository<TrainingPlan, Long> {
-    List<TrainingPlan> findAllByUserIdOrderByIdDesc(Long userId);
+    List<TrainingPlan> findAllByUser_Email(String email);
     Optional<TrainingPlan> findByIdAndUserId(long id, Long user_id);
 }
