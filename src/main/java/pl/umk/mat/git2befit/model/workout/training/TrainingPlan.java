@@ -4,6 +4,7 @@ import pl.umk.mat.git2befit.model.user.entity.User;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -20,12 +21,14 @@ public class TrainingPlan implements Serializable {
     private List<Training> planList;
     @ManyToOne
     private User user;
+    private LocalDateTime createdAt;
 
     public TrainingPlan() {}
 
     public TrainingPlan(TrainingForm trainingForm, List<Training> planList) {
         this.trainingForm = trainingForm;
         this.planList = planList;
+        this.createdAt = LocalDateTime.now();
     }
 
     public long getId() {
@@ -69,4 +72,11 @@ public class TrainingPlan implements Serializable {
         this.title = title;
     }
 
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }

@@ -3,73 +3,76 @@ package pl.umk.mat.git2befit.controller.workout;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.workout.conditions.ExerciseForm;
-import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
-import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.workout.equipment.EquipmentType;
-import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
+import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
-    private final TrainingPlanManufacture manufacture;
     private final TrainingPlanService trainingPlanService;
 
-    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
-        this.manufacture = manufacture;
+    public TrainingPlanController(TrainingPlanService service) {
         this.trainingPlanService = service;
     }
 
     @PostMapping("/generate")
-    public ResponseEntity<?> generate(@RequestBody(required = false) TrainingForm trainingForm) {
-        List<ExerciseExecution> exerciseExecutions = new ArrayList<>();
-        List<Training> trainingPlans;
-
-        try {
-            trainingPlans = manufacture.createTrainingPlan(trainingForm);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
-        }
-
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
-        trainingPlan.setTitle(trainingForm.getTrainingType());
-        return ResponseEntity.ok(trainingPlan);
+    public ResponseEntity<?> generate(
+            @RequestBody(required = false) TrainingForm trainingForm,
+            @RequestHeader(value = "Authorization", required = false) String authorizationToken
+    ) {
+        return trainingPlanService.generate(trainingForm, authorizationToken);
     }
 
     @PostMapping("/save")
     public ResponseEntity<?> save(
             @RequestBody List<TrainingPlan> trainingPlan,
-            @RequestHeader long userId
+            @RequestHeader(value = "Authorization") String authorizationToken
     ) {
-        return trainingPlanService.save(trainingPlan, userId);
+        String email = JWTService.parseEmail(authorizationToken);
+        try {
+            trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
+            return ResponseEntity.ok().build();
+        } catch (IllegalArgumentException exception) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", exception.getMessage()).build();
+        } catch (Exception exception) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     @GetMapping
-    public List<TrainingPlan> getAllTrainingPlansByUserId(@RequestHeader long userId) {
-        return trainingPlanService.getAllTrainingPlansByUserId(userId);
+    public ResponseEntity<?> getAllTrainingPlansByUserEmail(
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        return trainingPlanService.getAllTrainingPlansByUserEmail(authorizationToken);
     }
 
     @GetMapping("/{trainingPlanId}")
     public ResponseEntity<?> getOneTrainingPlansByUserId(
-            @RequestHeader long userId,
+            @RequestHeader(value = "Authorization") String authorizationToken,
             @PathVariable long trainingPlanId
     ) {
-        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, userId);
+        return trainingPlanService.getTrainingPlanByIdForUser(trainingPlanId, authorizationToken);
     }
 
     @PutMapping("/updateTitle/{id}")
-    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title){
-        try{
+    public ResponseEntity<?> updateTrainingPlan(@PathVariable Long id, @RequestHeader String title) {
+        try {
             trainingPlanService.updateTrainingPlan(title, id);
             return ResponseEntity.ok().build();
-        }catch (IllegalArgumentException exception){
+        } catch (IllegalArgumentException exception) {
             return ResponseEntity.notFound().header("Cause", exception.getMessage()).build();
         }
+    }
+
+    @DeleteMapping("/{trainingPlanId}")
+    public ResponseEntity<?> deleteTrainingPlan(
+            @PathVariable Long trainingPlanId,
+            @RequestHeader(value = "Authorization") String authorizationToken
+    ) {
+        return trainingPlanService.delete(trainingPlanId, authorizationToken);
     }
 }
