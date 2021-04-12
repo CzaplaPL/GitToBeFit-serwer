@@ -1,6 +1,5 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
-import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
@@ -11,7 +10,7 @@ import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+
 public class FBWTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FBW";
     private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
