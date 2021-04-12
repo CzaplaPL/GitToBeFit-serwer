@@ -92,6 +92,11 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
         return List.of(training);
     }
 
+    @Override
+    public void validateAfterCreating() {
+
+    }
+
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {
         List<Exercise> filtered = new ArrayList<>();
         switch (bodyPartName) {

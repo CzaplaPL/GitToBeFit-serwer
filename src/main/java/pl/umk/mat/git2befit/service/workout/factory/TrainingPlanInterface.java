@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public interface TrainingPlanInterface {
     List<Training> create(TrainingForm trainingForm);
-
+    void validateAfterCreating();
     default List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises, List<Long> availableEquipments){
         return exercises.stream().filter(exercise -> {
             for(Equipment equipment: exercise.getEquipmentsNeeded()) {
