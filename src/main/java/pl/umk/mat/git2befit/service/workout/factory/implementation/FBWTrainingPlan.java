@@ -1,19 +1,16 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
-import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Component
+
 public class FBWTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FBW";
     private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
@@ -33,18 +30,15 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     private void initialize(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
         this.localTrainingForm = trainingForm;
-
         var exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
-        BooleanSupplier isContainsEquipmentWithout = () -> trainingForm.getEquipmentIDs().contains(20L);
-        if (isContainsEquipmentWithout.getAsBoolean()) {
+        if (trainingForm.getEquipmentIDs().contains(20L)) {
             localTrainingForm.getEquipmentIDs().remove(20L);
             exercisesWithoutEquipment = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
         }
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
-
-        Predicate<TrainingForm> checkIfScheduleTypeEqualsREPETITIVE = trainingForm1 -> trainingForm1.getScheduleType().equals("REPETITIVE");
-        if (checkIfScheduleTypeEqualsREPETITIVE.test(trainingForm))
+        // razy daysCount
+        if (trainingForm.getScheduleType().equals("REPETITIVE"))
             localTrainingForm.setDaysCount(ONE_DAY);
     }
 
@@ -53,6 +47,11 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         initialize(trainingForm);
 
         return assignExercisesToBodyPart(exercisesWithEquipment, exercisesWithoutEquipment);
+    }
+
+    @Override
+    public void validateAfterCreating() {
+
     }
 
     private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
@@ -89,16 +88,16 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
             Collections.shuffle(exercisesWithoutEquipmentFilteredByBodyPart);
             //user może wybrać priorytet
-            var concatenatedExercises = new ArrayList<>(exercisesWithEquipmentFilteredByBodyPart);
-            concatenatedExercises.addAll(exercisesWithoutEquipmentFilteredByBodyPart);
+            var joinedExercises = new ArrayList<>(exercisesWithEquipmentFilteredByBodyPart);
+            joinedExercises.addAll(exercisesWithoutEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
                 ExerciseExecution exerciseExecution = new ExerciseExecution();
 
-                if (isEnough(concatenatedExercises))
-                    exerciseExecution.setExercise(concatenatedExercises.remove(i));
+                if (isEnough(joinedExercises))
+                    exerciseExecution.setExercise(joinedExercises.remove(i));
                 else
-                    exerciseExecution.setExercise(concatenatedExercises.get(i % concatenatedExercises.size()));
+                    exerciseExecution.setExercise(joinedExercises.get(i % joinedExercises.size()));
 
                 exerciseExecutionList.add(addSeriesAndCount(exerciseExecution));
             }

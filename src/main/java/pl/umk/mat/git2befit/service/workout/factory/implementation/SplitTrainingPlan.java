@@ -1,23 +1,24 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
-import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Component
+
 public class SplitTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "SPLIT";
     private final List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS");
     private final List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
+    private final int amountForSmall = 3;
+    private final int amountForBig = 4;
 
     private List<Exercise> exercisesWithoutEquipment = new ArrayList<>();
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
@@ -28,6 +29,12 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
     public SplitTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
+    }
+
+    @Override
+    public void validateAfterCreating() {
+        //example
+        SplitValidator.validateTraining(List.of());
     }
 
     private void initialize(TrainingForm trainingForm) {
@@ -42,8 +49,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         }
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
-        Predicate<TrainingForm> checkIfDaysIsMoreThanBodyParts = form -> form.getDaysCount() > form.getBodyParts().size();
-        if (checkIfDaysIsMoreThanBodyParts.test(trainingForm)) {
+        if (trainingForm.getDaysCount() > trainingForm.getBodyParts().size()) {
             var bodyPartsSize = trainingForm.getBodyParts().size();
             localTrainingForm.setDaysCount(bodyPartsSize);
         }
@@ -70,7 +76,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
             var exercisesWithEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
             var exercisesWithoutEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
 
-            int amountOfExercises = getAmountOfExercisesForBodyPart(bodyPart);
+            int amountOfExercises = smallBodyParts.contains(bodyPart) ? amountForSmall : amountForBig;
 
             for (int i = 0; i < amountOfExercises; i++) {
                 try {
@@ -92,12 +98,6 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
                 .collect(Collectors.toList());
     }
 
-    private int getAmountOfExercisesForBodyPart(String bodyPart) {
-        if (smallBodyParts.contains(bodyPart))
-            return 3;
-        else
-            return 4;
-    }
 
     private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFilteredByBodyPart,
                                                 List<Exercise> exercisesWithoutEquipmentFilteredByBodyPart) throws IllegalStateException {
@@ -177,9 +177,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
     public List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
         var random = new Random();
-        int maxIndex, minIndex;
-        int min;
-        int max;
+        int maxIndex, minIndex, min, max;
 
         do {
             List<Integer> listOfMapsSize = list.stream()
@@ -217,14 +215,21 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     private List<Training> parseMapOfExercisesToListOfExercises(List<Map<String, List<ExerciseExecution>>> list) {
         var trainingList = new ArrayList<Training>();
         list.forEach(trainingDay -> {
-            Training training = new Training();
-            List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
-            trainingDay.keySet()
-                    .forEach(key -> exerciseExecutionList.addAll(trainingDay.get(key)));
-            training.setExercisesExecutions(exerciseExecutionList);
+            var training = getTrainingForDay(trainingDay);
             trainingList.add(training);
         });
 
         return trainingList;
+    }
+
+    private Training getTrainingForDay(Map<String, List<ExerciseExecution>> trainingDay) {
+        var training = new Training();
+        List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
+
+        trainingDay.keySet()
+                .forEach(key -> exerciseExecutionList.addAll(trainingDay.get(key)));
+
+        training.setExercisesExecutions(exerciseExecutionList);
+        return training;
     }
 }

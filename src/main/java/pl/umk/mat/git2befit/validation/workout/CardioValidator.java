@@ -4,6 +4,9 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 
 import java.util.List;
 
-public interface TrainingValidator {
-    void validateTraining(List<Training> trainingList);
+public class CardioValidator {
+
+    public void validateTraining(List<Training> trainingList) {
+
+    }
 }
