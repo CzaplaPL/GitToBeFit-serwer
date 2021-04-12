@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.validation.workout;
 
+
 import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 

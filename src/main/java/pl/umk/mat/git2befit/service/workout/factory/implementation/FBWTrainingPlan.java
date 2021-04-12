@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
+import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
@@ -10,7 +11,7 @@ import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import java.util.*;
 import java.util.stream.Collectors;
 
-
+@Component
 public class FBWTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FBW";
     private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
@@ -30,6 +31,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     private void initialize(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
         this.localTrainingForm = trainingForm;
+
         var exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         if (trainingForm.getEquipmentIDs().contains(20L)) {
             localTrainingForm.getEquipmentIDs().remove(20L);
@@ -37,7 +39,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         }
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
-        // razy daysCount
+
         if (trainingForm.getScheduleType().equals("REPETITIVE"))
             localTrainingForm.setDaysCount(ONE_DAY);
     }
