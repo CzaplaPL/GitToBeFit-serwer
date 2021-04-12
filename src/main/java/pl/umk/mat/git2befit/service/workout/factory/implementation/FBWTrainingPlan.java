@@ -18,7 +18,6 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
 
     private final ExerciseRepository exerciseRepository;
 
-    private List<Exercise> exercisesWithoutEquipment = new ArrayList<>();
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
     private TrainingForm localTrainingForm;
@@ -32,12 +31,8 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         this.localTrainingForm = trainingForm;
 
         var exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
-        if (trainingForm.getEquipmentIDs().contains(20L)) {
-            localTrainingForm.getEquipmentIDs().remove(20L);
-            exercisesWithoutEquipment = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-        }
-        exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
+        exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
         if (trainingForm.getScheduleType().equals("REPETITIVE"))
             localTrainingForm.setDaysCount(ONE_DAY);
@@ -47,7 +42,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     public List<Training> create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
-        return assignExercisesToBodyPart(exercisesWithEquipment, exercisesWithoutEquipment);
+        return assignExercisesToBodyPart(exercisesWithEquipment);
     }
 
     @Override
@@ -55,11 +50,11 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
 
     }
 
-    private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
+    private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
 
         List<Training> trainingList = new ArrayList<>();
 
-        var mapOfExercisesByBodyPartForDaysCount = getBodyPartExercisesForDays(exercisesWithEquipment, exercisesWithoutEquipment);
+        var mapOfExercisesByBodyPartForDaysCount = getBodyPartExercisesForDays(exercisesWithEquipment);
 
         for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
             Training training = new Training();
@@ -67,7 +62,6 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
 
             for (String bodyPart : bodyPartsList) {
                 var exerciseExecutionsForBodyPart = mapOfExercisesByBodyPartForDaysCount.get(bodyPart);
-                //walidacja nie wystarczyło ćwiczeń
                 if (exerciseExecutionsForBodyPart.size() != 0)
                     exerciseExecutionList.add(exerciseExecutionsForBodyPart.get(i));
             }
@@ -77,28 +71,24 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         return trainingList;
     }
 
-    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
+    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment/*, List<Exercise> exercisesWithoutEquipment*/) {
         Map<String, List<ExerciseExecution>> exerciseExecutionMap = new HashMap<>();
 
         for (String bodyPart : bodyPartsList) {
             List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
 
             var exercisesWithEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
-            var exercisesWithoutEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
             //making some randomizing
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
-            Collections.shuffle(exercisesWithoutEquipmentFilteredByBodyPart);
-            //user może wybrać priorytet
-            var joinedExercises = new ArrayList<>(exercisesWithEquipmentFilteredByBodyPart);
-            joinedExercises.addAll(exercisesWithoutEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
                 ExerciseExecution exerciseExecution = new ExerciseExecution();
 
-                if (isEnough(joinedExercises))
-                    exerciseExecution.setExercise(joinedExercises.remove(i));
+                if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
+                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart.remove(i));
                 else
-                    exerciseExecution.setExercise(joinedExercises.get(i % joinedExercises.size()));
+                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart
+                            .get(i % exercisesWithEquipmentFilteredByBodyPart.size()));
 
                 exerciseExecutionList.add(addSeriesAndCount(exerciseExecution));
             }

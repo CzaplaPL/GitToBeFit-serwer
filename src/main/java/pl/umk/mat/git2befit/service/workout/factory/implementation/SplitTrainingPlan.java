@@ -9,7 +9,6 @@ import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
-import java.util.function.BooleanSupplier;
 import java.util.stream.Collectors;
 
 
@@ -20,7 +19,6 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     private final int amountForSmall = 3;
     private final int amountForBig = 4;
 
-    private List<Exercise> exercisesWithoutEquipment = new ArrayList<>();
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
     private TrainingForm localTrainingForm;
@@ -42,11 +40,6 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         this.localTrainingForm = trainingForm;
 
         List<Exercise> exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
-        BooleanSupplier isContainsEquipmentWithout = () -> trainingForm.getEquipmentIDs().contains(20L);
-        if (isContainsEquipmentWithout.getAsBoolean()) {
-            localTrainingForm.getEquipmentIDs().remove(20L);
-            exercisesWithoutEquipment = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-        }
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
         if (trainingForm.getDaysCount() > trainingForm.getBodyParts().size()) {
@@ -74,13 +67,12 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         for (String bodyPart : trainingFormBodyParts) {
 
             var exercisesWithEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
-            var exercisesWithoutEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
 
             int amountOfExercises = smallBodyParts.contains(bodyPart) ? amountForSmall : amountForBig;
 
             for (int i = 0; i < amountOfExercises; i++) {
                 try {
-                    var exerciseExecution = getUniqueExercise(exercisesWithEquipmentFilteredByBodyPart, exercisesWithoutEquipmentFilteredByBodyPart);
+                    var exerciseExecution = getUniqueExercise(exercisesWithEquipmentFilteredByBodyPart);
                     exerciseExecutionList.add(exerciseExecution);
                 } catch (IllegalStateException ignore) {
                 }
@@ -99,8 +91,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     }
 
 
-    private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFilteredByBodyPart,
-                                                List<Exercise> exercisesWithoutEquipmentFilteredByBodyPart) throws IllegalStateException {
+    private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFilteredByBodyPart) throws IllegalStateException {
         var exerciseExecution = new ExerciseExecution();
         var random = new Random();
         int randomExerciseIndex;
@@ -108,10 +99,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         if (isEnough(exercisesWithEquipmentFilteredByBodyPart)) {
             randomExerciseIndex = random.nextInt(exercisesWithEquipmentFilteredByBodyPart.size());
             exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart.remove(randomExerciseIndex));
-        } else if (isEnough(exercisesWithoutEquipmentFilteredByBodyPart)) {
-            randomExerciseIndex = random.nextInt(exercisesWithoutEquipmentFilteredByBodyPart.size());
-            exerciseExecution.setExercise(exercisesWithoutEquipmentFilteredByBodyPart.remove(randomExerciseIndex));
-        } else {
+        }else {
             throw new IllegalStateException();
         }
 
