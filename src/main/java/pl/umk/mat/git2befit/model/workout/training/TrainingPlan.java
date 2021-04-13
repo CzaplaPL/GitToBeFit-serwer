@@ -25,10 +25,10 @@ public class TrainingPlan implements Serializable {
 
     public TrainingPlan() {}
 
-    public TrainingPlan(TrainingForm trainingForm, List<Training> planList) {
+    public TrainingPlan(TrainingForm trainingForm, List<Training> planList, LocalDateTime date) {
         this.trainingForm = trainingForm;
         this.planList = planList;
-        this.createdAt = LocalDateTime.now();
+        this.createdAt = date;
     }
 
     public long getId() {

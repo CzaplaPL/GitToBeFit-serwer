@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.controller.workout;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -8,6 +9,7 @@ import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController()
@@ -22,9 +24,14 @@ public class TrainingPlanController {
     @PostMapping("/generate")
     public ResponseEntity<?> generate(
             @RequestBody(required = false) TrainingForm trainingForm,
-            @RequestHeader(value = "Authorization", required = false) String authorizationToken
+            @RequestHeader(value = "Authorization", required = false) String authorizationToken,
+            @RequestHeader(value = "Date") String date
     ) {
-        return trainingPlanService.generate(trainingForm, authorizationToken);
+        return trainingPlanService.generate(
+                trainingForm,
+                authorizationToken,
+                date
+        );
     }
 
     @PostMapping("/save")
@@ -32,10 +39,12 @@ public class TrainingPlanController {
             @RequestBody List<TrainingPlan> trainingPlan,
             @RequestHeader(value = "Authorization") String authorizationToken
     ) {
-        String email = JWTService.parseEmail(authorizationToken);
         try {
+            String email = JWTService.parseEmail(authorizationToken);
             trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
             return ResponseEntity.ok().build();
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", exception.getMessage()).build();
         } catch (Exception exception) {
