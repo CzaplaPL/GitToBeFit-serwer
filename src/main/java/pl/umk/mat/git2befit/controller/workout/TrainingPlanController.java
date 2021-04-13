@@ -3,20 +3,31 @@ package pl.umk.mat.git2befit.controller.workout;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
 import java.util.List;
+
+import static org.springframework.http.HttpStatus.EXPECTATION_FAILED;
 
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
+    private final TrainingPlanManufacture manufacture;
     private final TrainingPlanService trainingPlanService;
 
-    public TrainingPlanController(TrainingPlanService service) {
+    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
+        this.manufacture = manufacture;
         this.trainingPlanService = service;
+    }
+
+    @ExceptionHandler(value = NotValidTrainingException.class)
+    public ResponseEntity<?> handleValidationException(NotValidTrainingException exception) {
+        return ResponseEntity.status(EXPECTATION_FAILED).header("Cause", exception.getMessage()).build();
     }
 
     @PostMapping("/generate")

@@ -20,6 +20,8 @@ public class TrainingPlanManufacture {
     public List<Training> createTrainingPlan(TrainingForm trainingForm) throws IllegalArgumentException{
         TrainingFormValidationService.validate(trainingForm);
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
-        return trainingPlan.create(trainingForm);
+        trainingPlan.validateAfterCreating();
+
+        return List.of();
     }
 }

@@ -1,109 +1,106 @@
 package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
-import org.springframework.stereotype.Component;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-@Component
+
 public class FBWTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FBW";
-    private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS","SHOULDERS", "CHEST", "BACK", "THIGHS");
+    private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
+    private static final int ONE_DAY = 1;
+
     private final ExerciseRepository exerciseRepository;
+
+    private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
+    private TrainingForm localTrainingForm;
 
     public FBWTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
     }
 
+    private void initialize(TrainingForm trainingForm) {
+        this.trainingForm = trainingForm;
+        this.localTrainingForm = trainingForm;
+
+        var exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
+
+        exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
+
+        if (trainingForm.getScheduleType().equals("REPETITIVE"))
+            localTrainingForm.setDaysCount(ONE_DAY);
+    }
+
     @Override
     public List<Training> create(TrainingForm trainingForm) {
-        this.trainingForm = trainingForm;
-        List<Exercise> exerciseListFilteredByTrainingType = getExerciseListFilteredByTrainingType();
-        List<Exercise> exercisesWithoutEquipment = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-        List<Exercise> exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
-        return assignExercisesToBodyPart(exercisesWithEquipment,exercisesWithoutEquipment);
+        initialize(trainingForm);
+
+        return assignExercisesToBodyPart(exercisesWithEquipment);
     }
 
-    private List<Exercise> getExerciseListFilteredByTrainingType(){
-        return exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
+    @Override
+    public void validateAfterCreating() {
+
     }
 
-    private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment){
+    private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
 
         List<Training> trainingList = new ArrayList<>();
 
-        if(trainingForm.getScheduleType().equals("REPETITIVE")) {
-            List<ExerciseExecution> exerciseExecutionList = createExerciseExecutionList(exercisesWithEquipment, exercisesWithoutEquipment);
+        var mapOfExercisesByBodyPartForDaysCount = getBodyPartExercisesForDays(exercisesWithEquipment);
 
+        for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
             Training training = new Training();
-            training.setExercisesExecutions(exerciseExecutionList);
+            List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
 
-            for (int i = 0; i < trainingForm.getDaysCount(); i++)
-                trainingList.add(training);
-        }else if (trainingForm.getScheduleType().equals("PER_DAY")){
-            Map<String, List<ExerciseExecution>> exerciseExecutionMap = getBodyPartExercisesForDays(exercisesWithEquipment, exercisesWithoutEquipment);
-
-            for (int i = 0; i < trainingForm.getDaysCount(); i++) {
-                Training training = new Training();
-                List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
-
-                for (String bodyPart: bodyPartsList){
-                    List<ExerciseExecution> exerciseExecutionsForBodyPart = exerciseExecutionMap.get(bodyPart);
-                    if(exerciseExecutionsForBodyPart.size() != 0)
-                        exerciseExecutionList.add(exerciseExecutionsForBodyPart.get(i));
-                }
-                training.setExercisesExecutions(exerciseExecutionList);
-                trainingList.add(training);
+            for (String bodyPart : bodyPartsList) {
+                var exerciseExecutionsForBodyPart = mapOfExercisesByBodyPartForDaysCount.get(bodyPart);
+                if (exerciseExecutionsForBodyPart.size() != 0)
+                    exerciseExecutionList.add(exerciseExecutionsForBodyPart.get(i));
             }
+            training.setExercisesExecutions(exerciseExecutionList);
+            trainingList.add(training);
         }
         return trainingList;
     }
 
-    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
+    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment/*, List<Exercise> exercisesWithoutEquipment*/) {
         Map<String, List<ExerciseExecution>> exerciseExecutionMap = new HashMap<>();
-        for(String bodyPart: bodyPartsList){
+
+        for (String bodyPart : bodyPartsList) {
             List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
-            for (int i = 0; i < trainingForm.getDaysCount(); i++) {
+
+            var exercisesWithEquipmentFilteredByBodyPart = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
+            //making some randomizing
+            Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
+
+            for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
                 ExerciseExecution exerciseExecution = new ExerciseExecution();
 
-                List<Exercise> exercisesWithEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
-                List<Exercise> exercisesWithoutEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
-                List<Exercise> concatenated = new ArrayList<>(exercisesWithEquipmentFiltered);
-                concatenated.addAll(exercisesWithoutEquipmentFiltered);
+                if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
+                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart.remove(i));
+                else
+                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart
+                            .get(i % exercisesWithEquipmentFilteredByBodyPart.size()));
 
-                if (isEnoughExercises(concatenated))
-                    exerciseExecution.setExercise(concatenated.get(i % concatenated.size()));
-                exerciseExecution.setSeries(3);
-                exerciseExecution.setCount(8);
-
-                if(isEnoughExercises(concatenated))
-                    exerciseExecutionList.add(exerciseExecution);
+                exerciseExecutionList.add(addSeriesAndCount(exerciseExecution));
             }
-            exerciseExecutionMap.put(bodyPart,exerciseExecutionList);
+            exerciseExecutionMap.put(bodyPart, exerciseExecutionList);
         }
         return exerciseExecutionMap;
     }
 
-    private List<ExerciseExecution> createExerciseExecutionList(List<Exercise> exercisesWithEquipment, List<Exercise> exercisesWithoutEquipment) {
-        List<ExerciseExecution> exerciseExecutionList = new ArrayList<>();
-        for (String bodyPart : bodyPartsList) {
-
-            List<Exercise> exercisesWithEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithEquipment, bodyPart);
-            List<Exercise> exercisesWithoutEquipmentFiltered = getExercisesFilteredByBodyPart(exercisesWithoutEquipment, bodyPart);
-
-            try {
-                ExerciseExecution exerciseExecution = getUniqueExercise(exercisesWithEquipmentFiltered, exercisesWithoutEquipmentFiltered);
-                exerciseExecutionList.add(exerciseExecution);
-            }catch (IllegalArgumentException ignore){}
-        }
-        return exerciseExecutionList;
+    private ExerciseExecution addSeriesAndCount(ExerciseExecution exerciseExecution) {
+        exerciseExecution.setSeries(3);
+        exerciseExecution.setCount(8);
+        return exerciseExecution;
     }
 
     private List<Exercise> getExercisesFilteredByBodyPart(List<Exercise> exercises, String bodyPart) {
@@ -112,28 +109,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
                 .collect(Collectors.toList());
     }
 
-    private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFiltered, List<Exercise> exercisesWithoutEquipmentFiltered)  throws IllegalStateException{
-        Random random = new Random();
-        ExerciseExecution exerciseExecution = new ExerciseExecution();
-        int randomInt;
-
-        if (isEnoughExercises(exercisesWithEquipmentFiltered)){
-            randomInt = random.nextInt(exercisesWithEquipmentFiltered.size());
-            exerciseExecution.setExercise(exercisesWithEquipmentFiltered.get(randomInt));
-        }else if(isEnoughExercises(exercisesWithoutEquipmentFiltered)){
-            randomInt = random.nextInt(exercisesWithoutEquipmentFiltered.size());
-            exerciseExecution.setExercise(exercisesWithoutEquipmentFiltered.get(randomInt));
-        }else
-            throw new IllegalArgumentException();
-
-        exerciseExecution.setSeries(3);
-        exerciseExecution.setCount(8);
-        return exerciseExecution;
+    private boolean isEnough(List<Exercise> exercises) {
+        return exercises.size() >= localTrainingForm.getDaysCount();
     }
-
-    private boolean isEnoughExercises(List<Exercise> exercises) {
-        return exercises.size() != 0;
-    }
-
-
 }

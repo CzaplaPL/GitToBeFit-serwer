@@ -75,6 +75,11 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         return List.of(training);
     }
 
+    @Override
+    public void validateAfterCreating() {
+
+    }
+
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {
         BodyPart bodyPartToFind = exercise.getBodyPart();
         return rolledExercises.stream()
