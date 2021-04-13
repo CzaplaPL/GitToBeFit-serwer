@@ -69,6 +69,8 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
                 } else {
                     counter++;
                 }
+                if (rolledExercises.size() == exercisesToGet)
+                    break;
             }
             // jezeli nie ma cwiczen to wykonaj akcje
             if (filteredListOfExercises.isEmpty()) {
