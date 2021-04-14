@@ -15,16 +15,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
 import pl.umk.mat.git2befit.filter.JWTAuthorizationFilter;
 
-
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private UserDetailsServiceImpl userDetailsService ;
+    private UserDetailsServiceImpl userDetailsService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, PasswordEncoder passwordEncoder){
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -39,7 +38,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // Zezwolenie na dostep do pobrania wszystkich sprzetow oraz wzgledem kategorii
                 .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS, NO_EQUIPMENT).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich kategorii
-                .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES).permitAll()
+                .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES, CHECKSUM).permitAll()
                 // Zezwolenie na dostep do pobrania treningu
                 .antMatchers(HttpMethod.POST, TRAINING_GENERATION).permitAll()
                 .antMatchers(HttpMethod.POST, TRAINING_MODIFICATION).permitAll()

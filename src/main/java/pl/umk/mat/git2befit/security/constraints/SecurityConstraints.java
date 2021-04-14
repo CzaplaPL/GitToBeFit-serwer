@@ -23,4 +23,5 @@ public interface SecurityConstraints {
 
     String TRAINING_GENERATION = "/training-plan/generate";
     String TRAINING_MODIFICATION = "/replace/{id}";
+    String CHECKSUM = "/check-sum";
 }
