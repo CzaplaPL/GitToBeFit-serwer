@@ -92,28 +92,22 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
 
     private ExerciseExecution getUniqueExercise(List<Exercise> exercisesWithEquipmentFilteredByBodyPart) throws IllegalStateException {
-        var exerciseExecution = new ExerciseExecution();
         var random = new Random();
         int randomExerciseIndex;
+        Exercise exercise;
 
         if (isEnough(exercisesWithEquipmentFilteredByBodyPart)) {
             randomExerciseIndex = random.nextInt(exercisesWithEquipmentFilteredByBodyPart.size());
-            exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart.remove(randomExerciseIndex));
+            exercise = exercisesWithEquipmentFilteredByBodyPart.remove(randomExerciseIndex);
         }else {
             throw new IllegalStateException();
         }
 
-        return addSeriesAndCount(exerciseExecution);
+        return getExactExerciseExecution(exercise, this.trainingForm);
     }
 
     private boolean isEnough(List<Exercise> exercises) {
         return exercises.size() != 0;
-    }
-
-    private ExerciseExecution addSeriesAndCount(ExerciseExecution exerciseExecution) {
-        exerciseExecution.setSeries(3);
-        exerciseExecution.setCount(8);
-        return exerciseExecution;
     }
 
     private List<Map<String, List<ExerciseExecution>>> divideTrainingIntoDays(Map<String, List<ExerciseExecution>> exercisesForBodyPart) {
@@ -204,6 +198,8 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         var trainingList = new ArrayList<Training>();
         list.forEach(trainingDay -> {
             var training = getTrainingForDay(trainingDay);
+            training.setCircuitsCount(NOT_APPLICABLE);
+            training.setBreakTime(DEFAULT_BREAK_TIME);
             trainingList.add(training);
         });
 

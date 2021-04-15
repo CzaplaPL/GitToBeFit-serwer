@@ -13,12 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Component
 public class CardioTrainingPlan implements TrainingPlanInterface {
     private final String TRAINING_TYPE = "CARDIO";
     private final static int SINGLE_STEP = 3;
     private final static int MAX_RAND_TRIES = 100;
     private final ExerciseRepository exerciseRepository;
+    private TrainingForm trainingForm;
 
     public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -28,7 +28,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
     public List<Training> create(TrainingForm trainingForm) {
         List<Exercise> allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = filterAllByAvailableEquipment(allExercises, trainingForm.getEquipmentIDs());
-
+        this.trainingForm = trainingForm;
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
         Training training = new Training();
@@ -72,6 +72,10 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         }
         List<ExerciseExecution> exerciseExecutions = getExercisesExecutions(rolledExercises);
         training.setExercisesExecutions(exerciseExecutions);
+        training.setBreakTime(DEFAULT_BREAK_TIME);
+        training.setCircuitsCount(
+                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ? DEFAULT_CIRCUIT_COUNT : 0
+        );
         return List.of(training);
     }
 
@@ -91,19 +95,7 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
     private List<ExerciseExecution> getExercisesExecutions(List<Exercise> rolledExercises) {
         List<ExerciseExecution> execList = new ArrayList<>();
         for (Exercise exercise : rolledExercises) {
-            String scheduleType = exercise.getScheduleType().getName().toUpperCase();
-            ExerciseExecution exerciseExecution = new ExerciseExecution();
-            // powtorzenia
-            exerciseExecution.setExercise(exercise);
-            if (scheduleType.equals("REPEAT")) {
-                exerciseExecution.setSeries(3);
-                exerciseExecution.setCount(8);
-                exerciseExecution.setTime(0);
-            } else if (scheduleType.equals("TIME")) {
-                exerciseExecution.setSeries(3);
-                exerciseExecution.setCount(0);
-                exerciseExecution.setTime(30);
-            }
+            ExerciseExecution exerciseExecution = getExactExerciseExecution(exercise, this.trainingForm);
             execList.add(exerciseExecution);
         }
         return execList;

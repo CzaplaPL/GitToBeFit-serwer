@@ -66,6 +66,9 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
                     exerciseExecutionList.add(exerciseExecutionsForBodyPart.get(i));
             }
             training.setExercisesExecutions(exerciseExecutionList);
+            training.setBreakTime(DEFAULT_BREAK_TIME);
+            training.setCircuitsCount(NOT_APPLICABLE);
+
             trainingList.add(training);
         }
         return trainingList;
@@ -82,25 +85,22 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
-                ExerciseExecution exerciseExecution = new ExerciseExecution();
-
+                Exercise exercise;
                 if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
-                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart.remove(i));
+                    exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
                 else
-                    exerciseExecution.setExercise(exercisesWithEquipmentFilteredByBodyPart
-                            .get(i % exercisesWithEquipmentFilteredByBodyPart.size()));
+                    exercise = exercisesWithEquipmentFilteredByBodyPart.get(
+                            i % exercisesWithEquipmentFilteredByBodyPart.size()
+                    );
 
-                exerciseExecutionList.add(addSeriesAndCount(exerciseExecution));
+                exerciseExecutionList.add(getExactExerciseExecution(
+                        exercise,
+                        this.trainingForm
+                ));
             }
             exerciseExecutionMap.put(bodyPart, exerciseExecutionList);
         }
         return exerciseExecutionMap;
-    }
-
-    private ExerciseExecution addSeriesAndCount(ExerciseExecution exerciseExecution) {
-        exerciseExecution.setSeries(3);
-        exerciseExecution.setCount(8);
-        return exerciseExecution;
     }
 
     private List<Exercise> getExercisesFilteredByBodyPart(List<Exercise> exercises, String bodyPart) {
