@@ -8,15 +8,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
-import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.user.UserRepository;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
 import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
+
+import static pl.umk.mat.git2befit.model.workout.equipment.ServerLocationConstraints.EXERCISES_VIDEO_PREFIX;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +46,12 @@ public class TrainingPlanService {
 
         try {
             trainingPlans = manufacture.createTrainingPlan(trainingForm);
+            for (Training trainingPlan: trainingPlans) {
+                for (ExerciseExecution exercisesExecution : trainingPlan.getExercisesExecutions()) {
+                    Exercise exercise = exercisesExecution.getExercise();
+                    exercise.setVideoUrl(String.join("", EXERCISES_VIDEO_PREFIX, exercise.getVideoUrl()));
+                }
+            }
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
         }

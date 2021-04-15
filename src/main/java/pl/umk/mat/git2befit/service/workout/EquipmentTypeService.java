@@ -13,7 +13,7 @@ import static pl.umk.mat.git2befit.model.workout.equipment.ServerLocationConstra
 
 @Service
 public class EquipmentTypeService {
-    private EquipmentTypeRepository equipmentTypeRepository;
+    private final EquipmentTypeRepository equipmentTypeRepository;
 
     @Autowired
     public EquipmentTypeService(EquipmentTypeRepository equipmentTypeRepository) {

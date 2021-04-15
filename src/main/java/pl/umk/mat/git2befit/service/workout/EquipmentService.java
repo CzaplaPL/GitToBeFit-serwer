@@ -30,7 +30,6 @@ public class EquipmentService {
 
     public ResponseEntity<List<SimplifiedEquipment>> getEquipmentsOfSpecificType(long typeId) {
         List<Equipment> equipmentList = equipmentRepository.findAllByType_Id(typeId);
-        // obiekty equipment sa mapowane do wersji uproszczonej, w ktorej nie ma equipmentType
         List<SimplifiedEquipment> mappedEquipments = equipmentList.stream().map(equipment -> {
             String url = equipment.getUrl();
             equipment.setUrl(String.join("", EQUIPMENT_PHOTO_PREFIX, url));
