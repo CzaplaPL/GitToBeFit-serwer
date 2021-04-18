@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class SplitTrainingPlanTest {
 
@@ -61,7 +61,7 @@ class SplitTrainingPlanTest {
         } while (max - min > 1);
         //then
         System.out.println(list);
-        assertEquals(true , true);
+        assertTrue(true);
     }
 
 }

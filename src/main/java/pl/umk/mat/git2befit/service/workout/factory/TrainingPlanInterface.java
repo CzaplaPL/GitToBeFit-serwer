@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.service.workout.factory;
 
+import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
@@ -18,7 +19,9 @@ public interface TrainingPlanInterface {
     int NOT_APPLICABLE = 0;
 
     List<Training> create(TrainingForm trainingForm);
-    void validateAfterCreating();
+
+    void validateAfterCreating() throws NotValidTrainingException;
+
     default List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises, List<Long> availableEquipments){
         return exercises.stream().filter(exercise -> {
             for(Equipment equipment: exercise.getEquipmentsNeeded()) {
