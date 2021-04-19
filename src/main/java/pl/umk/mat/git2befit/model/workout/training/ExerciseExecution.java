@@ -13,6 +13,15 @@ public class ExerciseExecution implements Serializable {
     private int series;
     private int count;
 
+    public ExerciseExecution() {}
+
+    public ExerciseExecution(Exercise exercise, int time, int series, int count) {
+        this.exercise = exercise;
+        this.time = time;
+        this.series = series;
+        this.count = count;
+    }
+
     public Exercise getExercise() {
         return exercise;
     }

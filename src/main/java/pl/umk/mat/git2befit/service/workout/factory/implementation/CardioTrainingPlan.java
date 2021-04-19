@@ -74,7 +74,9 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         training.setExercisesExecutions(exerciseExecutions);
         training.setBreakTime(DEFAULT_BREAK_TIME);
         training.setCircuitsCount(
-                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ? DEFAULT_CIRCUIT_COUNT : 0
+                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ?
+                        DEFAULT_CIRCUIT_COUNT :
+                        NOT_APPLICABLE
         );
         return List.of(training);
     }
