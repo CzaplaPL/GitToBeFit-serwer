@@ -13,11 +13,11 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CardioValidatorTest extends TrainingValidationTestCase {
+    private final CardioValidator validator = new CardioValidator();
 
     @Test
     public void cardioValidatorShouldThrowExceptionWhenTrainingLengthIsNotEqualWithForm() {
         //given
-        CardioValidator validator = new CardioValidator();
         TrainingForm form = getValidTrainingForm("CARDIO", List.of(), 9);
         List<Training> list = getListOfTrainings(4);
 
@@ -33,7 +33,6 @@ class CardioValidatorTest extends TrainingValidationTestCase {
     @Test
     public void cardioValidatorShouldThrowExceptionWhenTrainingWillContainDuplicates() {
         //given
-        CardioValidator validator = new CardioValidator();
         TrainingForm form = getValidTrainingForm("CARDIO", List.of(), 9);
         List<Training> list = getListOfTrainings(2);
         List<ExerciseExecution> exec = list.get(0).getExercisesExecutions();

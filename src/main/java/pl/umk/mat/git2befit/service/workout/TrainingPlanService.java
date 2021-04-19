@@ -6,7 +6,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
@@ -154,7 +153,6 @@ public class TrainingPlanService {
             TrainingPlan trainingPlan = trainingPlanOptional.get();
             trainingPlan.setTitle(title);
             trainingPlanRepository.save(trainingPlan);
-
         } else
             throw new IllegalArgumentException("TrainingPlan with id: " + id + " is unknown");
     }
@@ -165,7 +163,7 @@ public class TrainingPlanService {
             Optional<User> user = userRepository.findByEmail(email);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findById(trainingPlanId);
-                if (!trainingPlan.isPresent())
+                if (trainingPlan.isEmpty())
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "training plan not found").build();
                 if (canBeDeletedByUser(trainingPlan.get(), user.get())) {
                     trainingPlanRepository.delete(trainingPlan.get());
