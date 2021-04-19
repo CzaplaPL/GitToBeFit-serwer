@@ -15,7 +15,7 @@ public interface TrainingPlanInterface {
     long DEFAULT_CIRCUIT_COUNT = 3;
     int DEFAULT_SERIES_COUNT = 3;
     int DEFAULT_COUNT_OF_REPEATITIONS = 8;
-    int DEFAULT_EXERCISE_TIME_EXECUTION = 3;
+    int DEFAULT_EXERCISE_TIME_EXECUTION = 30;
     int NOT_APPLICABLE = 0;
 
     List<Training> create(TrainingForm trainingForm);
@@ -34,17 +34,12 @@ public interface TrainingPlanInterface {
     }
 
     default ExerciseExecution getExactExerciseExecution(Exercise exercise, TrainingForm trainingForm) {
-        ExerciseExecution exerciseExecution = new ExerciseExecution();
         String scheduleType = exercise.getScheduleType().getName();
-        exerciseExecution.setExercise(exercise);
-        exerciseExecution.setSeries(trainingForm.checkIfScheduleTypeIsCircuit() ? NOT_APPLICABLE : DEFAULT_SERIES_COUNT);
-        if (scheduleType.equalsIgnoreCase("REPEAT")) {
-            exerciseExecution.setCount(DEFAULT_COUNT_OF_REPEATITIONS);
-            exerciseExecution.setTime(NOT_APPLICABLE);
-        } else if (scheduleType.equalsIgnoreCase("TIME")) {
-            exerciseExecution.setCount(NOT_APPLICABLE);
-            exerciseExecution.setTime(DEFAULT_EXERCISE_TIME_EXECUTION);
-        }
-        return exerciseExecution;
+        return new ExerciseExecution(
+                exercise,
+                scheduleType.equalsIgnoreCase("REPEAT") ? NOT_APPLICABLE : DEFAULT_EXERCISE_TIME_EXECUTION,
+                trainingForm.checkIfScheduleTypeIsCircuit() ? NOT_APPLICABLE : DEFAULT_SERIES_COUNT,
+                scheduleType.equalsIgnoreCase("REPEAT") ? DEFAULT_COUNT_OF_REPEATITIONS : NOT_APPLICABLE
+        );
     }
 }
