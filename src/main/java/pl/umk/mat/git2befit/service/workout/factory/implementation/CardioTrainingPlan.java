@@ -34,7 +34,6 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         this.trainingForm = trainingForm;
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
-        Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
 
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
@@ -65,19 +64,14 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                     filteredListOfExercises.remove(exercise);
                 }
             } else {
-                if (!loadingNoEquip) {
-                    filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-                    loadingNoEquip = true;
-                } else {
-                    break;
-                }
+                break;
             }
         }
         List<ExerciseExecution> exerciseExecutions = getExercisesExecutions(rolledExercises);
-        training.setExercisesExecutions(exerciseExecutions);
-        training.setBreakTime(DEFAULT_BREAK_TIME);
-        training.setCircuitsCount(
-                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ? DEFAULT_CIRCUIT_COUNT : 0
+        Training training = new Training(
+                DEFAULT_BREAK_TIME,
+                this.trainingForm.checkIfScheduleTypeIsCircuit() ? DEFAULT_CIRCUIT_COUNT : NOT_APPLICABLE,
+                exerciseExecutions
         );
         this.generatedTrainingsList = List.of(training);
         return this.generatedTrainingsList;

@@ -20,6 +20,18 @@ public class Training implements Serializable {
     @CollectionTable(name = "exercises_executions")
     private List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
 
+    public Training() {}
+
+    public Training(
+            long breakTime,
+            long circuitsCount,
+            List<ExerciseExecution> exercisesExecutions
+    ) {
+        this.breakTime = breakTime;
+        this.circuitsCount = circuitsCount;
+        this.exercisesExecutions = exercisesExecutions;
+    }
+
     public void addExerciseExecution(List<ExerciseExecution> exerciseExecutions){
         this.exercisesExecutions = new ArrayList<>(getExercisesExecutions());
         this.exercisesExecutions.addAll(exerciseExecutions);
