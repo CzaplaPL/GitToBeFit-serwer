@@ -9,7 +9,7 @@ import java.util.List;
 
 public class CardioValidator implements TrainingValidator {
     @Override
-    public void validate(List<Training> trainingList, TrainingForm form) throws NotValidTrainingException {
+    public void validate(List<Training> trainingList, TrainingForm form) {
         for (Training training : trainingList) {
             // walidacja czasu
             List<ExerciseExecution> exercisesExecutions = training.getExercisesExecutions();
