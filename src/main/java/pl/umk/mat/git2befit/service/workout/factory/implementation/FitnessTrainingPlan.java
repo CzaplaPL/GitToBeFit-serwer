@@ -7,6 +7,7 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.validation.workout.FitnessValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,6 +24,7 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
 
     private final ExerciseRepository exerciseRepository;
     private TrainingForm trainingForm;
+    private List<Training> generatedTraining;
 
     public FitnessTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -79,12 +81,14 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
                 this.trainingForm.checkIfScheduleTypeIsCircuit() ? DEFAULT_CIRCUIT_COUNT : NOT_APPLICABLE,
                 exercisesExecutions
         );
-        return List.of(training);
+        this.generatedTraining = List.of(training);
+        return this.generatedTraining;
     }
 
     @Override
     public void validateAfterCreating() {
-
+        FitnessValidator validator = new FitnessValidator();
+        validator.validate(this.generatedTraining, this.trainingForm);
     }
 
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {
