@@ -22,13 +22,13 @@ public class Exercise implements Serializable {
     @Column(unique = true)
     private String name;
     @Lob
-    @Column(length=2000)
+    @Column(length = 2000)
     private String descriptionOfStartPosition;
     @Lob
-    @Column(length=2000)
+    @Column(length = 2000)
     private String descriptionOfCorrectExecution;
     @Lob
-    @Column(length=2000)
+    @Column(length = 2000)
     private String hints;
     @ManyToOne(fetch = FetchType.EAGER)
     private ExerciseForm exerciseForm;
@@ -36,34 +36,37 @@ public class Exercise implements Serializable {
     private String photoUrl;
     @ManyToOne(fetch = FetchType.EAGER)
     private BodyPart bodyPart;
-    @ManyToMany(/*fetch = FetchType.EAGER*/)
+    @ManyToMany
     @Column(nullable = false)
     @JoinTable(name = "training_types_of_exercises",
             joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name="training_type_id", referencedColumnName="id")}
+            inverseJoinColumns = {@JoinColumn(name = "training_type_id", referencedColumnName = "id")}
     )
     private List<TrainingType> trainingTypes;
-    @ManyToMany(/*fetch = FetchType.EAGER*/)
+    @ManyToMany
     @Column(nullable = false)
     @JoinTable(name = "exercise_equipment",
-               joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
-               inverseJoinColumns = {@JoinColumn(name="equipment_id", referencedColumnName="id")}
+            joinColumns = {@JoinColumn(name = "exercise_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "equipment_id", referencedColumnName = "id")}
     )
     private List<Equipment> equipmentsNeeded;
 
-    public Exercise(){}
+    public Exercise() {
+    }
 
-    public Exercise(long id,
-                    String name,
-                    String descriptionOfStartPosition,
-                    String descriptionOfCorrectExecution,
-                    String hints,
-                    ExerciseForm exerciseForm,
-                    String videoUrl,
-                    String photoUrl,
-                    BodyPart bodyPart,
-                    List<TrainingType> trainingTypes,
-                    List<Equipment> equipmentsNeeded) {
+    public Exercise(
+            long id,
+            String name,
+            String descriptionOfStartPosition,
+            String descriptionOfCorrectExecution,
+            String hints,
+            ExerciseForm exerciseForm,
+            String videoUrl,
+            String photoUrl,
+            BodyPart bodyPart,
+            List<TrainingType> trainingTypes,
+            List<Equipment> equipmentsNeeded
+    ) {
         this.id = id;
         this.name = name;
         this.descriptionOfStartPosition = descriptionOfStartPosition;
@@ -169,7 +172,7 @@ public class Exercise implements Serializable {
     public String toString() {
         return "Exercise{" +
                 "id=" + id +
-                ", name= " + name + " bodyPart= " + bodyPart.getName() ;
+                ", name= " + name + " bodyPart= " + bodyPart.getName();
     }
 
     @Override

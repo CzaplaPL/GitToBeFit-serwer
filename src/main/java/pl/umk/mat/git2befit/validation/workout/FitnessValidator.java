@@ -26,7 +26,11 @@ public class FitnessValidator implements TrainingValidator {
             if (count != exercisesExecutions.size())
                 throw new NotValidTrainingException("duplicated exercises");
 
-
+            for (ExerciseExecution exercisesExecution : exercisesExecutions) {
+                String bodyPartOfExercise = exercisesExecution.getExercise().getBodyPart().getName();
+                if (!form.getBodyParts().contains(bodyPartOfExercise))
+                    throw new NotValidTrainingException("wrong exercise");
+            }
         }
     }
 }
