@@ -1,5 +1,6 @@
 package pl.umk.mat.git2befit.controller.workout;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,6 +11,7 @@ import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.EXPECTATION_FAILED;
@@ -32,10 +34,15 @@ public class TrainingPlanController {
 
     @PostMapping("/generate")
     public ResponseEntity<?> generate(
-            @RequestBody(required = false) TrainingForm trainingForm,
-            @RequestHeader(value = "Authorization", required = false) String authorizationToken
+            @RequestBody TrainingForm trainingForm,
+            @RequestHeader(value = "Authorization", required = false) String authorizationToken,
+            @RequestHeader(value = "Date", required = false) String date
     ) {
-        return trainingPlanService.generate(trainingForm, authorizationToken);
+        return trainingPlanService.generate(
+                trainingForm,
+                authorizationToken,
+                date == null ? LocalDateTime.now().toString() : date
+        );
     }
 
     @PostMapping("/save")
@@ -43,10 +50,12 @@ public class TrainingPlanController {
             @RequestBody List<TrainingPlan> trainingPlan,
             @RequestHeader(value = "Authorization") String authorizationToken
     ) {
-        String email = JWTService.parseEmail(authorizationToken);
         try {
+            String email = JWTService.parseEmail(authorizationToken);
             trainingPlanService.saveTrainingWithUserEmail(trainingPlan, email);
             return ResponseEntity.ok().build();
+        } catch (JWTVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", exception.getMessage()).build();
         } catch (Exception exception) {

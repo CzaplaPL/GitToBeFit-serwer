@@ -18,6 +18,8 @@ import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
 import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,16 +44,19 @@ public class TrainingPlanService {
         this.manufacture = manufacture;
     }
 
-    public ResponseEntity<?> generate(TrainingForm trainingForm, String authorizationToken) {
+    public ResponseEntity<?> generate(TrainingForm trainingForm, String authorizationToken, String dateAsString) {
         List<Training> trainingPlans;
 
         try {
+            LocalDateTime.parse(dateAsString);
             trainingPlans = manufacture.createTrainingPlan(trainingForm);
+        } catch (DateTimeParseException exception) {
+            return ResponseEntity.badRequest().header("Cause", "wrong date format").build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
         }
 
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans);
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, dateAsString);
 
         trainingPlan.setTitle(trainingForm.getTrainingType());
         List<TrainingPlan> savedTrainingPlan = null;
