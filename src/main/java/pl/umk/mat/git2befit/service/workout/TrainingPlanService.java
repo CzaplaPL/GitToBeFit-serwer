@@ -64,7 +64,8 @@ public class TrainingPlanService {
             try {
                 String email = JWTService.parseEmail(authorizationToken);
                 savedTrainingPlan = saveTrainingWithUserEmail(List.of(trainingPlan), email);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         TrainingPlan trainingPlanToReturn = savedTrainingPlan != null ? savedTrainingPlan.get(0) : trainingPlan;
         return ResponseEntity.ok(trainingPlanToReturn);
@@ -118,7 +119,7 @@ public class TrainingPlanService {
         }
     }
 
-    public List<Exercise> getSimilarExercises(long id, TrainingForm trainingForm) throws IllegalArgumentException{
+    public List<Exercise> getSimilarExercises(long id, TrainingForm trainingForm) throws IllegalArgumentException {
         Optional<Exercise> byId = exerciseRepository.findById(id);
         if (byId.isPresent()) {
             Exercise exerciseToExchange = byId.get();
@@ -131,7 +132,7 @@ public class TrainingPlanService {
 
             exercisesToReplace = filterExercisesWithMatchingEquipment(availableEquipmentIDs, exercisesToReplace);
             return exercisesToReplace;
-        }else {
+        } else {
             throw new IllegalArgumentException("Exercise with id: " + id + "is unknown");
         }
     }
@@ -142,7 +143,7 @@ public class TrainingPlanService {
                     boolean temp;
                     for (Equipment equipment : exercise.getEquipmentsNeeded()) {
                         temp = availableEquipmentIDs.contains(equipment.getId());
-                        if(!temp)
+                        if (!temp)
                             return false;
                     }
                     return true;
@@ -151,14 +152,13 @@ public class TrainingPlanService {
         return exercisesToReplace;
     }
 
-    public void updateTrainingPlan(String title, Long id){
+    public void updateTrainingPlan(String title, Long id) {
         Optional<TrainingPlan> trainingPlanOptional = trainingPlanRepository.findById(id);
         if (trainingPlanOptional.isPresent()) {
             TrainingPlan trainingPlan = trainingPlanOptional.get();
             trainingPlan.setTitle(title);
             trainingPlanRepository.save(trainingPlan);
-        }
-        else
+        } else
             throw new IllegalArgumentException("TrainingPlan with id: " + id + " is unknown");
     }
 
@@ -168,7 +168,7 @@ public class TrainingPlanService {
             Optional<User> user = userRepository.findByEmail(email);
             if (user.isPresent()) {
                 Optional<TrainingPlan> trainingPlan = trainingPlanRepository.findById(trainingPlanId);
-                if(!trainingPlan.isPresent())
+                if (trainingPlan.isEmpty())
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "training plan not found").build();
                 if (canBeDeletedByUser(trainingPlan.get(), user.get())) {
                     trainingPlanRepository.delete(trainingPlan.get());
@@ -179,7 +179,7 @@ public class TrainingPlanService {
             } else {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "user not found").build();
             }
-        }catch (JWTVerificationException e) {
+        } catch (JWTVerificationException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).header("Cause", "wrong token").build();
         } catch (Exception e) {
             log.error(e.getMessage());

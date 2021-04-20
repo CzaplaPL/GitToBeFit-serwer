@@ -13,7 +13,7 @@ public class TrainingPlanFactory {
         this.exerciseRepository = exerciseRepository;
     }
 
-    private ExerciseRepository exerciseRepository;
+    private final ExerciseRepository exerciseRepository;
 
     public TrainingPlanInterface createPlan(String trainingType) throws IllegalArgumentException{
 

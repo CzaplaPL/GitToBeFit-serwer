@@ -8,6 +8,7 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.validation.workout.CardioValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,8 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
     private final ExerciseRepository exerciseRepository;
     private TrainingForm trainingForm;
 
+    private List<Training> generatedTrainingsList;
+
     public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
     }
@@ -31,7 +34,6 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
         this.trainingForm = trainingForm;
         int duration = trainingForm.getDuration();
         int exercisesToGet = duration / SINGLE_STEP;
-        Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
 
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
@@ -62,28 +64,23 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                     filteredListOfExercises.remove(exercise);
                 }
             } else {
-                if (!loadingNoEquip) {
-                    filteredListOfExercises = exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE);
-                    loadingNoEquip = true;
-                } else {
-                    break;
-                }
+                break;
             }
         }
         List<ExerciseExecution> exerciseExecutions = getExercisesExecutions(rolledExercises);
-        training.setExercisesExecutions(exerciseExecutions);
-        training.setBreakTime(DEFAULT_BREAK_TIME);
-        training.setCircuitsCount(
-                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ?
-                        DEFAULT_CIRCUIT_COUNT :
-                        NOT_APPLICABLE
+        Training training = new Training(
+                DEFAULT_BREAK_TIME,
+                this.trainingForm.checkIfScheduleTypeIsCircuit() ? DEFAULT_CIRCUIT_COUNT : NOT_APPLICABLE,
+                exerciseExecutions
         );
-        return List.of(training);
+        this.generatedTrainingsList = List.of(training);
+        return this.generatedTrainingsList;
     }
 
     @Override
     public void validateAfterCreating() {
-
+        CardioValidator validator = new CardioValidator();
+        validator.validate(this.generatedTrainingsList, this.trainingForm);
     }
 
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {

@@ -7,6 +7,7 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.validation.workout.FitnessValidator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,12 +19,12 @@ import java.util.stream.Collectors;
 public class FitnessTrainingPlan implements TrainingPlanInterface {
     private static final String TRAINING_TYPE = "FITNESS";
     private static final int SINGLE_STEP = 3;
-    private static final List<String> ALL_BODY_PARTS = List.of("CHEST", "SIXPACK", "BACK", "LEGS", "ARMS");
     private static final List<String> SPECIFIED_ARMS = List.of("SHOULDERS", "TRICEPS", "BICEPS");
     private static final List<String> SPECIFIED_LEGS = List.of("THIGHS", "CALVES");
 
     private final ExerciseRepository exerciseRepository;
     private TrainingForm trainingForm;
+    private List<Training> generatedTraining;
 
     public FitnessTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -38,18 +39,8 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
         int exercisesToGet = duration / SINGLE_STEP;
 
         ThreadLocalRandom randomIndexGen = ThreadLocalRandom.current();
-        Training training = new Training();
         List<Exercise> rolledExercises = new ArrayList<>();
-        List<String> bodyPartsFromForm;
-        // zabezpieczenie, ze jezeli uzytkownik nie przeslal zadnej partii ciala to bedzie generowalo dla wszystkich
-        if ((trainingForm.getBodyParts().size() == 1 && trainingForm.getBodyParts().get(0).isEmpty())
-                || trainingForm.getBodyParts().isEmpty()) {
-            bodyPartsFromForm = ALL_BODY_PARTS;
-        } else {
-            bodyPartsFromForm = trainingForm.getBodyParts();
-        }
-
-        boolean containsNoEquips = false;
+        List<String> bodyPartsFromForm = trainingForm.getBodyParts();
 
         // na kazda partie ciala jest losowane jedno cwiczenie
         while (rolledExercises.size() < exercisesToGet) {
@@ -76,34 +67,28 @@ public class FitnessTrainingPlan implements TrainingPlanInterface {
             }
             // jezeli nie ma cwiczen to wykonaj akcje
             if (filteredListOfExercises.isEmpty()) {
-                // sprawdz czy zostaly pobrane cwiczenia bez sprzetu
-                if (!containsNoEquips) {
-                    filteredListOfExercises.addAll(exerciseRepository.getAllWithNoEquipmentForTrainingTypeName(TRAINING_TYPE));
-                    containsNoEquips = true;
-                } else {
-                    break;
-                }
-            } else {
-                // sprawdzenie czy w puli sa jeszcze jakiekolwiek cwiczenia dla danej partii, jesli nie to wyjscie
-                if (counter == bodyPartsFromForm.size()) {
-                    break;
-                }
+                break;
+            } else if (counter == bodyPartsFromForm.size()) {
+                break;
             }
         }
+
         List<ExerciseExecution> exercisesExecutions = getExercisesExecutions(rolledExercises);
         Collections.shuffle(exercisesExecutions);
 
-        training.setExercisesExecutions(exercisesExecutions);
-        training.setBreakTime(DEFAULT_BREAK_TIME);
-        training.setCircuitsCount(
-                this.trainingForm.getScheduleType().equalsIgnoreCase("CIRCUIT") ? DEFAULT_CIRCUIT_COUNT : 0
+        Training training = new Training(
+                DEFAULT_BREAK_TIME,
+                this.trainingForm.checkIfScheduleTypeIsCircuit() ? DEFAULT_CIRCUIT_COUNT : NOT_APPLICABLE,
+                exercisesExecutions
         );
-        return List.of(training);
+        this.generatedTraining = List.of(training);
+        return this.generatedTraining;
     }
 
     @Override
     public void validateAfterCreating() {
-
+        FitnessValidator validator = new FitnessValidator();
+        validator.validate(this.generatedTraining, this.trainingForm);
     }
 
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {
