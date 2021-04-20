@@ -13,6 +13,9 @@ public class Training implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    private long breakTime;
+    private long circuitsCount;
+
     @ElementCollection
     @CollectionTable(name = "exercises_executions")
     private List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
@@ -35,5 +38,21 @@ public class Training implements Serializable {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public long getBreakTime() {
+        return breakTime;
+    }
+
+    public void setBreakTime(long breakTime) {
+        this.breakTime = breakTime;
+    }
+
+    public long getCircuitsCount() {
+        return circuitsCount;
+    }
+
+    public void setCircuitsCount(long circuitsCount) {
+        this.circuitsCount = circuitsCount;
     }
 }

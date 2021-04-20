@@ -75,4 +75,8 @@ public class TrainingForm {
     public void setDuration(int duration) {
         this.duration = duration;
     }
+
+    public boolean checkIfScheduleTypeIsCircuit() {
+        return this.scheduleType.equalsIgnoreCase("CIRCUIT");
+    }
 }
