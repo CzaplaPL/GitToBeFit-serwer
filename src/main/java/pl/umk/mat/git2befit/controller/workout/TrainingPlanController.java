@@ -23,14 +23,14 @@ public class TrainingPlanController {
 
     @PostMapping("/generate")
     public ResponseEntity<?> generate(
-            @RequestBody(required = false) TrainingForm trainingForm,
+            @RequestBody TrainingForm trainingForm,
             @RequestHeader(value = "Authorization", required = false) String authorizationToken,
-            @RequestHeader(value = "Date") String date
+            @RequestHeader(value = "Date", required = false) String date
     ) {
         return trainingPlanService.generate(
                 trainingForm,
                 authorizationToken,
-                date
+                date == null ? LocalDateTime.now().toString() : date
         );
     }
 
