@@ -23,7 +23,7 @@ public class TrainingPlanManufacture {
         TrainingFormValidationService.validate(trainingForm);
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
         List<Training> trainingsList = trainingPlan.create(trainingForm);
-        trainingPlan.validateAfterCreating();
+//        trainingPlan.validateAfterCreating();
 
         return trainingsList;
     }
