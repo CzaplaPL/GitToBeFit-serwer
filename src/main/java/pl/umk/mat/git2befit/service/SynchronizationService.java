@@ -9,12 +9,13 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class SynchService {
+public class SynchronizationService {
 
-    @Autowired
+
     private final JdbcTemplate jdbcTemplate;
 
-    public SynchService(JdbcTemplate jdbcTemplate) {
+    @Autowired
+    public SynchronizationService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
 

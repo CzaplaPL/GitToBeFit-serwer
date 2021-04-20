@@ -5,22 +5,22 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import pl.umk.mat.git2befit.service.SynchService;
+import pl.umk.mat.git2befit.service.SynchronizationService;
 
 @RestController
 @RequestMapping("/check-sum")
-public class SynchronizeController {
+public class SynchronizationController {
 
-    private final SynchService synchService;
+    private final SynchronizationService synchronizationService;
 
     @Autowired
-    public SynchronizeController(SynchService synchService) {
-        this.synchService = synchService;
+    public SynchronizationController(SynchronizationService synchronizationService) {
+        this.synchronizationService = synchronizationService;
     }
 
     @GetMapping
     public ResponseEntity<?> checkSum() {
-        var checkSums = synchService.getCheckSum();
+        var checkSums = synchronizationService.getCheckSum();
         return ResponseEntity.ok(checkSums);
     }
 }
