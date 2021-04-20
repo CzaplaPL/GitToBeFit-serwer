@@ -46,18 +46,17 @@ public class TrainingPlanService {
 
     public ResponseEntity<?> generate(TrainingForm trainingForm, String authorizationToken, String dateAsString) {
         List<Training> trainingPlans;
-        LocalDateTime date;
 
         try {
-            date = LocalDateTime.parse(dateAsString);
+            LocalDateTime.parse(dateAsString);
             trainingPlans = manufacture.createTrainingPlan(trainingForm);
         } catch (DateTimeParseException exception) {
-            return ResponseEntity.badRequest().header("Cause", "wrong date").build();
+            return ResponseEntity.badRequest().header("Cause", "wrong date format").build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
         }
 
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, date);
+        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, dateAsString);
 
         trainingPlan.setTitle(trainingForm.getTrainingType());
         List<TrainingPlan> savedTrainingPlan = null;

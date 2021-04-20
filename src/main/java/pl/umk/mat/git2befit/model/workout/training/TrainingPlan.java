@@ -21,11 +21,11 @@ public class TrainingPlan implements Serializable {
     private List<Training> planList;
     @ManyToOne
     private User user;
-    private LocalDateTime createdAt;
+    private String createdAt;
 
     public TrainingPlan() {}
 
-    public TrainingPlan(TrainingForm trainingForm, List<Training> planList, LocalDateTime date) {
+    public TrainingPlan(TrainingForm trainingForm, List<Training> planList, String date) {
         this.trainingForm = trainingForm;
         this.planList = planList;
         this.createdAt = date;
@@ -72,11 +72,11 @@ public class TrainingPlan implements Serializable {
         this.title = title;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 }
