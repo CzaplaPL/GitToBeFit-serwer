@@ -15,16 +15,15 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import pl.umk.mat.git2befit.filter.JWTAuthenticationFilter;
 import pl.umk.mat.git2befit.filter.JWTAuthorizationFilter;
 
-
 import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.*;
 
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    private UserDetailsServiceImpl userDetailsService ;
+    private UserDetailsServiceImpl userDetailsService;
     private PasswordEncoder passwordEncoder;
 
     @Autowired
-    public SecurityConfig(UserDetailsServiceImpl userDetailsService, PasswordEncoder passwordEncoder){
+    public SecurityConfig(UserDetailsServiceImpl userDetailsService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
@@ -37,7 +36,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, SIGN_UP_URL, FACEBOOK_LOGIN, GOOGLE_LOGIN, PASSWORD_REMIND, TOKEN_VERIFICATION, "/user/login", USER_ACTIVATION_VERIFICATION, SEND_RENEW).permitAll()
                 .antMatchers(HttpMethod.GET, EMAIL_VERIFICATION).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich sprzetow oraz wzgledem kategorii
-                .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS, NO_EQUIPMENT).permitAll()
+                .antMatchers(HttpMethod.GET, ALL_EQUIPMENTS, NO_EQUIPMENT, CHECKSUM).permitAll()
                 // Zezwolenie na dostep do pobrania wszystkich kategorii
                 .antMatchers(HttpMethod.GET, ALL_EQUIPMENT_TYPES).permitAll()
                 // Zezwolenie na dostep do pobrania treningu
