@@ -1,6 +1,7 @@
 package pl.umk.mat.git2befit.validation;
 
 import org.springframework.stereotype.Service;
+import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 
 import java.util.List;
@@ -13,12 +14,19 @@ public class TrainingFormValidationService {
 
     private TrainingFormValidationService(){}
 
-    public static void  validate(TrainingForm trainingForm) throws IllegalArgumentException{
+    public static void  validate(TrainingForm trainingForm) throws IllegalArgumentException, EquipmentCountException {
+        validateEquipmentSize(trainingForm.getEquipmentIDs());
         validateBodyParts(trainingForm.getBodyParts());
         validateTrainingTypes(trainingForm.getTrainingType());
         validateScheduleTypes(trainingForm.getScheduleType());
         validateDuration(trainingForm.getDuration());
         validateDaysCount(trainingForm.getDaysCount());
+    }
+
+    private static void validateEquipmentSize(List<Long> equipmentIDs) throws EquipmentCountException {
+        if(equipmentIDs.size() == 0){
+            throw new EquipmentCountException();
+        }
     }
 
     private static void validateBodyParts(List<String> bodyParts) throws IllegalArgumentException{

@@ -6,6 +6,7 @@ import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
+import pl.umk.mat.git2befit.validation.workout.FBWValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -21,6 +22,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
     private TrainingForm localTrainingForm;
+    private List<Training> trainingList;
 
     public FBWTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
@@ -42,12 +44,15 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     public List<Training> create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
-        return assignExercisesToBodyPart(exercisesWithEquipment);
+        trainingList = assignExercisesToBodyPart(exercisesWithEquipment);
+        validateAfterCreating();
+        return trainingList;
     }
 
     @Override
     public void validateAfterCreating() {
-
+        var fbwValidator = new FBWValidator();
+        fbwValidator.validateTraining(trainingList);
     }
 
     private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
@@ -74,7 +79,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         return trainingList;
     }
 
-    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment/*, List<Exercise> exercisesWithoutEquipment*/) {
+    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment) {
         Map<String, List<ExerciseExecution>> exerciseExecutionMap = new HashMap<>();
 
         for (String bodyPart : bodyPartsList) {
@@ -85,18 +90,20 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
-                Exercise exercise;
-                if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
-                    exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
-                else
-                    exercise = exercisesWithEquipmentFilteredByBodyPart.get(
-                            i % exercisesWithEquipmentFilteredByBodyPart.size()
-                    );
+                if(exercisesWithEquipmentFilteredByBodyPart.size() != 0) {
+                    Exercise exercise;
+                    if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
+                        exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
+                    else
+                        exercise = exercisesWithEquipmentFilteredByBodyPart.get(
+                                i % exercisesWithEquipmentFilteredByBodyPart.size()
+                        );
 
-                exerciseExecutionList.add(getExactExerciseExecution(
-                        exercise,
-                        this.trainingForm
-                ));
+                    exerciseExecutionList.add(getExactExerciseExecution(
+                            exercise,
+                            this.trainingForm
+                    ));
+                }
             }
             exerciseExecutionMap.put(bodyPart, exerciseExecutionList);
         }

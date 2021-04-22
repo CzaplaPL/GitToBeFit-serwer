@@ -2,6 +2,7 @@ package pl.umk.mat.git2befit.service.workout.factory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
 import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
@@ -19,11 +20,10 @@ public class TrainingPlanManufacture {
     }
 
     public List<Training> createTrainingPlan(TrainingForm trainingForm)
-            throws IllegalArgumentException, NotValidTrainingException {
+            throws IllegalArgumentException, NotValidTrainingException, EquipmentCountException {
         TrainingFormValidationService.validate(trainingForm);
         TrainingPlanInterface trainingPlan = trainingPlanFactory.createPlan(trainingForm.getTrainingType());
         List<Training> trainingsList = trainingPlan.create(trainingForm);
-//        trainingPlan.validateAfterCreating();
 
         return trainingsList;
     }

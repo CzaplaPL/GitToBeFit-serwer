@@ -21,7 +21,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
-    private TrainingForm localTrainingForm;
+    private List<Map<String, List<ExerciseExecution>>> listOfBodyPartsExercises;
 
     private final ExerciseRepository exerciseRepository;
 
@@ -31,21 +31,16 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
     @Override
     public void validateAfterCreating() {
-        //example
-        SplitValidator.validateTraining(List.of());
+        var splitValidator = new SplitValidator();
+        splitValidator.validateTraining(listOfBodyPartsExercises, trainingForm);
     }
 
     private void initialize(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
-        this.localTrainingForm = trainingForm;
 
         List<Exercise> exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
 
-        if (trainingForm.getDaysCount() > trainingForm.getBodyParts().size()) {
-            var bodyPartsSize = trainingForm.getBodyParts().size();
-            localTrainingForm.setDaysCount(bodyPartsSize);
-        }
     }
 
     @Override
@@ -54,15 +49,18 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
         var trainingForBodyPart = assignExercisesToBodyPart();
         var trainingList = divideTrainingIntoDays(trainingForBodyPart);
+        var normalizedTraining = normalize(trainingList);
 
-        return normalize(trainingList);
+        validateAfterCreating();
+
+        return normalizedTraining;
     }
 
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {
         var exerciseExecutionList = new ArrayList<ExerciseExecution>();
         var exercisesForBodyPart = new HashMap<String, List<ExerciseExecution>>();
 
-        var trainingFormBodyParts = localTrainingForm.getBodyParts();
+        var trainingFormBodyParts = trainingForm.getBodyParts();
 
         for (String bodyPart : trainingFormBodyParts) {
 
@@ -113,10 +111,10 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     private List<Map<String, List<ExerciseExecution>>> divideTrainingIntoDays(Map<String, List<ExerciseExecution>> exercisesForBodyPart) {
         List<Map<String, List<ExerciseExecution>>> trainingList = new ArrayList<>();
 
-        if (localTrainingForm.getBodyParts().size() == 0)
+        if (trainingForm.getBodyParts().size() == 0)
             return Collections.emptyList();
 
-        switch (localTrainingForm.getDaysCount()) {
+        switch (trainingForm.getDaysCount()) {
             case 1 -> {
                 trainingList.add(getMapOfBodyPartsExercisesForDay(exercisesForBodyPart, "THIGHS", "TRICEPS", "SHOULDERS0", "CALVES",
                         "CHEST", "BICEPS", "SIXPACK", "BACK"));
@@ -190,7 +188,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
             }
         } while (max - min > 1);
 
-
+        listOfBodyPartsExercises = list;
         return parseMapOfExercisesToListOfExercises(list);
     }
 
