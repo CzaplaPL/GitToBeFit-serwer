@@ -10,7 +10,7 @@ import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface TrainingPlanInterface {
+interface TrainingPlanInterface {
     long DEFAULT_BREAK_TIME = 30;
     long DEFAULT_CIRCUIT_COUNT = 3;
     int DEFAULT_SERIES_COUNT = 3;

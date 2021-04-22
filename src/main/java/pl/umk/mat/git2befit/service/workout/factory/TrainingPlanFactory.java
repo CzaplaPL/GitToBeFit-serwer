@@ -16,7 +16,6 @@ public class TrainingPlanFactory {
     private final ExerciseRepository exerciseRepository;
 
     public TrainingPlanInterface createPlan(String trainingType) throws IllegalArgumentException{
-
         return switch (trainingType.toUpperCase()) {
             case "SPLIT" -> new SplitTrainingPlan(exerciseRepository);
             case "FBW" -> new FBWTrainingPlan(exerciseRepository);
