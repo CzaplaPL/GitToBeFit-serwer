@@ -1,18 +1,13 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class SplitTrainingPlan implements TrainingPlanInterface {
+class SplitTrainingPlan implements TrainingPlanGenerator {
     private final String TRAINING_TYPE = "SPLIT";
     private final List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS");
     private final List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
@@ -30,9 +25,23 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     }
 
     @Override
-    public void validateAfterCreating() {
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
         //example
         SplitValidator.validateTraining(List.of());
+    }
+
+    @Override
+    public TrainingPlan create(TrainingForm trainingForm) {
+        initialize(trainingForm);
+
+        var trainingForBodyPart = assignExercisesToBodyPart();
+        var trainingList = divideTrainingIntoDays(trainingForBodyPart);
+
+        return new TrainingPlan(
+                TRAINING_TYPE,
+                this.localTrainingForm,
+                normalize(trainingList)
+        );
     }
 
     private void initialize(TrainingForm trainingForm) {
@@ -46,16 +55,6 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
             var bodyPartsSize = trainingForm.getBodyParts().size();
             localTrainingForm.setDaysCount(bodyPartsSize);
         }
-    }
-
-    @Override
-    public List<Training> create(TrainingForm trainingForm) {
-        initialize(trainingForm);
-
-        var trainingForBodyPart = assignExercisesToBodyPart();
-        var trainingList = divideTrainingIntoDays(trainingForBodyPart);
-
-        return normalize(trainingList);
     }
 
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {
@@ -157,7 +156,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
         return map;
     }
 
-    public List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
+    private List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
         var random = new Random();
         int maxIndex, minIndex, min, max;
 

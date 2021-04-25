@@ -9,7 +9,7 @@ import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.service.user.JWTService;
 import pl.umk.mat.git2befit.service.workout.TrainingPlanService;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanFacade;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -19,10 +19,10 @@ import static org.springframework.http.HttpStatus.EXPECTATION_FAILED;
 @RestController()
 @RequestMapping("/training-plan")
 public class TrainingPlanController {
-    private final TrainingPlanManufacture manufacture;
+    private final TrainingPlanFacade manufacture;
     private final TrainingPlanService trainingPlanService;
 
-    public TrainingPlanController(TrainingPlanManufacture manufacture, TrainingPlanService service) {
+    public TrainingPlanController(TrainingPlanFacade manufacture, TrainingPlanService service) {
         this.manufacture = manufacture;
         this.trainingPlanService = service;
     }

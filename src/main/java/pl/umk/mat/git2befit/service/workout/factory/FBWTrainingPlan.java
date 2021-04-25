@@ -1,17 +1,12 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class FBWTrainingPlan implements TrainingPlanInterface {
+class FBWTrainingPlan implements TrainingPlanGenerator {
     private static final String TRAINING_TYPE = "FBW";
     private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
     private static final int ONE_DAY = 1;
@@ -39,14 +34,18 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     }
 
     @Override
-    public List<Training> create(TrainingForm trainingForm) {
+    public TrainingPlan create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
-        return assignExercisesToBodyPart(exercisesWithEquipment);
+        return new TrainingPlan(
+                TRAINING_TYPE,
+                this.localTrainingForm,
+                assignExercisesToBodyPart(exercisesWithEquipment)
+        );
     }
 
     @Override
-    public void validateAfterCreating() {
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
 
     }
 
