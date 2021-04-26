@@ -16,7 +16,7 @@ public class TrainingFormValidationService {
 
     public static void  validate(TrainingForm trainingForm) throws IllegalArgumentException, EquipmentCountException {
         validateEquipmentSize(trainingForm.getEquipmentIDs());
-        validateBodyParts(trainingForm.getBodyParts());
+        validateBodyParts(trainingForm);
         validateTrainingTypes(trainingForm.getTrainingType());
         validateScheduleTypes(trainingForm.getScheduleType());
         validateDuration(trainingForm.getDuration());
@@ -29,10 +29,16 @@ public class TrainingFormValidationService {
         }
     }
 
-    private static void validateBodyParts(List<String> bodyParts) throws IllegalArgumentException{
-        for (String bodyPart: bodyParts){
+    private static void validateBodyParts(TrainingForm trainingForm) throws IllegalArgumentException{
+        for (String bodyPart: trainingForm.getBodyParts()){
             if(!bodyPartsList.contains(bodyPart))
                 throw new IllegalArgumentException("Body part: " + bodyPart + " is unknown");
+        }
+
+        if(trainingForm.getTrainingType().equals("SPLIT")){
+            if(trainingForm.getBodyParts().size() == 0){
+                throw new IllegalArgumentException("0 body parts");
+            }
         }
     }
 

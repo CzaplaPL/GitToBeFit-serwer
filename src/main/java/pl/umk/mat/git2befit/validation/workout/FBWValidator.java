@@ -16,11 +16,13 @@ public class FBWValidator {
 
     private void checkIfAllBodyPartsHaveExercise(List<Training> trainingList) {
         ArrayList<String> bodyParts = new ArrayList<>();
-        trainingList.forEach(trainingDay -> trainingDay.getExercisesExecutions()
-                .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName())));
-        bodyPartsList.removeAll(bodyParts);
-        if (bodyPartsList.size() != 0){
-            throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsList));
+        for (Training trainingDay : trainingList) {
+            trainingDay.getExercisesExecutions()
+                    .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName()));
+            bodyPartsList.removeAll(bodyParts);
+            if (bodyPartsList.size() != 0){
+                throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsList));
+            }
         }
     }
 }
