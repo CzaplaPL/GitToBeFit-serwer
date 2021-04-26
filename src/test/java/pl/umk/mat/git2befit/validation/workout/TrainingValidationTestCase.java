@@ -1,13 +1,13 @@
 package pl.umk.mat.git2befit.validation.workout;
 
-import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.workout.conditions.ExerciseForm;
-import pl.umk.mat.git2befit.model.workout.conditions.TrainingType;
-import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.training.model.conditions.BodyPart;
+import pl.umk.mat.git2befit.training.model.conditions.ExerciseForm;
+import pl.umk.mat.git2befit.training.model.conditions.TrainingType;
+import pl.umk.mat.git2befit.training.model.equipment.Equipment;
+import pl.umk.mat.git2befit.training.model.training.Exercise;
+import pl.umk.mat.git2befit.training.model.training.ExerciseExecution;
+import pl.umk.mat.git2befit.training.model.training.Training;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
 
 import java.util.ArrayList;
 import java.util.List;
