@@ -11,9 +11,13 @@ public class FBWValidator {
     private List<String> bodyPartsList = Arrays.asList("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
 
     public void validateTraining(List<Training> trainingList) {
+        checkIfAllBodyPartsHaveExercise(trainingList);
+    }
+
+    private void checkIfAllBodyPartsHaveExercise(List<Training> trainingList) {
         ArrayList<String> bodyParts = new ArrayList<>();
-        trainingList.forEach(a -> a.getExercisesExecutions()
-                .forEach(b -> bodyParts.add(b.getExercise().getBodyPart().getName())));
+        trainingList.forEach(trainingDay -> trainingDay.getExercisesExecutions()
+                .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName())));
         bodyPartsList.removeAll(bodyParts);
         if (bodyPartsList.size() != 0){
             throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsList));

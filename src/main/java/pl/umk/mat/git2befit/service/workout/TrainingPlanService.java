@@ -56,7 +56,7 @@ public class TrainingPlanService {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
         } catch (EquipmentCountException e) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).header("Cause", e.getMessage()).build();
         }
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, dateAsString);

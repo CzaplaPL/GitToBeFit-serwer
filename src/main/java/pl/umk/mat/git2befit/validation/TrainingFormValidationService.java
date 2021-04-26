@@ -25,7 +25,7 @@ public class TrainingFormValidationService {
 
     private static void validateEquipmentSize(List<Long> equipmentIDs) throws EquipmentCountException {
         if(equipmentIDs.size() == 0){
-            throw new EquipmentCountException();
+            throw new EquipmentCountException("Must be at least one equipment");
         }
     }
 
