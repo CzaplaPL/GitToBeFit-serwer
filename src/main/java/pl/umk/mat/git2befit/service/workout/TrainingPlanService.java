@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
 import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
@@ -54,6 +55,8 @@ public class TrainingPlanService {
             return ResponseEntity.badRequest().header("Cause", "wrong date format").build();
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", e.getMessage()).build();
+        } catch (EquipmentCountException e) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).header("Cause", e.getMessage()).build();
         }
 
         TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, dateAsString);
