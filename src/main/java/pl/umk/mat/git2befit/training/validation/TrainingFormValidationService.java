@@ -1,8 +1,8 @@
 package pl.umk.mat.git2befit.validation;
 
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.training.exceptions.EquipmentCountException;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
 
 import java.util.List;
 

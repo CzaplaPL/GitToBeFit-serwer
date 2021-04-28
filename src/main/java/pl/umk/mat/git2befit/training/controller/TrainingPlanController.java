@@ -7,9 +7,9 @@ import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.training.model.training.TrainingForm;
 import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
-import pl.umk.mat.git2befit.user.service.JWTService;
 import pl.umk.mat.git2befit.training.service.TrainingPlanService;
 import pl.umk.mat.git2befit.training.service.factory.TrainingPlanFacade;
+import pl.umk.mat.git2befit.user.service.JWTService;
 
 import java.time.LocalDateTime;
 import java.util.List;

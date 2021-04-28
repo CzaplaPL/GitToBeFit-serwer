@@ -1,20 +1,15 @@
-package pl.umk.mat.git2befit.validation.workout;
+package pl.umk.mat.git2befit.training.validation;
 
-
-import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
-import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
+import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
+import pl.umk.mat.git2befit.training.model.training.ExerciseExecution;
+import pl.umk.mat.git2befit.training.model.training.Training;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
+import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 
 public class SplitValidator {
     private final List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS");

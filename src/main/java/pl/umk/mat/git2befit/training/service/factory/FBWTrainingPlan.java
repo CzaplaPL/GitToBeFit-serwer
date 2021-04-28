@@ -1,7 +1,8 @@
 package pl.umk.mat.git2befit.training.service.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.*;
-import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
+import pl.umk.mat.git2befit.training.model.training.*;
+import pl.umk.mat.git2befit.training.repository.ExerciseRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;

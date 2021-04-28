@@ -1,4 +1,4 @@
-package pl.umk.mat.git2befit.service.workout;
+package pl.umk.mat.git2befit.training.service;
 
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import org.slf4j.Logger;
@@ -6,16 +6,17 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.model.user.entity.User;
-import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
-import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
-import pl.umk.mat.git2befit.repository.user.UserRepository;
-import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
-import pl.umk.mat.git2befit.service.user.JWTService;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanFacade;
+import pl.umk.mat.git2befit.training.exceptions.EquipmentCountException;
+import pl.umk.mat.git2befit.training.model.equipment.Equipment;
+import pl.umk.mat.git2befit.training.model.training.Exercise;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
+import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
+import pl.umk.mat.git2befit.training.repository.ExerciseRepository;
+import pl.umk.mat.git2befit.training.repository.TrainingPlanRepository;
+import pl.umk.mat.git2befit.training.service.factory.TrainingPlanFacade;
+import pl.umk.mat.git2befit.user.model.entity.User;
+import pl.umk.mat.git2befit.user.repository.UserRepository;
+import pl.umk.mat.git2befit.user.service.JWTService;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;

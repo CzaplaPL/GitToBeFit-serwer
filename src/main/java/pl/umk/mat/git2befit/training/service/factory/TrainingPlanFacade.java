@@ -2,9 +2,10 @@ package pl.umk.mat.git2befit.training.service.factory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
-import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
+import pl.umk.mat.git2befit.training.exceptions.EquipmentCountException;
+import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
+import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
 import pl.umk.mat.git2befit.validation.TrainingFormValidationService;
 
 @Component
