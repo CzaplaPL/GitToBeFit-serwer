@@ -1,11 +1,7 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
@@ -29,12 +25,6 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
     }
 
     @Override
-    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
-        //example
-        SplitValidator.validateTraining(List.of());
-    }
-
-    @Override
     public TrainingPlan create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
@@ -48,6 +38,12 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
         );
     }
 
+    @Override
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
+        SplitValidator splitValidator = new SplitValidator();
+        splitValidator.validateTraining(trainingPlan, trainingForm);
+    }
+
     private void initialize(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
         this.localTrainingForm = trainingForm;
@@ -59,19 +55,6 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
             var bodyPartsSize = trainingForm.getBodyParts().size();
             localTrainingForm.setDaysCount(bodyPartsSize);
         }
-    }
-
-    @Override
-    public List<Training> create(TrainingForm trainingForm) {
-        initialize(trainingForm);
-
-        var trainingForBodyPart = assignExercisesToBodyPart();
-        var trainingList = divideTrainingIntoDays(trainingForBodyPart);
-        var normalizedTraining = normalize(trainingList);
-
-        validateAfterCreating();
-
-        return normalizedTraining;
     }
 
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {

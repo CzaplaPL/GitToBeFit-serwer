@@ -1,8 +1,8 @@
 package pl.umk.mat.git2befit.service.workout.factory;
 
+import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.FBWValidator;
 
 import java.util.*;
@@ -48,9 +48,17 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
     }
 
     @Override
-    public void validate() {
-        var fbwValidator = new FBWValidator();
-        fbwValidator.validateTraining(trainingList);
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) throws NotValidTrainingException {
+        List<String> bodyPartsListCopy = new ArrayList<>(bodyPartsList);
+        ArrayList<String> bodyParts = new ArrayList<>();
+        for (Training trainingDay : trainingPlan.getPlanList()) {
+            trainingDay.getExercisesExecutions()
+                    .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName()));
+            bodyPartsListCopy.removeAll(bodyParts);
+            if (bodyPartsListCopy.size() != 0){
+                throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsListCopy));
+            }
+        }
     }
 
     private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
