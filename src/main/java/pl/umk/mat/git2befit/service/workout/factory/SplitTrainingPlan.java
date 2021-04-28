@@ -1,7 +1,11 @@
-package pl.umk.mat.git2befit.service.workout.factory;
+package pl.umk.mat.git2befit.service.workout.factory.implementation;
 
-import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.model.workout.training.Exercise;
+import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
+import pl.umk.mat.git2befit.model.workout.training.Training;
+import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
@@ -57,11 +61,24 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
         }
     }
 
+    @Override
+    public List<Training> create(TrainingForm trainingForm) {
+        initialize(trainingForm);
+
+        var trainingForBodyPart = assignExercisesToBodyPart();
+        var trainingList = divideTrainingIntoDays(trainingForBodyPart);
+        var normalizedTraining = normalize(trainingList);
+
+        validateAfterCreating();
+
+        return normalizedTraining;
+    }
+
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {
         var exerciseExecutionList = new ArrayList<ExerciseExecution>();
         var exercisesForBodyPart = new HashMap<String, List<ExerciseExecution>>();
 
-        var trainingFormBodyParts = localTrainingForm.getBodyParts();
+        var trainingFormBodyParts = trainingForm.getBodyParts();
 
         for (String bodyPart : trainingFormBodyParts) {
 
@@ -156,7 +173,7 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
         return map;
     }
 
-    private List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
+    public List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
         var random = new Random();
         int maxIndex, minIndex, min, max;
 
