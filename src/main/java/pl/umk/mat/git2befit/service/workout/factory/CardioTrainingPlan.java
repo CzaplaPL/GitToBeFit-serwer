@@ -1,34 +1,27 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import org.springframework.stereotype.Component;
+import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.conditions.BodyPart;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
-import pl.umk.mat.git2befit.validation.workout.CardioValidator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
-public class CardioTrainingPlan implements TrainingPlanInterface {
+class CardioTrainingPlan implements TrainingPlanGenerator {
     private final String TRAINING_TYPE = "CARDIO";
     private final static int SINGLE_STEP = 3;
     private final static int MAX_RAND_TRIES = 100;
     private final ExerciseRepository exerciseRepository;
     private TrainingForm trainingForm;
 
-    private List<Training> generatedTrainingsList;
-
     public CardioTrainingPlan(ExerciseRepository exerciseRepository) {
         this.exerciseRepository = exerciseRepository;
     }
 
     @Override
-    public List<Training> create(TrainingForm trainingForm) {
+    public TrainingPlan create(TrainingForm trainingForm) {
         List<Exercise> allExercises = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         List<Exercise> filteredListOfExercises = filterAllByAvailableEquipment(allExercises, trainingForm.getEquipmentIDs());
         this.trainingForm = trainingForm;
@@ -73,14 +66,31 @@ public class CardioTrainingPlan implements TrainingPlanInterface {
                 this.trainingForm.checkIfScheduleTypeIsCircuit() ? DEFAULT_CIRCUIT_COUNT : NOT_APPLICABLE,
                 exerciseExecutions
         );
-        this.generatedTrainingsList = List.of(training);
-        return this.generatedTrainingsList;
+        return new TrainingPlan(
+                this.TRAINING_TYPE,
+                trainingForm,
+                List.of(training)
+        );
     }
 
     @Override
-    public void validateAfterCreating() {
-        CardioValidator validator = new CardioValidator();
-        validator.validate(this.generatedTrainingsList, this.trainingForm);
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
+        for (Training training : trainingPlan.getPlanList()) {
+            // walidacja czasu
+            List<ExerciseExecution> exercisesExecutions = training.getExercisesExecutions();
+
+            int size = exercisesExecutions.size();
+            if (size * 3 != trainingForm.getDuration())
+                throw new NotValidTrainingException("wrong exercises count");
+
+            long count = exercisesExecutions
+                    .stream()
+                    .map(exerciseExecution -> exerciseExecution.getExercise().getId())
+                    .distinct()
+                    .count();
+            if (count != exercisesExecutions.size())
+                throw new NotValidTrainingException("duplicated exercises");
+        }
     }
 
     private boolean checkIfBodyPartIsNotOverloaded(List<Exercise> rolledExercises, Exercise exercise) {

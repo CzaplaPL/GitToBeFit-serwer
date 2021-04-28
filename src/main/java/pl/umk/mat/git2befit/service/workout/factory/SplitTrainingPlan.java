@@ -1,18 +1,13 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.SplitValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class SplitTrainingPlan implements TrainingPlanInterface {
+class SplitTrainingPlan implements TrainingPlanGenerator {
     private final String TRAINING_TYPE = "SPLIT";
     private final List<String> smallBodyParts = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS");
     private final List<String> bigBodyParts = List.of("CHEST", "BACK", "THIGHS");
@@ -21,7 +16,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
 
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
-    private List<Map<String, List<ExerciseExecution>>> listOfBodyPartsExercises;
+    private TrainingForm localTrainingForm;
 
     private final ExerciseRepository exerciseRepository;
 
@@ -30,30 +25,36 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     }
 
     @Override
-    public void validateAfterCreating() {
-        var splitValidator = new SplitValidator();
-        splitValidator.validateTraining(listOfBodyPartsExercises, trainingForm);
-    }
-
-    private void initialize(TrainingForm trainingForm) {
-        this.trainingForm = trainingForm;
-
-        List<Exercise> exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
-        exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
-
-    }
-
-    @Override
-    public List<Training> create(TrainingForm trainingForm) {
+    public TrainingPlan create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
         var trainingForBodyPart = assignExercisesToBodyPart();
         var trainingList = divideTrainingIntoDays(trainingForBodyPart);
-        var normalizedTraining = normalize(trainingList);
 
-        validateAfterCreating();
+        return new TrainingPlan(
+                TRAINING_TYPE,
+                this.localTrainingForm,
+                normalize(trainingList)
+        );
+    }
 
-        return normalizedTraining;
+    @Override
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
+        SplitValidator splitValidator = new SplitValidator();
+        splitValidator.validateTraining(trainingPlan, trainingForm);
+    }
+
+    private void initialize(TrainingForm trainingForm) {
+        this.trainingForm = trainingForm;
+        this.localTrainingForm = trainingForm;
+
+        List<Exercise> exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
+        exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
+
+        if (trainingForm.getDaysCount() > trainingForm.getBodyParts().size()) {
+            var bodyPartsSize = trainingForm.getBodyParts().size();
+            localTrainingForm.setDaysCount(bodyPartsSize);
+        }
     }
 
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {
@@ -111,10 +112,10 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
     private List<Map<String, List<ExerciseExecution>>> divideTrainingIntoDays(Map<String, List<ExerciseExecution>> exercisesForBodyPart) {
         List<Map<String, List<ExerciseExecution>>> trainingList = new ArrayList<>();
 
-        if (trainingForm.getBodyParts().size() == 0)
+        if (localTrainingForm.getBodyParts().size() == 0)
             return Collections.emptyList();
 
-        switch (trainingForm.getDaysCount()) {
+        switch (localTrainingForm.getDaysCount()) {
             case 1 -> {
                 trainingList.add(getMapOfBodyPartsExercisesForDay(exercisesForBodyPart, "THIGHS", "TRICEPS", "SHOULDERS0", "CALVES",
                         "CHEST", "BICEPS", "SIXPACK", "BACK"));
@@ -188,7 +189,7 @@ public class SplitTrainingPlan implements TrainingPlanInterface {
             }
         } while (max - min > 1);
 
-        listOfBodyPartsExercises = list;
+
         return parseMapOfExercisesToListOfExercises(list);
     }
 

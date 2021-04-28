@@ -31,6 +31,12 @@ public class TrainingPlan implements Serializable {
         this.createdAt = date;
     }
 
+    public TrainingPlan(String title, TrainingForm trainingForm, List<Training> planList) {
+        this.title = title;
+        this.trainingForm = trainingForm;
+        this.planList = planList;
+    }
+
     public long getId() {
         return id;
     }

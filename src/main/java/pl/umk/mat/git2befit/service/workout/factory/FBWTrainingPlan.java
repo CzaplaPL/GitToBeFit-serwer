@@ -1,18 +1,14 @@
-package pl.umk.mat.git2befit.service.workout.factory.implementation;
+package pl.umk.mat.git2befit.service.workout.factory;
 
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanInterface;
 import pl.umk.mat.git2befit.validation.workout.FBWValidator;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-
-public class FBWTrainingPlan implements TrainingPlanInterface {
+class FBWTrainingPlan implements TrainingPlanGenerator {
     private static final String TRAINING_TYPE = "FBW";
     private static final List<String> bodyPartsList = List.of("SIXPACK", "CALVES", "BICEPS", "TRICEPS", "SHOULDERS", "CHEST", "BACK", "THIGHS");
     private static final int ONE_DAY = 1;
@@ -41,18 +37,28 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
     }
 
     @Override
-    public List<Training> create(TrainingForm trainingForm) {
+    public TrainingPlan create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
-        trainingList = assignExercisesToBodyPart(exercisesWithEquipment);
-        validateAfterCreating();
-        return trainingList;
+        return new TrainingPlan(
+                TRAINING_TYPE,
+                this.localTrainingForm,
+                assignExercisesToBodyPart(exercisesWithEquipment)
+        );
     }
 
     @Override
-    public void validateAfterCreating() {
-        var fbwValidator = new FBWValidator();
-        fbwValidator.validateTraining(trainingList);
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) throws NotValidTrainingException {
+        List<String> bodyPartsListCopy = new ArrayList<>(bodyPartsList);
+        ArrayList<String> bodyParts = new ArrayList<>();
+        for (Training trainingDay : trainingPlan.getPlanList()) {
+            trainingDay.getExercisesExecutions()
+                    .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName()));
+            bodyPartsListCopy.removeAll(bodyParts);
+            if (bodyPartsListCopy.size() != 0){
+                throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsListCopy));
+            }
+        }
     }
 
     private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
@@ -79,7 +85,7 @@ public class FBWTrainingPlan implements TrainingPlanInterface {
         return trainingList;
     }
 
-    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment) {
+    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment/*, List<Exercise> exercisesWithoutEquipment*/) {
         Map<String, List<ExerciseExecution>> exerciseExecutionMap = new HashMap<>();
 
         for (String bodyPart : bodyPartsList) {

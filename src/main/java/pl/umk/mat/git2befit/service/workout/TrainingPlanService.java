@@ -10,14 +10,13 @@ import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
 import pl.umk.mat.git2befit.model.user.entity.User;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
 import pl.umk.mat.git2befit.model.workout.training.Exercise;
-import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 import pl.umk.mat.git2befit.repository.user.UserRepository;
 import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 import pl.umk.mat.git2befit.repository.workout.TrainingPlanRepository;
 import pl.umk.mat.git2befit.service.user.JWTService;
-import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanManufacture;
+import pl.umk.mat.git2befit.service.workout.factory.TrainingPlanFacade;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
@@ -30,14 +29,14 @@ public class TrainingPlanService {
     private final TrainingPlanRepository trainingPlanRepository;
     private final UserRepository userRepository;
     private final ExerciseRepository exerciseRepository;
-    private final TrainingPlanManufacture manufacture;
+    private final TrainingPlanFacade manufacture;
     private final Logger log = LoggerFactory.getLogger(TrainingPlanService.class);
 
     public TrainingPlanService(
             TrainingPlanRepository trainingPlanRepository,
             UserRepository userRepository,
             ExerciseRepository exerciseRepository,
-            TrainingPlanManufacture manufacture
+            TrainingPlanFacade manufacture
     ) {
         this.trainingPlanRepository = trainingPlanRepository;
         this.userRepository = userRepository;
@@ -46,11 +45,10 @@ public class TrainingPlanService {
     }
 
     public ResponseEntity<?> generate(TrainingForm trainingForm, String authorizationToken, String dateAsString) {
-        List<Training> trainingPlans;
-
+        TrainingPlan trainingPlan;
         try {
             LocalDateTime.parse(dateAsString);
-            trainingPlans = manufacture.createTrainingPlan(trainingForm);
+            trainingPlan = manufacture.createTrainingPlan(trainingForm);
         } catch (DateTimeParseException exception) {
             return ResponseEntity.badRequest().header("Cause", "wrong date format").build();
         } catch (IllegalArgumentException e) {
@@ -58,10 +56,7 @@ public class TrainingPlanService {
         } catch (EquipmentCountException e) {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).header("Cause", e.getMessage()).build();
         }
-
-        TrainingPlan trainingPlan = new TrainingPlan(trainingForm, trainingPlans, dateAsString);
-
-        trainingPlan.setTitle(trainingForm.getTrainingType());
+        trainingPlan.setCreatedAt(dateAsString);
         List<TrainingPlan> savedTrainingPlan = null;
         if (authorizationToken != null) {
             try {

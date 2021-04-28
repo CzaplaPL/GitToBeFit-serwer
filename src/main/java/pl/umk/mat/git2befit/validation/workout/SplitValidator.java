@@ -3,12 +3,17 @@ package pl.umk.mat.git2befit.validation.workout;
 
 import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
+import pl.umk.mat.git2befit.model.workout.training.Training;
 import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
+import pl.umk.mat.git2befit.model.workout.training.TrainingPlan;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 public class SplitValidator {
@@ -17,9 +22,28 @@ public class SplitValidator {
     private final int amountForSmall = 3;
     private final int amountForBig = 4;
 
-    public void validateTraining(List<Map<String, List<ExerciseExecution>>> trainingList, TrainingForm trainingForm) {
+    public void validateTraining(TrainingPlan trainingPlan, TrainingForm trainingForm) {
         validateDaysCount(trainingForm);
-        validateAmountOfExercises(trainingList);
+        validateAmountOfExercises(prepare(trainingPlan));
+    }
+
+    private List<Map<String, List<ExerciseExecution>>> prepare(TrainingPlan plan) {
+        List<Map<String, List<ExerciseExecution>>> listToReturn = new ArrayList<>();
+        for (Training training : plan.getPlanList()) {
+            Map<String, List<ExerciseExecution>> map = new HashMap<>();
+            training.getExercisesExecutions()
+                    .stream()
+                    .map(exerciseExecution -> exerciseExecution.getExercise().getBodyPart().getName())
+                    .distinct()
+                    .forEach(s -> map.put(s, new ArrayList<>()));
+            training.getExercisesExecutions()
+                    .forEach(exerciseExecution -> {
+                        String name = exerciseExecution.getExercise().getBodyPart().getName();
+                        map.get(name).add(exerciseExecution);
+                    });
+            listToReturn.add(map);
+        }
+        return listToReturn;
     }
 
     private void validateAmountOfExercises(List<Map<String, List<ExerciseExecution>>> trainingList) {
@@ -36,6 +60,7 @@ public class SplitValidator {
             throw new NotValidTrainingException("not enough exercises for: %s".formatted(errors.toString()));
         }
     }
+
     private int getAmountOfExercisesForBodyPart(String bodyPart){
         if(smallBodyParts.contains(bodyPart)){
             return amountForSmall;
@@ -48,5 +73,4 @@ public class SplitValidator {
             throw new NotValidTrainingException("not enough days for set body parts");
         }
     }
-
 }

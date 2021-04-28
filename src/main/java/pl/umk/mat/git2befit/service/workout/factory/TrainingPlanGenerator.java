@@ -1,16 +1,13 @@
 package pl.umk.mat.git2befit.service.workout.factory;
 
 import pl.umk.mat.git2befit.exceptions.NotValidTrainingException;
-import pl.umk.mat.git2befit.model.workout.training.Exercise;
+import pl.umk.mat.git2befit.model.workout.training.*;
 import pl.umk.mat.git2befit.model.workout.equipment.Equipment;
-import pl.umk.mat.git2befit.model.workout.training.ExerciseExecution;
-import pl.umk.mat.git2befit.model.workout.training.Training;
-import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface TrainingPlanInterface {
+public interface TrainingPlanGenerator {
     long DEFAULT_BREAK_TIME = 30;
     long DEFAULT_CIRCUIT_COUNT = 3;
     int DEFAULT_SERIES_COUNT = 3;
@@ -18,9 +15,9 @@ public interface TrainingPlanInterface {
     int DEFAULT_EXERCISE_TIME_EXECUTION = 30;
     int NOT_APPLICABLE = 0;
 
-    List<Training> create(TrainingForm trainingForm);
+    TrainingPlan create(TrainingForm trainingForm);
 
-    void validateAfterCreating() throws NotValidTrainingException;
+    void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) throws NotValidTrainingException;
 
     default List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises, List<Long> availableEquipments){
         return exercises.stream().filter(exercise -> {
