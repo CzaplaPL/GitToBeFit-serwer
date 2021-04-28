@@ -1,7 +1,7 @@
 package pl.umk.mat.git2befit.training.service.factory;
 
-import pl.umk.mat.git2befit.training.model.training.*;
-import pl.umk.mat.git2befit.training.repository.ExerciseRepository;
+import pl.umk.mat.git2befit.model.workout.training.*;
+import pl.umk.mat.git2befit.repository.workout.ExerciseRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -45,8 +45,17 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
     }
 
     @Override
-    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
-
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) throws NotValidTrainingException {
+        List<String> bodyPartsListCopy = new ArrayList<>(bodyPartsList);
+        ArrayList<String> bodyParts = new ArrayList<>();
+        for (Training trainingDay : trainingPlan.getPlanList()) {
+            trainingDay.getExercisesExecutions()
+                    .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName()));
+            bodyPartsListCopy.removeAll(bodyParts);
+            if (bodyPartsListCopy.size() != 0) {
+                throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsListCopy));
+            }
+        }
     }
 
     private List<Training> assignExercisesToBodyPart(List<Exercise> exercisesWithEquipment) {
@@ -84,18 +93,20 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
-                Exercise exercise;
-                if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
-                    exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
-                else
-                    exercise = exercisesWithEquipmentFilteredByBodyPart.get(
-                            i % exercisesWithEquipmentFilteredByBodyPart.size()
-                    );
+                if (exercisesWithEquipmentFilteredByBodyPart.size() != 0) {
+                    Exercise exercise;
+                    if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
+                        exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
+                    else
+                        exercise = exercisesWithEquipmentFilteredByBodyPart.get(
+                                i % exercisesWithEquipmentFilteredByBodyPart.size()
+                        );
 
-                exerciseExecutionList.add(getExactExerciseExecution(
-                        exercise,
-                        this.trainingForm
-                ));
+                    exerciseExecutionList.add(getExactExerciseExecution(
+                            exercise,
+                            this.trainingForm
+                    ));
+                }
             }
             exerciseExecutionMap.put(bodyPart, exerciseExecutionList);
         }

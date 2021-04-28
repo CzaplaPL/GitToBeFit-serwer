@@ -1,7 +1,8 @@
-package pl.umk.mat.git2befit.training.validation;
+package pl.umk.mat.git2befit.validation;
 
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.training.model.training.TrainingForm;
+import pl.umk.mat.git2befit.exceptions.EquipmentCountException;
+import pl.umk.mat.git2befit.model.workout.training.TrainingForm;
 
 import java.util.List;
 
@@ -13,18 +14,31 @@ public class TrainingFormValidationService {
 
     private TrainingFormValidationService(){}
 
-    public static void  validate(TrainingForm trainingForm) throws IllegalArgumentException{
-        validateBodyParts(trainingForm.getBodyParts());
+    public static void  validate(TrainingForm trainingForm) throws IllegalArgumentException, EquipmentCountException {
+        validateEquipmentSize(trainingForm.getEquipmentIDs());
+        validateBodyParts(trainingForm);
         validateTrainingTypes(trainingForm.getTrainingType());
         validateScheduleTypes(trainingForm.getScheduleType());
         validateDuration(trainingForm.getDuration());
         validateDaysCount(trainingForm.getDaysCount());
     }
 
-    private static void validateBodyParts(List<String> bodyParts) throws IllegalArgumentException{
-        for (String bodyPart: bodyParts){
+    private static void validateEquipmentSize(List<Long> equipmentIDs) throws EquipmentCountException {
+        if(equipmentIDs.size() == 0){
+            throw new EquipmentCountException("Must be at least one equipment");
+        }
+    }
+
+    private static void validateBodyParts(TrainingForm trainingForm) throws IllegalArgumentException{
+        for (String bodyPart: trainingForm.getBodyParts()){
             if(!bodyPartsList.contains(bodyPart))
                 throw new IllegalArgumentException("Body part: " + bodyPart + " is unknown");
+        }
+
+        if(trainingForm.getTrainingType().equals("SPLIT")){
+            if(trainingForm.getBodyParts().size() == 0){
+                throw new IllegalArgumentException("0 body parts");
+            }
         }
     }
 

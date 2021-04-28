@@ -24,7 +24,7 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
                   SELECT ttoe.exercise_id
                   FROM training_types_of_exercises ttoe
                   INNER JOIN training_types tt ON tt.id = ttoe.training_type_id
-                  WHERE tt.name = 'SPLIT'
+                  WHERE tt.name = :name
                 );
             """)
     List<Exercise> getAllWithNoEquipmentForTrainingTypeName(String name);

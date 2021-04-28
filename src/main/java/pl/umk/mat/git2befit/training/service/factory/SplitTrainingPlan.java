@@ -25,12 +25,6 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
     }
 
     @Override
-    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
-        //example
-        SplitValidator.validateTraining(List.of());
-    }
-
-    @Override
     public TrainingPlan create(TrainingForm trainingForm) {
         initialize(trainingForm);
 
@@ -42,6 +36,12 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
                 this.localTrainingForm,
                 normalize(trainingList)
         );
+    }
+
+    @Override
+    public void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) {
+        SplitValidator splitValidator = new SplitValidator();
+        splitValidator.validateTraining(trainingPlan, trainingForm);
     }
 
     private void initialize(TrainingForm trainingForm) {
@@ -61,7 +61,7 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
         var exerciseExecutionList = new ArrayList<ExerciseExecution>();
         var exercisesForBodyPart = new HashMap<String, List<ExerciseExecution>>();
 
-        var trainingFormBodyParts = localTrainingForm.getBodyParts();
+        var trainingFormBodyParts = trainingForm.getBodyParts();
 
         for (String bodyPart : trainingFormBodyParts) {
 
@@ -156,7 +156,7 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
         return map;
     }
 
-    private List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
+    public List<Training> normalize(List<Map<String, List<ExerciseExecution>>> list) {
         var random = new Random();
         int maxIndex, minIndex, min, max;
 
