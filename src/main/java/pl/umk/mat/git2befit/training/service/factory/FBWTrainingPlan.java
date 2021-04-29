@@ -83,7 +83,7 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
         return trainingList;
     }
 
-    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment/*, List<Exercise> exercisesWithoutEquipment*/) {
+    private Map<String, List<ExerciseExecution>> getBodyPartExercisesForDays(List<Exercise> exercisesWithEquipment) {
         Map<String, List<ExerciseExecution>> exerciseExecutionMap = new HashMap<>();
 
         for (String bodyPart : bodyPartsList) {
@@ -94,7 +94,7 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
             Collections.shuffle(exercisesWithEquipmentFilteredByBodyPart);
 
             for (int i = 0; i < localTrainingForm.getDaysCount(); i++) {
-                if (exercisesWithEquipmentFilteredByBodyPart.size() != 0) {
+                if(exercisesWithEquipmentFilteredByBodyPart.size() != 0) {
                     Exercise exercise;
                     if (isEnough(exercisesWithEquipmentFilteredByBodyPart))
                         exercise = exercisesWithEquipmentFilteredByBodyPart.remove(i);
