@@ -19,7 +19,6 @@ public class Training implements Serializable {
     @ElementCollection
     @CollectionTable(name = "exercises_executions")
     private List<ExerciseExecution> exercisesExecutions = new ArrayList<>();
-    private int dayOfTraining;
 
     public Training() {}
 
@@ -31,7 +30,6 @@ public class Training implements Serializable {
         this.breakTime = breakTime;
         this.circuitsCount = circuitsCount;
         this.exercisesExecutions = exercisesExecutions;
-        dayOfTraining = 0;
     }
 
     public void addExerciseExecution(List<ExerciseExecution> exerciseExecutions){
@@ -69,13 +67,5 @@ public class Training implements Serializable {
     public void setCircuitsCount(long circuitsCount) {
 
         this.circuitsCount = circuitsCount;
-    }
-
-    public int getDayOfTraining() {
-        return dayOfTraining;
-    }
-
-    public void setDayOfTraining(int dayOfTraining) {
-        this.dayOfTraining = dayOfTraining;
     }
 }
