@@ -42,7 +42,7 @@ public class TrainingFormValidationService {
 
     private static boolean checkIfBodyPartsListCannotBeEmpty(TrainingForm trainingForm) {
         return trainingForm.getBodyParts().isEmpty() &&
-                (trainingForm.getTrainingType().equalsIgnoreCase("SPLIT") &&
+                (trainingForm.getTrainingType().equalsIgnoreCase("SPLIT") ||
                         trainingForm.getTrainingType().equalsIgnoreCase("FITNESS"));
     }
 
