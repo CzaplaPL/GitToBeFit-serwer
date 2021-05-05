@@ -16,7 +16,6 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
 
     private List<Exercise> exercisesWithEquipment = new ArrayList<>();
     private TrainingForm trainingForm;
-    private TrainingForm localTrainingForm;
 
     private final ExerciseRepository exerciseRepository;
 
@@ -33,7 +32,7 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
 
         return new TrainingPlan(
                 TRAINING_TYPE,
-                this.localTrainingForm,
+                this.trainingForm,
                 normalize(trainingList)
         );
     }
@@ -46,15 +45,9 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
 
     private void initialize(TrainingForm trainingForm) {
         this.trainingForm = trainingForm;
-        this.localTrainingForm = trainingForm;
 
         List<Exercise> exerciseListFilteredByTrainingType = exerciseRepository.getAllByTrainingTypes_Name(TRAINING_TYPE);
         exercisesWithEquipment = filterAllByAvailableEquipment(exerciseListFilteredByTrainingType, trainingForm.getEquipmentIDs());
-
-        if (trainingForm.getDaysCount() > trainingForm.getBodyParts().size()) {
-            var bodyPartsSize = trainingForm.getBodyParts().size();
-            localTrainingForm.setDaysCount(bodyPartsSize);
-        }
     }
 
     private Map<String, List<ExerciseExecution>> assignExercisesToBodyPart() {
@@ -112,10 +105,10 @@ class SplitTrainingPlan implements TrainingPlanGenerator {
     private List<Map<String, List<ExerciseExecution>>> divideTrainingIntoDays(Map<String, List<ExerciseExecution>> exercisesForBodyPart) {
         List<Map<String, List<ExerciseExecution>>> trainingList = new ArrayList<>();
 
-        if (localTrainingForm.getBodyParts().size() == 0)
+        if (trainingForm.getBodyParts().size() == 0)
             return Collections.emptyList();
 
-        switch (localTrainingForm.getDaysCount()) {
+        switch (trainingForm.getDaysCount()) {
             case 1 -> {
                 trainingList.add(getMapOfBodyPartsExercisesForDay(exercisesForBodyPart, "THIGHS", "TRICEPS", "SHOULDERS0", "CALVES",
                         "CHEST", "BICEPS", "SIXPACK", "BACK"));

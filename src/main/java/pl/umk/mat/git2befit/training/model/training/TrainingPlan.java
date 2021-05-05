@@ -21,6 +21,7 @@ public class TrainingPlan implements Serializable {
     @ManyToOne
     private User user;
     private String createdAt;
+    private int dayOfTraining;
 
     public TrainingPlan() {}
 
@@ -28,12 +29,14 @@ public class TrainingPlan implements Serializable {
         this.trainingForm = trainingForm;
         this.planList = planList;
         this.createdAt = date;
+        this.dayOfTraining = 0;
     }
 
     public TrainingPlan(String title, TrainingForm trainingForm, List<Training> planList) {
         this.title = title;
         this.trainingForm = trainingForm;
         this.planList = planList;
+        this.dayOfTraining = 0;
     }
 
     public long getId() {
@@ -83,5 +86,13 @@ public class TrainingPlan implements Serializable {
 
     public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public int getDayOfTraining() {
+        return dayOfTraining;
+    }
+
+    public void setDayOfTraining(int dayOfTraining) {
+        this.dayOfTraining = dayOfTraining;
     }
 }

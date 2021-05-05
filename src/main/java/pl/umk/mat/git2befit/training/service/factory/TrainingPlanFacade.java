@@ -6,7 +6,7 @@ import pl.umk.mat.git2befit.training.exceptions.EquipmentCountException;
 import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
 import pl.umk.mat.git2befit.training.model.training.TrainingForm;
 import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
-import pl.umk.mat.git2befit.validation.TrainingFormValidationService;
+import pl.umk.mat.git2befit.training.validation.TrainingFormValidationService;
 
 @Component
 public class TrainingPlanFacade {
