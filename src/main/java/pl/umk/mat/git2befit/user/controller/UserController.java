@@ -1,5 +1,7 @@
 package pl.umk.mat.git2befit.user.controller;
 
+import org.apache.commons.mail.EmailException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.umk.mat.git2befit.user.model.management.APIAuthModel;
@@ -41,7 +43,11 @@ public class UserController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signUp(@RequestBody User user) {
-        return userService.registerUserFromApp(user);
+        try {
+            return userService.registerUserFromApp(user);
+        } catch (EmailException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+        }
     }
 
     @GetMapping("/{id}")
@@ -61,7 +67,11 @@ public class UserController {
 
     @PutMapping("/{id}/email-update")
     public ResponseEntity<?> changeEmail(@PathVariable long id, @RequestBody User form) {
-        return userService.updateEmail(id, form);
+        try {
+            return userService.updateEmail(id, form);
+        } catch (EmailException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+        }
     }
 
     @GetMapping("/activation/{token}")
@@ -71,7 +81,11 @@ public class UserController {
 
     @PostMapping("/remind-password")
     public ResponseEntity<?> remindPassword(@RequestParam String email) {
-        return userService.sendNewGeneratedPasswordByEmail(email);
+        try {
+            return userService.sendNewGeneratedPasswordByEmail(email);
+        } catch (EmailException e) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+        }
     }
 
     @DeleteMapping("/{id}")

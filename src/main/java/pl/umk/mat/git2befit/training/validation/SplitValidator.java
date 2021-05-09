@@ -19,7 +19,7 @@ public class SplitValidator {
 
     public void validateTraining(TrainingPlan trainingPlan, TrainingForm trainingForm) {
         validateDaysCount(trainingForm);
-        validateAmountOfExercises(prepare(trainingPlan));
+        validateAmountOfExercises(prepare(trainingPlan), trainingForm);
     }
 
     private List<Map<String, List<ExerciseExecution>>> prepare(TrainingPlan plan) {
@@ -41,15 +41,20 @@ public class SplitValidator {
         return listToReturn;
     }
 
-    private void validateAmountOfExercises(List<Map<String, List<ExerciseExecution>>> trainingList) {
+    private void validateAmountOfExercises(List<Map<String, List<ExerciseExecution>>> trainingList, TrainingForm trainingForm) {
         Map<String, List<ExerciseExecution>> map = new HashMap<>();
         trainingList.forEach(map::putAll);
         List<String> errors = new ArrayList<>();
 
-        for (String bodyPart : map.keySet()){
-            if(map.get(bodyPart).size() != getAmountOfExercisesForBodyPart(bodyPart)){
+        for (String bodyPart : trainingForm.getBodyParts()){
+            if(map.containsKey(bodyPart)) {
+                if (map.get(bodyPart).size() != getAmountOfExercisesForBodyPart(bodyPart)) {
+                    errors.add(bodyPart);
+                }
+            }else {
                 errors.add(bodyPart);
             }
+
         }
         if (!errors.isEmpty()){
             throw new NotValidTrainingException("not enough exercises for: %s".formatted(errors.toString()));
