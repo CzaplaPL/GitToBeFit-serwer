@@ -14,18 +14,21 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import pl.umk.mat.git2befit.user.exception.EmailValidationException;
-import pl.umk.mat.git2befit.user.exception.WeakPasswordException;
-import pl.umk.mat.git2befit.user.service.messaging.email.EmailMessageFacade;
-import pl.umk.mat.git2befit.user.service.messaging.email.MessageGenerator;
-import pl.umk.mat.git2befit.user.model.management.LoginForm;
-import pl.umk.mat.git2befit.user.model.management.PasswordUpdateForm;
-import pl.umk.mat.git2befit.user.model.entity.User;
-import pl.umk.mat.git2befit.user.repository.UserRepository;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
 import pl.umk.mat.git2befit.config.security.service.JWTGenerator;
 import pl.umk.mat.git2befit.config.security.service.PasswordGenerator;
+import pl.umk.mat.git2befit.user.exception.EmailValidationException;
+import pl.umk.mat.git2befit.user.exception.WeakPasswordException;
+import pl.umk.mat.git2befit.user.model.entity.User;
+import pl.umk.mat.git2befit.user.model.management.LoginForm;
+import pl.umk.mat.git2befit.user.model.management.PasswordUpdateForm;
+import pl.umk.mat.git2befit.user.repository.UserRepository;
+import pl.umk.mat.git2befit.user.service.messaging.email.EmailMessageFacade;
+import pl.umk.mat.git2befit.user.service.messaging.email.MessageGenerator;
 import pl.umk.mat.git2befit.user.validation.UserValidationService;
 
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -38,12 +41,18 @@ import static pl.umk.mat.git2befit.config.security.constraints.SecurityConstrain
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PlatformTransactionManager transactionManager;
     private final Logger log = LoggerFactory.getLogger(UserService.class);
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(
+            UserRepository userRepository,
+            PasswordEncoder passwordEncoder,
+            PlatformTransactionManager transactionManager
+    ) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.transactionManager = transactionManager;
     }
 
     public ResponseEntity<?> updatePassword(long id, PasswordUpdateForm passwordUpdateForm) {
@@ -92,6 +101,7 @@ public class UserService {
             if (userByEmail.isEmpty()) {
                 User tmp = userRepository.save(user);
                 String token = JWTGenerator.generateVerificationToken(tmp.getId());
+                // todo cronik i usuwanie nieuzywanych userow
                 sendEmailWithVerificationToken(tmp.getEmail(), token);
                 return ResponseEntity.created(URI.create("/user/" + tmp.getId())).build();
             }
@@ -200,6 +210,7 @@ public class UserService {
 
     public ResponseEntity<?> activateUser(String token) {
         try {
+            //todo zmienic na token na bazie emaila oraz nowy klucz do hashowania
             String id = JWT.require(Algorithm.HMAC256(SECRET.getBytes()))
                     .build()
                     .verify(token)
