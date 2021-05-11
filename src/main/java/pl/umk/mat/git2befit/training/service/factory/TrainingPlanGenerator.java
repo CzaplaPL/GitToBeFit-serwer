@@ -1,8 +1,10 @@
 package pl.umk.mat.git2befit.training.service.factory;
 
-import pl.umk.mat.git2befit.training.exceptions.NotValidTrainingException;
-import pl.umk.mat.git2befit.training.model.training.*;
 import pl.umk.mat.git2befit.training.model.equipment.Equipment;
+import pl.umk.mat.git2befit.training.model.training.Exercise;
+import pl.umk.mat.git2befit.training.model.training.ExerciseExecution;
+import pl.umk.mat.git2befit.training.model.training.TrainingForm;
+import pl.umk.mat.git2befit.training.model.training.TrainingPlan;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -17,11 +19,11 @@ public interface TrainingPlanGenerator {
 
     TrainingPlan create(TrainingForm trainingForm);
 
-    void validate(TrainingPlan trainingPlan, TrainingForm trainingForm) throws NotValidTrainingException;
+    void validate(TrainingPlan trainingPlan, TrainingForm trainingForm);
 
-    default List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises, List<Long> availableEquipments){
+    default List<Exercise> filterAllByAvailableEquipment(List<Exercise> exercises, List<Long> availableEquipments) {
         return exercises.stream().filter(exercise -> {
-            for(Equipment equipment: exercise.getEquipmentsNeeded()) {
+            for (Equipment equipment : exercise.getEquipmentsNeeded()) {
                 if (!availableEquipments.contains(equipment.getId())) {
                     return false;
                 }
