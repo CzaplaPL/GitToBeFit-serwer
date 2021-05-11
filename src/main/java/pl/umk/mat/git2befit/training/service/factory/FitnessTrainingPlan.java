@@ -100,12 +100,28 @@ class FitnessTrainingPlan implements TrainingPlanGenerator {
             if (count != exercisesExecutions.size())
                 throw new NotValidTrainingException("duplicated exercises");
 
-            for (ExerciseExecution exercisesExecution : exercisesExecutions) {
-                String bodyPartOfExercise = exercisesExecution.getExercise().getBodyPart().getName();
-                if (!trainingForm.getBodyParts().contains(bodyPartOfExercise))
-                    throw new NotValidTrainingException("wrong exercise");
+            var bodyParts = mapToSpecifiedBodyParts(trainingForm.getBodyParts());
+            boolean anyWrong = exercisesExecutions.stream()
+                    .map(exerciseExecution -> exerciseExecution.getExercise().getBodyPart().getName())
+                    .allMatch(bodyParts::contains);
+            if (!anyWrong) {
+                throw new NotValidTrainingException("wrong exercise");
             }
         }
+    }
+
+    private List<String> mapToSpecifiedBodyParts(List<String> bodyParts) {
+        ArrayList<String> bodyPartsExtended = new ArrayList<>();
+        for (String bodyPart : bodyParts) {
+            if (bodyPart.equalsIgnoreCase("ARMS")) {
+                bodyPartsExtended.addAll(SPECIFIED_ARMS);
+            } else if (bodyPart.equalsIgnoreCase("LEGS")) {
+                bodyPartsExtended.addAll(SPECIFIED_LEGS);
+            } else {
+                bodyPartsExtended.add(bodyPart);
+            }
+        }
+        return bodyPartsExtended;
     }
 
     private List<Exercise> getExercisesForSpecifiedBodyPart(List<Exercise> exercises, String bodyPartName) {

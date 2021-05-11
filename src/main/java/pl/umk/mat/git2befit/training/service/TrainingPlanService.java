@@ -49,6 +49,7 @@ public class TrainingPlanService {
         try {
             LocalDateTime.parse(dateAsString);
             trainingPlan = manufacture.createTrainingPlan(trainingForm);
+
         } catch (DateTimeParseException exception) {
             return ResponseEntity.badRequest().header("Cause", "wrong date format").build();
         } catch (IllegalArgumentException e) {

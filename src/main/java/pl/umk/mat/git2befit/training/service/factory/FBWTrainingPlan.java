@@ -54,7 +54,7 @@ class FBWTrainingPlan implements TrainingPlanGenerator {
                     .forEach(exerciseExecution -> bodyParts.add(exerciseExecution.getExercise().getBodyPart().getName()));
             bodyPartsListCopy.removeAll(bodyParts);
             if (bodyPartsListCopy.size() != 0) {
-                throw new NotValidTrainingException("not enough exercises for %s".formatted(bodyPartsListCopy));
+                throw new NotValidTrainingException("not enough exercises for: %s".formatted(bodyPartsListCopy));
             }
         }
     }

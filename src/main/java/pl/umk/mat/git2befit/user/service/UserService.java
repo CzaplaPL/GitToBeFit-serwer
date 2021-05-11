@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.umk.mat.git2befit.user.exception.EmailValidationException;
 import pl.umk.mat.git2befit.user.exception.WeakPasswordException;
 import pl.umk.mat.git2befit.user.service.messaging.email.EmailMessageFacade;
@@ -63,6 +64,7 @@ public class UserService {
             user.setPassword(passwordEncoder.encode(passwordUpdateForm.getNewPassword()));
 
             userRepository.save(user);
+            //catch SQLexception
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad password").build();
@@ -83,12 +85,14 @@ public class UserService {
         return email.equals(email2);
     }
 
-    public ResponseEntity<?> registerUserFromApp(User user) {
+    @Transactional(rollbackFor = EmailException.class)
+    public ResponseEntity<?> registerUserFromApp(User user) throws EmailException {
         try {
             UserValidationService.validateUser(user);
             user.setPassword(passwordEncoder.encode(user.getPassword()));
             user.setEnable(false);
             Optional<User> userByEmail = userRepository.findByEmail(user.getEmail());
+
             if (userByEmail.isEmpty()) {
                 User tmp = userRepository.save(user);
                 String token = JWTGenerator.generateVerificationToken(tmp.getId());
@@ -101,11 +105,11 @@ public class UserService {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "bad email").build();
         } catch (WeakPasswordException e) {
             return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "weak password").build();
-        } catch (EmailException e) {
-            log.error("Error while sending verification email", e);
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+        } catch (EmailException emailException) {
+            log.error("Error while sending verification email", emailException);
+            throw emailException;
         } catch (Exception e) {
-            log.error("Unexpected error occured in registerUserFromApp method", e);
+            log.error("Unexpected error occurred in registerUserFromApp method", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).header("Cause", "unexpected error").build();
         }
     }
@@ -122,7 +126,8 @@ public class UserService {
                 .orElseGet(() -> ResponseEntity.notFound().header("Cause", "user not found").build());
     }
 
-    public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) {
+    @Transactional(rollbackFor = EmailException.class)
+    public ResponseEntity<?> sendNewGeneratedPasswordByEmail(String email) throws EmailException {
         Optional<User> dbUser = userRepository.findByEmail(email);
         if (dbUser.isEmpty()) {
             return ResponseEntity.notFound().header("Cause", "user not found").build();
@@ -132,13 +137,13 @@ public class UserService {
             User user = dbUser.get();
             user.setPassword(passwordEncoder.encode(newPassword));
             try {
+                userRepository.save(user);
                 EmailMessageFacade emailMessage = new EmailMessageFacade("Przypomnienie hasła", message, email);
                 emailMessage.sendEmail();
-                userRepository.save(user);
                 return ResponseEntity.ok().build();
-            } catch (EmailException e) {
-                log.error("Error while sending verification email", e);
-                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+            } catch (EmailException emailException) {
+                log.error("Error while sending verification email", emailException);
+                throw emailException;
             } catch (DataIntegrityViolationException e) {
                 return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "save error").build();
             }
@@ -160,7 +165,8 @@ public class UserService {
         }
     }
 
-    public ResponseEntity<?> updateEmail(long id, User form) {
+    @Transactional(rollbackFor = EmailException.class)
+    public ResponseEntity<?> updateEmail(long id, User form) throws EmailException {
         Optional<User> dbUser = userRepository.findById(id);
         if (dbUser.isPresent()) {
             User user = dbUser.get();
@@ -175,9 +181,9 @@ public class UserService {
                     String token = JWTGenerator.generateVerificationToken(user.getId());
                     sendEmailWithVerificationToken(form.getEmail(), token);
                     return ResponseEntity.ok().build();
-                } catch (EmailException e) {
-                    log.error("Error while sending verification email", e);
-                    return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).header("Cause", "email sending").build();
+                } catch (EmailException emailException) {
+                    log.error("Error while sending verification email", emailException);
+                    throw emailException;
                 } catch (DataIntegrityViolationException e) {
                     return ResponseEntity.status(HttpStatus.CONFLICT).header("Cause", "duplicated email").build();
                 } catch (EmailValidationException e) {
