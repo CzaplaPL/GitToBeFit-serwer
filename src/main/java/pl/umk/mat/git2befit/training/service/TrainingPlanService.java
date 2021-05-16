@@ -189,4 +189,8 @@ public class TrainingPlanService {
     private boolean canBeDeletedByUser(TrainingPlan trainingPlan, User user) {
         return trainingPlan.getUser().getId().equals(user.getId());
     }
+
+    public ResponseEntity<?> getAllExercisesForEquipmentIdsList(List<Long> equipmentIds) {
+        return ResponseEntity.ok(exerciseRepository.getAllByEquipmentIds(equipmentIds));
+    }
 }

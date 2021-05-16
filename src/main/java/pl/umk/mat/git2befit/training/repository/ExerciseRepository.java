@@ -28,4 +28,16 @@ public interface ExerciseRepository extends JpaRepository<Exercise, Long> {
                 );
             """)
     List<Exercise> getAllWithNoEquipmentForTrainingTypeName(String name);
+
+    @Query(nativeQuery = true, value =
+            """
+                SELECT e.*  FROM exercises e
+                WHERE e.id in (
+                  SELECT a.exercise_id
+                  FROM exercise_equipment a INNER JOIN equipment b
+                  ON a.equipment_id = b.id
+                  WHERE b.id IN :equipmentIds
+                );
+            """)
+    List<Exercise> getAllByEquipmentIds(List<Long> equipmentIds);
 }
