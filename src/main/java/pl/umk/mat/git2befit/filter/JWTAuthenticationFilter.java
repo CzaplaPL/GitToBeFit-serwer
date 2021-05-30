@@ -6,8 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import pl.umk.mat.git2befit.model.user.entity.User;
-import pl.umk.mat.git2befit.security.JWTGenerator;
+import pl.umk.mat.git2befit.user.model.entity.User;
+import pl.umk.mat.git2befit.config.security.service.JWTGenerator;
 
 import javax.servlet.FilterChain;
 import javax.servlet.http.HttpServletRequest;
@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
 
-import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.AUTHORIZATION;
-import static pl.umk.mat.git2befit.security.constraints.SecurityConstraints.TOKEN_PREFIX;
+import static pl.umk.mat.git2befit.config.security.constraints.SecurityConstraints.AUTHORIZATION;
+import static pl.umk.mat.git2befit.config.security.constraints.SecurityConstraints.TOKEN_PREFIX;
 
 public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
